@@ -5,25 +5,44 @@ import { ChatInput } from "./ChatInput";
 
 export function Component() {
   const { currentModel } = useModel();
-  const { messages, streamingContent, isGenerating, sendMessage, resetSession, cancelGeneration } = useChatSession();
+  const { messages, streamingContent, isGenerating, sendMessage, resetSession, cancelGeneration } =
+    useChatSession();
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)]">
-      <div className="flex items-center justify-between mb-4">
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-[#F0F4F9]">
+      {/* Subtle header */}
+      <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">AI Chat</h2>
-          <p className="text-sm text-gray-500">Multi-turn conversation — fully on-device via WebGPU</p>
+          <h2 className="text-xl font-bold text-[#1F1F1F]">Chat</h2>
+          {currentModel && (
+            <p className="text-xs text-[#444746] mt-0.5">
+              {currentModel.name} · on-device via WebGPU
+            </p>
+          )}
         </div>
         {messages.length > 0 && (
-          <button onClick={resetSession} className="text-sm text-gray-500 hover:text-gray-700 px-3 py-1.5 border border-gray-200 rounded-lg">
-            New conversation
+          <button
+            onClick={resetSession}
+            className="text-sm text-[#0B57D0] hover:text-[#0842A0] px-3 py-1.5 rounded-xl hover:bg-[#D3E3FD]/50 transition-colors font-medium"
+          >
+            New chat
           </button>
         )}
       </div>
 
-      <div className="flex-1 flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <MessageList messages={messages} streamingContent={streamingContent} isGenerating={isGenerating} />
-        <ChatInput onSend={sendMessage} onCancel={cancelGeneration} disabled={!currentModel} isGenerating={isGenerating} />
+      {/* Chat area */}
+      <div className="flex-1 flex flex-col mx-4 mb-4 bg-white rounded-2xl overflow-hidden shadow-sm">
+        <MessageList
+          messages={messages}
+          streamingContent={streamingContent}
+          isGenerating={isGenerating}
+        />
+        <ChatInput
+          onSend={sendMessage}
+          onCancel={cancelGeneration}
+          disabled={!currentModel}
+          isGenerating={isGenerating}
+        />
       </div>
     </div>
   );

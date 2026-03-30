@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ModelInfo } from "../../types";
 import { useDownload } from "../../contexts/DownloadContext";
 import { useModel } from "../../contexts/ModelContext";
@@ -12,6 +13,7 @@ export function ModelCard({ model }: Props) {
   const { getModelStatus, downloadProgress, startDownload, removeModel, getModelBlob } =
     useDownload();
   const { currentModel, isLoading, loadModel } = useModel();
+  const [expanded, setExpanded] = useState(false);
 
   const status = getModelStatus(model.id);
   const progress = downloadProgress[model.id];
@@ -24,61 +26,133 @@ export function ModelCard({ model }: Props) {
 
   return (
     <div
-      className={`rounded-xl border p-5 bg-white shadow-sm transition-all ${
-        isActive ? "border-primary ring-2 ring-primary/20" : "border-gray-200"
+      className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all ${
+        isActive ? "ring-2 ring-[#3174F1]/40" : ""
       }`}
     >
-      <div className="flex items-start justify-between mb-3">
-        <div>
-          <h3 className="font-semibold text-gray-900">{model.name}</h3>
-          <p className="text-sm text-gray-500 mt-0.5">{model.description}</p>
+      {/* Card header — always visible */}
+      <button
+        type="button"
+        className="w-full text-left px-5 py-4"
+        onClick={() => setExpanded((v) => !v)}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex-1 min-w-0 mr-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold text-[#1F1F1F] text-sm">{model.name}</span>
+              {isActive && (
+                <span className="text-[10px] font-semibold bg-[#D3E3FD] text-[#0842A0] px-2 py-0.5 rounded-full">
+                  Active
+                </span>
+              )}
+              {status === "ready" && !isActive && (
+                <span className="text-[10px] font-semibold bg-[#C4EED0] text-[#146C2E] px-2 py-0.5 rounded-full">
+                  Downloaded
+                </span>
+              )}
+            </div>
+            <div className="flex gap-2 mt-1.5 flex-wrap">
+              <span className="text-[11px] text-[#444746] bg-[#F0F4F9] px-2 py-0.5 rounded">
+                {model.parameterCount}
+              </span>
+              <span className="text-[11px] text-[#444746] bg-[#F0F4F9] px-2 py-0.5 rounded">
+                {formatSize(model.sizeBytes)}
+              </span>
+              <span className="text-[11px] text-[#444746] bg-[#F0F4F9] px-2 py-0.5 rounded">
+                {model.quantization}
+              </span>
+            </div>
+          </div>
+
+          {/* Status icon */}
+          <div className="flex-shrink-0">
+            {status === "not_downloaded" && (
+              <div className="w-9 h-9 rounded-full border-2 border-[#C4C7C5] flex items-center justify-center text-[#747775]">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                </svg>
+              </div>
+            )}
+            {status === "downloading" && (
+              <div className="w-9 h-9 rounded-full border-2 border-[#3174F1] flex items-center justify-center text-[#3174F1] animate-spin">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                </svg>
+              </div>
+            )}
+            {status === "ready" && (
+              <div className="w-9 h-9 rounded-full bg-[#C4EED0] flex items-center justify-center text-[#146C2E]">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                </svg>
+              </div>
+            )}
+          </div>
         </div>
-        {isActive && (
-          <span className="text-xs font-medium bg-secondary/10 text-secondary px-2 py-0.5 rounded-full">
-            Active
-          </span>
+
+        {/* Download progress inline */}
+        {status === "downloading" && progress && (
+          <div className="mt-3">
+            <DownloadProgress progress={progress} />
+          </div>
         )}
-      </div>
+      </button>
 
-      <div className="flex gap-3 text-xs text-gray-500 mb-4">
-        <span className="bg-gray-100 px-2 py-0.5 rounded">{model.parameterCount}</span>
-        <span className="bg-gray-100 px-2 py-0.5 rounded">{formatSize(model.sizeBytes)}</span>
-        <span className="bg-gray-100 px-2 py-0.5 rounded">{model.quantization}</span>
-        {model.capabilities.map((cap) => (
-          <span key={cap} className="bg-blue-50 text-primary px-2 py-0.5 rounded">
-            {cap}
-          </span>
-        ))}
-      </div>
+      {/* Expandable section */}
+      {expanded && (
+        <div className="px-5 pb-5 border-t border-[#E9EEF6]">
+          <p className="text-sm text-[#444746] mt-3 mb-3 leading-relaxed">
+            {model.description}
+          </p>
 
-      {status === "not_downloaded" && (
-        <button
-          onClick={() => startDownload(model)}
-          className="w-full py-2 px-4 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors"
-        >
-          Download ({formatSize(model.sizeBytes)})
-        </button>
-      )}
+          {model.capabilities.length > 0 && (
+            <div className="flex gap-2 flex-wrap mb-4">
+              {model.capabilities.map((cap) => (
+                <span
+                  key={cap}
+                  className="text-[11px] bg-[#D3E3FD] text-[#0842A0] px-2 py-0.5 rounded-full"
+                >
+                  {cap}
+                </span>
+              ))}
+            </div>
+          )}
 
-      {status === "downloading" && progress && (
-        <DownloadProgress progress={progress} />
-      )}
+          {status === "not_downloaded" && (
+            <button
+              onClick={() => startDownload(model)}
+              className="w-full py-2.5 px-4 bg-[#0B57D0] text-white rounded-xl text-sm font-semibold hover:bg-[#0842A0] transition-colors"
+            >
+              Download ({formatSize(model.sizeBytes)})
+            </button>
+          )}
 
-      {status === "ready" && !isActive && (
-        <div className="flex gap-2">
-          <button
-            onClick={handleLoad}
-            disabled={isLoading}
-            className="flex-1 py-2 px-4 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark transition-colors disabled:opacity-50"
-          >
-            {isLoading ? "Loading..." : "Load Model"}
-          </button>
-          <button
-            onClick={() => removeModel(model)}
-            className="py-2 px-3 border border-gray-200 text-gray-500 rounded-lg text-sm hover:bg-gray-50 transition-colors"
-          >
-            Delete
-          </button>
+          {status === "ready" && !isActive && (
+            <div className="flex gap-2">
+              <button
+                onClick={handleLoad}
+                disabled={isLoading}
+                className="flex-1 py-2.5 px-4 bg-[#0B57D0] text-white rounded-xl text-sm font-semibold hover:bg-[#0842A0] transition-colors disabled:opacity-50"
+              >
+                {isLoading ? "Loading…" : "Load Model"}
+              </button>
+              <button
+                onClick={() => removeModel(model)}
+                className="py-2.5 px-4 border border-[#C4C7C5] text-[#444746] rounded-xl text-sm hover:bg-[#F0F4F9] transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          )}
+
+          {status === "ready" && isActive && (
+            <div className="flex items-center gap-2 text-sm text-[#146C2E] font-medium">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+              </svg>
+              Model is loaded and ready
+            </div>
+          )}
         </div>
       )}
     </div>

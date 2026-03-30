@@ -13,14 +13,17 @@ export function DownloadProgress({ progress }: Props) {
 
   return (
     <div className="w-full">
-      <div className="flex justify-between text-xs text-gray-500 mb-1">
+      <div className="flex justify-between text-xs text-[#444746] mb-1.5">
         <span>{formatSize(progress.bytesDownloaded)}</span>
-        <span>{percent}%</span>
+        <span className="font-semibold text-[#0B57D0]">{percent}%</span>
       </div>
-      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="w-full h-1.5 bg-[#E9EEF6] rounded-full overflow-hidden">
         <div
-          className="h-full bg-primary rounded-full transition-all duration-300"
-          style={{ width: `${percent}%` }}
+          className="h-full rounded-full transition-all duration-300"
+          style={{
+            width: `${percent}%`,
+            background: "linear-gradient(90deg, #669DF6 0%, #3174F1 100%)",
+          }}
         />
       </div>
     </div>

@@ -18,23 +18,55 @@ export function ChatInput({ onSend, onCancel, disabled, isGenerating }: Props) {
     setInput("");
   };
 
+  const canSend = !disabled && !!input.trim() && !isGenerating;
+
   return (
-    <form onSubmit={handleSubmit} className="border-t border-gray-200 p-4 flex gap-3">
-      <input
-        type="text"
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-end gap-2 px-4 py-3 border-t border-[#E9EEF6] bg-white"
+    >
+      <textarea
+        rows={1}
         value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder={disabled ? "Load a model first..." : "Type a message..."}
-        disabled={disabled}
-        className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary disabled:bg-gray-50 disabled:text-gray-400"
+        onChange={(e) => {
+          setInput(e.target.value);
+          // auto-grow: reset height then set to scrollHeight
+          e.target.style.height = "auto";
+          e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+        }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit(e as unknown as FormEvent);
+          }
+        }}
+        placeholder={disabled ? "Load a model first…" : "Message"}
+        disabled={disabled || isGenerating}
+        className="flex-1 resize-none bg-[#F0F4F9] text-[#1F1F1F] placeholder-[#747775] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#3174F1]/30 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
+        style={{ height: "40px" }}
       />
+
       {isGenerating ? (
-        <button type="button" onClick={onCancel} className="px-4 py-2.5 bg-danger text-white rounded-lg text-sm font-medium hover:bg-danger/90">
-          Stop
+        <button
+          type="button"
+          onClick={onCancel}
+          className="w-10 h-10 flex-shrink-0 rounded-full bg-[#D93025] text-white flex items-center justify-center hover:bg-[#B3261E] transition-colors"
+          title="Stop generating"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+            <path d="M6 6h12v12H6z" />
+          </svg>
         </button>
       ) : (
-        <button type="submit" disabled={disabled || !input.trim()} className="px-4 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark disabled:opacity-50 transition-colors">
-          Send
+        <button
+          type="submit"
+          disabled={!canSend}
+          className="w-10 h-10 flex-shrink-0 rounded-full bg-[#0B57D0] text-white flex items-center justify-center hover:bg-[#0842A0] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          title="Send message"
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+          </svg>
         </button>
       )}
     </form>
