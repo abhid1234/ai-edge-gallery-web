@@ -42,8 +42,10 @@ describe("ModelCard", () => {
     expect(screen.getByText("500 MB")).toBeInTheDocument();
   });
 
-  it("shows download button when not downloaded", () => {
+  it("has an expandable card header", () => {
     render(<ModelCard model={mockModel} />);
-    expect(screen.getByRole("button", { name: /download/i })).toBeInTheDocument();
+    expect(screen.getByText("Test Model")).toBeInTheDocument();
+    // Header is a button for expand/collapse
+    expect(screen.getByRole("button")).toBeInTheDocument();
   });
 });

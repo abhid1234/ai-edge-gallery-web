@@ -1,11 +1,92 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #1a73e8;
-  --color-primary-dark: #1557b0;
-  --color-secondary: #34a853;
-  --color-surface: #f8f9fa;
-  --color-surface-dark: #e8eaed;
-  --color-danger: #ea4335;
-  --font-sans: "Inter", system-ui, sans-serif;
+  /* Google AI Edge Gallery color system */
+  --color-primary: #0B57D0;
+  --color-primary-light: #D3E3FD;
+  --color-primary-container: #D3E3FD;
+  --color-on-primary: #FFFFFF;
+  --color-on-primary-container: #0842A0;
+
+  --color-secondary: #00639B;
+  --color-secondary-container: #C2E7FF;
+
+  --color-tertiary: #146C2E;
+  --color-tertiary-container: #C4EED0;
+
+  --color-error: #B3261E;
+  --color-error-container: #F9DEDC;
+
+  --color-surface: #FFFFFF;
+  --color-surface-container: #F0F4F9;
+  --color-surface-container-low: #F8FAFD;
+  --color-surface-container-high: #E9EEF6;
+  --color-surface-container-highest: #DDE3EA;
+  --color-on-surface: #1F1F1F;
+  --color-on-surface-variant: #444746;
+  --color-outline: #747775;
+  --color-outline-variant: #C4C7C5;
+
+  /* Task colors (Google 4-color brand rotation) */
+  --color-task-red: #DB372D;
+  --color-task-red-bg: #FFF5F5;
+  --color-task-red-gradient-start: #E25F57;
+  --color-task-green: #128937;
+  --color-task-green-bg: #F4FBF6;
+  --color-task-green-gradient-start: #41A15F;
+  --color-task-blue: #3174F1;
+  --color-task-blue-bg: #F1F6FE;
+  --color-task-blue-gradient-start: #669DF6;
+  --color-task-yellow: #CAA12A;
+  --color-task-yellow-bg: #FFFBF0;
+  --color-task-yellow-gradient-start: #FDD45D;
+
+  /* Chat bubbles */
+  --color-chat-user: #32628D;
+  --color-chat-agent: #E9EEF6;
+
+  /* UI accents */
+  --color-link: #32628D;
+  --color-success: #3D860B;
+  --color-warning: #E37400;
+  --color-warning-container: #FEF7E0;
+  --color-danger: #D93025;
+  --color-danger-container: #FCE8E6;
+  --color-new-badge: #EEDCFE;
+  --color-new-badge-text: #400B84;
+
+  /* Tab header */
+  --color-tab-selected: #3174F1;
+
+  /* Title gradient */
+  --color-title-gradient-start: #85B1F8;
+  --color-title-gradient-end: #3174F1;
+
+  /* Typography */
+  --font-sans: "Nunito", system-ui, sans-serif;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 3px;
+}
+
+/* Chat bubble shapes */
+.bubble-user {
+  border-radius: 20px 4px 20px 20px;
+}
+.bubble-agent {
+  border-radius: 4px 20px 20px 20px;
 }
