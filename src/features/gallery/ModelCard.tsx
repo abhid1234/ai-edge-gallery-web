@@ -30,11 +30,13 @@ export function ModelCard({ model }: Props) {
         isActive ? "ring-2 ring-[#3174F1]/40" : ""
       }`}
     >
-      {/* Card header — always visible */}
-      <button
-        type="button"
-        className="w-full text-left px-5 py-4"
+      {/* Card header — always visible, clickable to expand */}
+      <div
+        role="button"
+        tabIndex={0}
+        className="w-full text-left px-5 py-4 cursor-pointer hover:bg-[#F8FAFD] transition-colors"
         onClick={() => setExpanded((v) => !v)}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpanded((v) => !v); }}
       >
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0 mr-3">
@@ -64,8 +66,8 @@ export function ModelCard({ model }: Props) {
             </div>
           </div>
 
-          {/* Status icon */}
-          <div className="flex-shrink-0">
+          {/* Status icon + expand chevron */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             {status === "not_downloaded" && (
               <div className="w-9 h-9 rounded-full border-2 border-[#C4C7C5] flex items-center justify-center text-[#747775]">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -87,18 +89,25 @@ export function ModelCard({ model }: Props) {
                 </svg>
               </div>
             )}
+            <svg
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className={`w-5 h-5 text-[#747775] transition-transform ${expanded ? "rotate-180" : ""}`}
+            >
+              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
+            </svg>
           </div>
         </div>
+      </div>
 
-        {/* Download progress inline */}
-        {status === "downloading" && progress && (
-          <div className="mt-3">
-            <DownloadProgress progress={progress} />
-          </div>
-        )}
-      </button>
+      {/* Download progress — shown below header when downloading */}
+      {status === "downloading" && progress && (
+        <div className="px-5 pb-3">
+          <DownloadProgress progress={progress} />
+        </div>
+      )}
 
-      {/* Expandable section */}
+      {/* Expandable section with action buttons */}
       {expanded && (
         <div className="px-5 pb-5 border-t border-[#E9EEF6]">
           <p className="text-sm text-[#444746] mt-3 mb-3 leading-relaxed">
@@ -120,7 +129,7 @@ export function ModelCard({ model }: Props) {
 
           {status === "not_downloaded" && (
             <button
-              onClick={() => startDownload(model)}
+              onClick={(e) => { e.stopPropagation(); startDownload(model); }}
               className="w-full py-2.5 px-4 bg-[#0B57D0] text-white rounded-xl text-sm font-semibold hover:bg-[#0842A0] transition-colors"
             >
               Download ({formatSize(model.sizeBytes)})
@@ -130,14 +139,14 @@ export function ModelCard({ model }: Props) {
           {status === "ready" && !isActive && (
             <div className="flex gap-2">
               <button
-                onClick={handleLoad}
+                onClick={(e) => { e.stopPropagation(); handleLoad(); }}
                 disabled={isLoading}
                 className="flex-1 py-2.5 px-4 bg-[#0B57D0] text-white rounded-xl text-sm font-semibold hover:bg-[#0842A0] transition-colors disabled:opacity-50"
               >
                 {isLoading ? "Loading…" : "Load Model"}
               </button>
               <button
-                onClick={() => removeModel(model)}
+                onClick={(e) => { e.stopPropagation(); removeModel(model); }}
                 className="py-2.5 px-4 border border-[#C4C7C5] text-[#444746] rounded-xl text-sm hover:bg-[#F0F4F9] transition-colors"
               >
                 Delete
