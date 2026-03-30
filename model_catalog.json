@@ -1,0 +1,40 @@
+{
+  "models": [
+    {
+      "id": "gemma-3-270m",
+      "name": "Gemma 3 270M",
+      "fileName": "gemma-3-270m-it-int4-Web.litertlm",
+      "downloadUrl": "https://huggingface.co/litert-community/Gemma3-270M-IT-int4/resolve/main/gemma-3-270m-it-int4-Web.litertlm",
+      "sizeBytes": 314572800,
+      "capabilities": ["text"],
+      "quantization": "int4",
+      "parameterCount": "270M",
+      "description": "Fast text generation. Best for quick prompts and experiments.",
+      "maxTokens": 1000
+    },
+    {
+      "id": "gemma-3-1b",
+      "name": "Gemma 3 1B",
+      "fileName": "gemma-3-1b-it-int4-Web.litertlm",
+      "downloadUrl": "https://huggingface.co/litert-community/Gemma3-1B-IT-int4/resolve/main/gemma-3-1b-it-int4-Web.litertlm",
+      "sizeBytes": 524288000,
+      "capabilities": ["text"],
+      "quantization": "int4",
+      "parameterCount": "1B",
+      "description": "Balanced text generation. Good for multi-turn conversations.",
+      "maxTokens": 1000
+    },
+    {
+      "id": "gemma-3n-e2b",
+      "name": "Gemma 3n E2B",
+      "fileName": "gemma-3n-E2B-it-int4-Web.litertlm",
+      "downloadUrl": "https://huggingface.co/litert-community/Gemma3n-E2B-IT-int4/resolve/main/gemma-3n-E2B-it-int4-Web.litertlm",
+      "sizeBytes": 3221225472,
+      "capabilities": ["text", "image", "audio"],
+      "quantization": "int4",
+      "parameterCount": "E2B (~2B active)",
+      "description": "Multimodal: text, image, and audio understanding. Largest download.",
+      "maxTokens": 1000
+    }
+  ]
+}
