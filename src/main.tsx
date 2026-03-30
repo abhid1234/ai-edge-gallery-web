@@ -1,10 +1,16 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import App from "./App";
+import { DownloadProvider } from "./contexts/DownloadContext";
+import { ModelProvider } from "./contexts/ModelContext";
 import "./index.css";
-import App from "./App.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <DownloadProvider>
+      <ModelProvider>
+        <App />
+      </ModelProvider>
+    </DownloadProvider>
   </StrictMode>
 );
