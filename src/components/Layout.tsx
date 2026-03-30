@@ -14,37 +14,75 @@ export function Layout() {
   const { info } = useWebGPU();
 
   return (
-    <div className="min-h-screen bg-surface flex flex-col">
-      <header className="bg-white border-b border-surface-dark px-6 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <h1 className="text-lg font-semibold text-gray-900">
-            AI Edge Gallery
-            <span className="text-xs ml-2 text-gray-500 font-normal">Web</span>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "var(--color-surface-container)" }}>
+      {/* Top App Bar */}
+      <header className="bg-white shadow-sm px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+        {/* Title */}
+        <div className="flex items-center gap-2">
+          <h1 className="text-xl font-extrabold leading-none" style={{ fontFamily: "var(--font-sans)" }}>
+            <span
+              style={{
+                background: "linear-gradient(90deg, var(--color-title-gradient-start), var(--color-title-gradient-end))",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Google AI
+            </span>
+            <span className="text-on-surface ml-1" style={{ color: "var(--color-on-surface)" }}>
+              Edge Gallery
+            </span>
           </h1>
-          <nav className="flex gap-1">
-            {navLinks.map(({ to, label, ...rest }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={"end" in rest}
-                className={({ isActive }) =>
-                  `px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-                  }`
-                }
-              >
-                {label}
-              </NavLink>
-            ))}
-          </nav>
+          <span
+            className="text-xs font-semibold px-2 py-0.5 rounded-full"
+            style={{
+              backgroundColor: "var(--color-primary-container)",
+              color: "var(--color-on-primary-container)",
+              fontSize: "11px",
+            }}
+          >
+            Web
+          </span>
         </div>
+
+        {/* Model Indicator */}
         <ModelIndicator />
       </header>
 
-      {!info.supported && <WebGPUWarning />}
+      {/* Pill Tab Navigation */}
+      <div className="bg-white border-b px-6 py-2 flex gap-2 overflow-x-auto" style={{ borderColor: "var(--color-outline-variant)" }}>
+        {navLinks.map(({ to, label, end }) => (
+          <NavLink
+            key={to}
+            to={to}
+            end={end}
+            className={({ isActive }) =>
+              `flex-shrink-0 h-10 px-5 rounded-full text-sm font-semibold transition-colors flex items-center ${
+                isActive
+                  ? "text-white"
+                  : "hover:opacity-80"
+              }`
+            }
+            style={({ isActive }) =>
+              isActive
+                ? { backgroundColor: "var(--color-tab-selected)", color: "#ffffff" }
+                : { backgroundColor: "transparent", color: "var(--color-on-surface-variant)" }
+            }
+          >
+            {label}
+          </NavLink>
+        ))}
+      </div>
 
+      {/* WebGPU Warning */}
+      {!info.supported && (
+        <div className="px-6 pt-4">
+          <WebGPUWarning />
+        </div>
+      )}
+
+      {/* Content Area */}
       <main className="flex-1 p-6">
         <Outlet />
       </main>
