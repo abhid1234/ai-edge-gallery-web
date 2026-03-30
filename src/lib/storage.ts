@@ -63,7 +63,8 @@ export async function deleteFile(fileName: string): Promise<void> {
 export async function listFiles(): Promise<string[]> {
   const root = await getRoot();
   const names: string[] = [];
-  for await (const [name] of root.entries()) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for await (const [name] of (root as any).entries()) {
     names.push(name);
   }
   return names;

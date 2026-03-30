@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import type { WebGPUInfo } from "../types";
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   interface Navigator {
-    gpu?: GPU;
+    gpu?: any;
   }
 }
 
