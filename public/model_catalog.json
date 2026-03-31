@@ -25,6 +25,18 @@
       "maxTokens": 4096
     },
     {
+      "id": "gemma-3n-e4b",
+      "name": "Gemma 3n E4B",
+      "fileName": "gemma-3n-E4B-it-int4.task",
+      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/gemma-3n-E4B-it-int4.task",
+      "sizeBytes": 4405655031,
+      "capabilities": ["text", "image", "audio"],
+      "quantization": "int4",
+      "parameterCount": "E4B (~4B active)",
+      "description": "Largest multimodal model. Higher quality than E2B. Requires 12GB+ free RAM.",
+      "maxTokens": 4096
+    },
+    {
       "id": "qwen-1.5b",
       "name": "Qwen 2.5 1.5B",
       "fileName": "Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
