@@ -151,6 +151,19 @@ export function ModelCard({ model }: Props) {
             </div>
           )}
 
+          {model.downloadUrl.includes('huggingface.co') && (
+            <a
+              href={model.downloadUrl.replace('/resolve/main/', '/').replace(/\/[^/]+$/, '')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs flex items-center gap-1 mb-3"
+              style={{ color: "var(--color-primary)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              View on HuggingFace →
+            </a>
+          )}
+
           {status === "not_downloaded" && (
             <button
               onClick={(e) => { e.stopPropagation(); startDownload(model); }}

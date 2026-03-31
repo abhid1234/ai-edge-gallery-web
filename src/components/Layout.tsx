@@ -12,6 +12,7 @@ const navLinks = [
   { to: "/benchmarks", label: "Benchmarks" },
   { to: "/prompt-lab", label: "Prompt Lab" },
   { to: "/web-actions", label: "Web Actions" },
+  { to: "/tiny-garden", label: "Tiny Garden" },
 ];
 
 export function Layout() {

@@ -16,6 +16,8 @@ export function ChatInput({ onSend, onCancel, disabled, isGenerating }: Props) {
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setInput("");
+    // Blur input to dismiss mobile keyboard
+    ((e.target as HTMLFormElement).querySelector('textarea,input') as HTMLElement | null)?.blur();
   };
 
   const canSend = !disabled && !!input.trim() && !isGenerating;

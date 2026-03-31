@@ -34,8 +34,8 @@ export function Component() {
             color: "#5F4B00",
           }}
         >
-          Current model ({currentModel.name}) doesn't support audio. Load{" "}
-          <strong>Gemma 3n E2B</strong> from the Gallery for audio support.
+          Current model ({currentModel.name}) doesn't support audio.{" "}
+          <strong>Recommended: Load Gemma 3n E2B or E4B</strong> from the Gallery for audio understanding.
         </div>
       )}
 

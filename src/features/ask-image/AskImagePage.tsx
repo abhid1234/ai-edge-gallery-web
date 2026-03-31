@@ -24,8 +24,8 @@ export function Component() {
       </div>
 
       {needsMultimodal && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4 text-sm text-yellow-800">
-          Current model ({currentModel.name}) doesn't support images. Load <strong>Gemma 3n E2B</strong> from the Gallery for multimodal support.
+        <div className="rounded-lg p-4 mb-4 text-sm border" style={{ backgroundColor: "#FEF7E0", borderColor: "#F9E080", color: "#5F4B00" }}>
+          Current model ({currentModel.name}) doesn't support images. <strong>Recommended: Load Gemma 3n E2B or E4B</strong> from the Gallery for image understanding.
         </div>
       )}
 
