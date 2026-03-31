@@ -10,6 +10,7 @@ const navLinks = [
   { to: "/ask-audio", label: "Ask Audio" },
   { to: "/benchmarks", label: "Benchmarks" },
   { to: "/prompt-lab", label: "Prompt Lab" },
+  { to: "/web-actions", label: "Web Actions" },
 ];
 
 export function Layout() {

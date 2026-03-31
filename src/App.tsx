@@ -13,6 +13,8 @@ const router = createBrowserRouter(
         { path: "ask-audio", lazy: () => import("./features/ask-audio/AskAudioPage") },
         { path: "benchmarks", lazy: () => import("./features/benchmarks/BenchmarksPage") },
         { path: "prompt-lab", lazy: () => import("./features/prompt-lab/PromptLabPage") },
+        { path: "web-actions", lazy: () => import("./features/web-actions/WebActionsPage") },
+        { path: "tiny-garden", lazy: () => import("./features/tiny-garden/TinyGardenPage") },
       ],
     },
   ],
