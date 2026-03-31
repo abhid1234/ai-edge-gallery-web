@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import type { ChatMessage } from "../../types";
 
@@ -13,10 +13,19 @@ function formatGemmaPrompt(messages: ChatMessage[], newMessage: string): string 
 }
 
 export function useChatSession() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    try {
+      const saved = localStorage.getItem("chat_messages");
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
   const [streamingContent, setStreamingContent] = useState("");
   const { generate, cancel, isGenerating } = useModel();
   const doneHandledRef = useRef(false);
+
+  useEffect(() => {
+    localStorage.setItem("chat_messages", JSON.stringify(messages));
+  }, [messages]);
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -85,6 +94,7 @@ export function useChatSession() {
   const resetSession = useCallback(() => {
     setMessages([]);
     setStreamingContent("");
+    localStorage.removeItem("chat_messages");
   }, []);
 
   return {

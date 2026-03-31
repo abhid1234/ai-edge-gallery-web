@@ -1,13 +1,21 @@
 import { useEffect, useRef } from "react";
 import type { ChatMessage } from "../../types";
 
+const EXAMPLE_PROMPTS = [
+  "Explain on-device ML in simple terms",
+  "Write a Python fizzbuzz",
+  "Tell me a creative short story",
+  "What are the benefits of WebGPU?",
+];
+
 interface Props {
   messages: ChatMessage[];
   streamingContent: string;
   isGenerating: boolean;
+  onSendPrompt?: (prompt: string) => void;
 }
 
-export function MessageList({ messages, streamingContent, isGenerating }: Props) {
+export function MessageList({ messages, streamingContent, isGenerating, onSendPrompt }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,6 +40,24 @@ export function MessageList({ messages, streamingContent, isGenerating }: Props)
             Type a message below to chat with your on-device model
           </p>
         </div>
+        {onSendPrompt && (
+          <div className="flex flex-wrap gap-2 mt-4 max-w-md justify-center">
+            {EXAMPLE_PROMPTS.map((prompt) => (
+              <button
+                key={prompt}
+                onClick={() => onSendPrompt(prompt)}
+                className="text-xs px-3 py-1.5 rounded-full border transition-colors"
+                style={{
+                  borderColor: "var(--color-outline-variant)",
+                  color: "var(--color-primary)",
+                  backgroundColor: "var(--color-surface-container)",
+                }}
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
@@ -44,7 +70,7 @@ export function MessageList({ messages, streamingContent, isGenerating }: Props)
           className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
         >
           <div
-            className={`max-w-[76%] px-4 py-3 text-sm leading-relaxed ${
+            className={`max-w-[76%] px-4 py-3 text-sm leading-relaxed relative group ${
               msg.role === "user" ? "bubble-user ml-12" : "bubble-agent mr-12"
             }`}
             style={
@@ -54,6 +80,18 @@ export function MessageList({ messages, streamingContent, isGenerating }: Props)
             }
           >
             <pre className="whitespace-pre-wrap font-sans">{msg.content}</pre>
+            {msg.role === "model" && (
+              <button
+                onClick={() => navigator.clipboard.writeText(msg.content)}
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded"
+                style={{ backgroundColor: "var(--color-surface-container)" }}
+                title="Copy response"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5" style={{ color: "var(--color-on-surface-variant)" }}>
+                  <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+              </button>
+            )}
           </div>
         </div>
       ))}

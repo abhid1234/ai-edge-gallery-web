@@ -44,6 +44,7 @@ export function Component() {
           messages={messages}
           streamingContent={streamingContent}
           isGenerating={isGenerating}
+          onSendPrompt={sendMessage}
         />
         <ChatInput
           onSend={sendMessage}

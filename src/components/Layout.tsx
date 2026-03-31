@@ -49,6 +49,19 @@ export function Layout() {
           >
             Web
           </span>
+          <span
+            className="text-[10px] ml-2 px-2 py-0.5 rounded-full flex items-center gap-1"
+            style={{
+              backgroundColor: "var(--color-tertiary-container)",
+              color: "var(--color-tertiary)",
+            }}
+            title="All inference runs on your device. No data is sent to any server."
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+            </svg>
+            On-Device
+          </span>
         </div>
 
         {/* Controls */}
