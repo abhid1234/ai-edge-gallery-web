@@ -14,14 +14,26 @@ import {
   readFileAsBlob,
 } from "../lib/storage";
 
+const HF_TOKEN_KEY = "hf_token";
+
+function getStoredToken(): string | null {
+  return localStorage.getItem(HF_TOKEN_KEY);
+}
+
+function storeToken(token: string) {
+  localStorage.setItem(HF_TOKEN_KEY, token);
+}
+
 interface DownloadContextValue {
   modelStatuses: Record<string, ModelStatus>;
   downloadProgress: Record<string, DownloadProgress>;
+  hfToken: string | null;
   getModelStatus: (modelId: string) => ModelStatus;
   startDownload: (model: ModelInfo) => Promise<void>;
   removeModel: (model: ModelInfo) => Promise<void>;
   getModelBlob: (model: ModelInfo) => Promise<Blob>;
   checkStoredModels: (models: ModelInfo[]) => Promise<void>;
+  setHfToken: (token: string) => void;
 }
 
 const DownloadContext = createContext<DownloadContextValue | null>(null);
@@ -29,6 +41,12 @@ const DownloadContext = createContext<DownloadContextValue | null>(null);
 export function DownloadProvider({ children }: { children: ReactNode }) {
   const [modelStatuses, setModelStatuses] = useState<Record<string, ModelStatus>>({});
   const [downloadProgress, setDownloadProgress] = useState<Record<string, DownloadProgress>>({});
+  const [hfToken, setHfTokenState] = useState<string | null>(getStoredToken);
+
+  const setHfToken = useCallback((token: string) => {
+    storeToken(token);
+    setHfTokenState(token);
+  }, []);
 
   const getModelStatus = useCallback(
     (modelId: string): ModelStatus => modelStatuses[modelId] ?? "not_downloaded",
@@ -56,8 +74,19 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
     }));
 
     try {
-      const response = await fetch(model.downloadUrl);
-      if (!response.ok || !response.body) throw new Error(`Download failed: ${response.status}`);
+      const headers: Record<string, string> = {};
+      if (hfToken) {
+        headers["Authorization"] = `Bearer ${hfToken}`;
+      }
+
+      const response = await fetch(model.downloadUrl, { headers });
+
+      if (response.status === 401 || response.status === 403) {
+        throw new Error("Authentication required. Please add your HuggingFace token in the Gallery page.");
+      }
+      if (!response.ok || !response.body) {
+        throw new Error(`Download failed: ${response.status} ${response.statusText}`);
+      }
 
       await writeFileFromStream(model.fileName, response.body, (bytes) => {
         setDownloadProgress((prev) => ({
@@ -88,7 +117,7 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
         },
       }));
     }
-  }, []);
+  }, [hfToken]);
 
   const removeModel = useCallback(async (model: ModelInfo) => {
     await deleteFile(model.fileName);
@@ -101,7 +130,7 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
 
   return (
     <DownloadContext.Provider
-      value={{ modelStatuses, downloadProgress, getModelStatus, startDownload, removeModel, getModelBlob, checkStoredModels }}
+      value={{ modelStatuses, downloadProgress, hfToken, getModelStatus, startDownload, removeModel, getModelBlob, checkStoredModels, setHfToken }}
     >
       {children}
     </DownloadContext.Provider>

@@ -75,7 +75,9 @@ const FEATURE_CARDS = [
 export function Component() {
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [loading, setLoading] = useState(true);
-  const { checkStoredModels } = useDownload();
+  const [tokenInput, setTokenInput] = useState("");
+  const [showTokenInput, setShowTokenInput] = useState(false);
+  const { checkStoredModels, hfToken, setHfToken } = useDownload();
 
   useEffect(() => {
     async function init() {
@@ -140,9 +142,49 @@ export function Component() {
 
       {/* Models section */}
       <div className="px-6 pt-8 pb-8">
-        <h2 className="text-lg font-bold text-[#1F1F1F] mb-4 px-0">
-          Available Models
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-[#1F1F1F]">
+            Available Models
+          </h2>
+          <button
+            onClick={() => setShowTokenInput((v) => !v)}
+            className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
+              hfToken
+                ? "bg-[#C4EED0] text-[#146C2E]"
+                : "bg-[#FEF7E0] text-[#E37400]"
+            }`}
+          >
+            {hfToken ? "HF Token Set" : "Add HF Token"}
+          </button>
+        </div>
+
+        {showTokenInput && (
+          <div className="bg-white rounded-xl p-4 mb-4 shadow-sm">
+            <p className="text-xs text-[#444746] mb-2">
+              Gemma models are gated on HuggingFace. Get a token at{" "}
+              <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-[#0B57D0] underline">
+                huggingface.co/settings/tokens
+              </a>
+              {" "}and accept the model license first.
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="password"
+                value={tokenInput}
+                onChange={(e) => setTokenInput(e.target.value)}
+                placeholder="hf_..."
+                className="flex-1 px-3 py-2 text-sm border border-[#C4C7C5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/30"
+              />
+              <button
+                onClick={() => { setHfToken(tokenInput); setShowTokenInput(false); }}
+                disabled={!tokenInput.trim()}
+                className="px-4 py-2 bg-[#0B57D0] text-white rounded-lg text-sm font-semibold disabled:opacity-50"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex items-center justify-center h-32 text-[#444746] text-sm">

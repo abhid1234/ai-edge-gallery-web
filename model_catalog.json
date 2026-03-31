@@ -1,40 +1,40 @@
 {
   "models": [
     {
-      "id": "gemma-3-270m",
-      "name": "Gemma 3 270M",
-      "fileName": "gemma-3-270m-it-int4-Web.litertlm",
-      "downloadUrl": "https://huggingface.co/litert-community/Gemma3-270M-IT-int4/resolve/main/gemma-3-270m-it-int4-Web.litertlm",
-      "sizeBytes": 314572800,
-      "capabilities": ["text"],
-      "quantization": "int4",
-      "parameterCount": "270M",
-      "description": "Fast text generation. Best for quick prompts and experiments.",
-      "maxTokens": 1000
-    },
-    {
       "id": "gemma-3-1b",
       "name": "Gemma 3 1B",
-      "fileName": "gemma-3-1b-it-int4-Web.litertlm",
-      "downloadUrl": "https://huggingface.co/litert-community/Gemma3-1B-IT-int4/resolve/main/gemma-3-1b-it-int4-Web.litertlm",
-      "sizeBytes": 524288000,
+      "fileName": "Gemma3-1B-IT_multi-prefill-seq_q4_ekv2048.task",
+      "downloadUrl": "https://huggingface.co/litert-community/Gemma3-1B-IT/resolve/main/Gemma3-1B-IT_multi-prefill-seq_q4_ekv2048.task",
+      "sizeBytes": 554661246,
       "capabilities": ["text"],
-      "quantization": "int4",
+      "quantization": "q4",
       "parameterCount": "1B",
-      "description": "Balanced text generation. Good for multi-turn conversations.",
-      "maxTokens": 1000
+      "description": "Balanced text generation with 4-bit quantization. Good for multi-turn conversations.",
+      "maxTokens": 1024
     },
     {
       "id": "gemma-3n-e2b",
       "name": "Gemma 3n E2B",
-      "fileName": "gemma-3n-E2B-it-int4-Web.litertlm",
-      "downloadUrl": "https://huggingface.co/litert-community/Gemma3n-E2B-IT-int4/resolve/main/gemma-3n-E2B-it-int4-Web.litertlm",
-      "sizeBytes": 3221225472,
-      "capabilities": ["text", "image", "audio"],
+      "fileName": "gemma-3n-E2B-it-int4.task",
+      "downloadUrl": "https://huggingface.co/google/gemma-3n-E2B-it-litert-preview/resolve/main/gemma-3n-E2B-it-int4.task",
+      "sizeBytes": 3136226711,
+      "capabilities": ["text", "image"],
       "quantization": "int4",
       "parameterCount": "E2B (~2B active)",
-      "description": "Multimodal: text, image, and audio understanding. Largest download.",
-      "maxTokens": 1000
+      "description": "Multimodal: text and image understanding. Largest download but most capable.",
+      "maxTokens": 4096
+    },
+    {
+      "id": "qwen-1.5b",
+      "name": "Qwen 2.5 1.5B",
+      "fileName": "Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
+      "downloadUrl": "https://huggingface.co/litert-community/Qwen2.5-1.5B-Instruct/resolve/main/Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
+      "sizeBytes": 1625493432,
+      "capabilities": ["text"],
+      "quantization": "q8",
+      "parameterCount": "1.5B",
+      "description": "High quality text generation with 8-bit quantization. CPU-accelerated.",
+      "maxTokens": 1024
     }
   ]
 }

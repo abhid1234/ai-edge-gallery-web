@@ -162,6 +162,12 @@ export function ModelCard({ model }: Props) {
               Model is loaded and ready
             </div>
           )}
+
+          {progress?.status === "error" && progress.error && (
+            <div className="mt-3 bg-[#FCE8E6] text-[#D93025] text-xs rounded-lg px-3 py-2">
+              {progress.error}
+            </div>
+          )}
         </div>
       )}
     </div>
