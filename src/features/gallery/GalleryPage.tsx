@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { loadCatalog } from "../../lib/catalog";
 import { useDownload } from "../../contexts/DownloadContext";
 import { ModelCard } from "./ModelCard";
+import { ModelImport } from "./ModelImport";
 import type { ModelInfo } from "../../types";
 
 // Task card color rotation: red → green → blue → yellow
@@ -101,6 +102,7 @@ const FEATURE_CARDS = [
 
 export function Component() {
   const [models, setModels] = useState<ModelInfo[]>([]);
+  const [customModels, setCustomModels] = useState<ModelInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [tokenInput, setTokenInput] = useState("");
   const [showTokenInput, setShowTokenInput] = useState(false);
@@ -222,8 +224,19 @@ export function Component() {
             {models.map((model) => (
               <ModelCard key={model.id} model={model} />
             ))}
+            {customModels.map((model) => (
+              <ModelCard key={model.id} model={model} />
+            ))}
           </div>
         )}
+
+        <ModelImport
+          onImported={(model) =>
+            setCustomModels((prev) =>
+              prev.some((m) => m.id === model.id) ? prev : [...prev, model]
+            )
+          }
+        />
       </div>
     </div>
   );

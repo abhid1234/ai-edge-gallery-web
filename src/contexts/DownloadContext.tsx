@@ -34,6 +34,7 @@ interface DownloadContextValue {
   getModelBlob: (model: ModelInfo) => Promise<Blob>;
   checkStoredModels: (models: ModelInfo[]) => Promise<void>;
   setHfToken: (token: string) => void;
+  importLocalModel: (file: File, onProgress?: (bytes: number) => void) => Promise<ModelInfo>;
 }
 
 const DownloadContext = createContext<DownloadContextValue | null>(null);
@@ -132,9 +133,39 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
     return readFileAsBlob(model.fileName);
   }, []);
 
+  const importLocalModel = useCallback(
+    async (file: File, onProgress?: (bytes: number) => void): Promise<ModelInfo> => {
+      const modelId = `local-${file.name}`;
+      const modelInfo: ModelInfo = {
+        id: modelId,
+        name: file.name.replace(/\.(task|litertlm)$/, ""),
+        fileName: file.name,
+        downloadUrl: "",
+        sizeBytes: file.size,
+        capabilities: ["text"],
+        quantization: "unknown",
+        parameterCount: "Custom",
+        description: "Locally imported model",
+        maxTokens: 1024,
+      };
+
+      setModelStatuses((prev) => ({ ...prev, [modelId]: "downloading" }));
+      try {
+        const stream = file.stream();
+        await writeFileFromStream(file.name, stream, onProgress);
+        setModelStatuses((prev) => ({ ...prev, [modelId]: "ready" }));
+      } catch (e) {
+        setModelStatuses((prev) => ({ ...prev, [modelId]: "not_downloaded" }));
+        throw e;
+      }
+      return modelInfo;
+    },
+    []
+  );
+
   return (
     <DownloadContext.Provider
-      value={{ modelStatuses, downloadProgress, hfToken, getModelStatus, startDownload, removeModel, getModelBlob, checkStoredModels, setHfToken }}
+      value={{ modelStatuses, downloadProgress, hfToken, getModelStatus, startDownload, removeModel, getModelBlob, checkStoredModels, setHfToken, importLocalModel }}
     >
       {children}
     </DownloadContext.Provider>
