@@ -21,7 +21,7 @@
       "capabilities": ["text", "image"],
       "quantization": "int4",
       "parameterCount": "E2B (~2B active)",
-      "description": "Multimodal: text and image understanding. Largest download but most capable.",
+      "description": "Multimodal: text and image understanding. Requires 8GB+ RAM. Largest download.",
       "maxTokens": 4096
     },
     {

@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import type { ChatMessage } from "../../types";
 
@@ -16,6 +16,7 @@ export function useChatSession() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streamingContent, setStreamingContent] = useState("");
   const { generate, cancel, isGenerating } = useModel();
+  const doneHandledRef = useRef(false);
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -28,24 +29,55 @@ export function useChatSession() {
 
       setMessages((prev) => [...prev, userMessage]);
       setStreamingContent("");
+      doneHandledRef.current = false;
 
       const prompt = formatGemmaPrompt(messages, content);
 
       let fullResponse = "";
-      await generate(prompt, (partial, done) => {
-        fullResponse += partial;
-        setStreamingContent(fullResponse);
-        if (done) {
+      try {
+        await generate(prompt, (partial, done) => {
+          fullResponse += partial;
+          setStreamingContent(fullResponse);
+
+          if (done && !doneHandledRef.current) {
+            doneHandledRef.current = true;
+            const modelMessage: ChatMessage = {
+              id: crypto.randomUUID(),
+              role: "model",
+              content: fullResponse.trim(),
+              timestamp: Date.now(),
+            };
+            setMessages((prev) => [...prev, modelMessage]);
+            setStreamingContent("");
+          }
+        });
+
+        // Fallback: if callback never fired done=true, use the return value
+        if (!doneHandledRef.current && fullResponse.trim()) {
+          doneHandledRef.current = true;
           const modelMessage: ChatMessage = {
             id: crypto.randomUUID(),
             role: "model",
-            content: fullResponse,
+            content: fullResponse.trim(),
             timestamp: Date.now(),
           };
           setMessages((prev) => [...prev, modelMessage]);
           setStreamingContent("");
         }
-      });
+      } catch (e) {
+        // If generation fails, still add whatever we got
+        if (fullResponse.trim() && !doneHandledRef.current) {
+          doneHandledRef.current = true;
+          const modelMessage: ChatMessage = {
+            id: crypto.randomUUID(),
+            role: "model",
+            content: fullResponse.trim(),
+            timestamp: Date.now(),
+          };
+          setMessages((prev) => [...prev, modelMessage]);
+        }
+        setStreamingContent("");
+      }
     },
     [messages, generate]
   );

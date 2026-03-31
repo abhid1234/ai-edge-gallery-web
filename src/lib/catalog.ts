@@ -5,7 +5,7 @@ export interface ModelCatalog {
 }
 
 export async function loadCatalog(): Promise<ModelCatalog> {
-  const response = await fetch("/ODML/model_catalog.json");
+  const response = await fetch("/model_catalog.json");
   if (!response.ok) {
     throw new Error(`Failed to load model catalog: ${response.status}`);
   }

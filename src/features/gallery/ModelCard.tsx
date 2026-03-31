@@ -12,16 +12,23 @@ interface Props {
 export function ModelCard({ model }: Props) {
   const { getModelStatus, downloadProgress, startDownload, removeModel, getModelBlob } =
     useDownload();
-  const { currentModel, isLoading, loadModel } = useModel();
+  const { currentModel, isLoading, loadModel, error: modelError } = useModel();
   const [expanded, setExpanded] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const status = getModelStatus(model.id);
   const progress = downloadProgress[model.id];
   const isActive = currentModel?.id === model.id;
 
   const handleLoad = async () => {
-    const blob = await getModelBlob(model);
-    await loadModel(model, blob);
+    setLoadError(null);
+    try {
+      const blob = await getModelBlob(model);
+      await loadModel(model, blob);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Failed to load model";
+      setLoadError(msg);
+    }
   };
 
   return (
@@ -165,7 +172,19 @@ export function ModelCard({ model }: Props) {
 
           {progress?.status === "error" && progress.error && (
             <div className="mt-3 bg-[#FCE8E6] text-[#D93025] text-xs rounded-lg px-3 py-2">
-              {progress.error}
+              Download error: {progress.error}
+            </div>
+          )}
+
+          {loadError && (
+            <div className="mt-3 bg-[#FCE8E6] text-[#D93025] text-xs rounded-lg px-3 py-2">
+              Load error: {loadError}
+            </div>
+          )}
+
+          {modelError && isActive && (
+            <div className="mt-3 bg-[#FCE8E6] text-[#D93025] text-xs rounded-lg px-3 py-2">
+              Model error: {modelError}
             </div>
           )}
         </div>

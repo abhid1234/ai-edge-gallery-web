@@ -16,27 +16,31 @@ export async function initModel(
   await dispose();
 
   const genaiFileset = await FilesetResolver.forGenAiTasks(WASM_CDN);
-  const buffer = await modelBlob.arrayBuffer();
 
-  const options: Record<string, unknown> = {
-    baseOptions: {
-      modelAssetBuffer: new Uint8Array(buffer),
-    },
-    maxTokens: modelInfo.maxTokens,
-    topK: 40,
-    temperature: 0.8,
-    randomSeed: 101,
-  };
+  // Create a blob URL so MediaPipe can fetch the model itself
+  // This avoids us having to load the entire file into a single ArrayBuffer
+  const blobUrl = URL.createObjectURL(modelBlob);
 
-  if (modelInfo.capabilities.includes("image")) {
-    (options as Record<string, unknown>).maxNumImages = 5;
+  try {
+    const options: Record<string, unknown> = {
+      baseOptions: {
+        modelAssetPath: blobUrl,
+      },
+      maxTokens: modelInfo.maxTokens,
+      topK: 40,
+      temperature: 0.8,
+      randomSeed: 101,
+    };
+
+    if (modelInfo.capabilities.includes("image")) {
+      (options as Record<string, unknown>).maxNumImages = 5;
+    }
+
+    instance = await LlmInference.createFromOptions(genaiFileset, options);
+    currentModelId = modelInfo.id;
+  } finally {
+    URL.revokeObjectURL(blobUrl);
   }
-  if (modelInfo.capabilities.includes("audio")) {
-    (options as Record<string, unknown>).supportAudio = true;
-  }
-
-  instance = await LlmInference.createFromOptions(genaiFileset, options);
-  currentModelId = modelInfo.id;
 }
 
 export async function generateText(

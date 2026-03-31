@@ -14,7 +14,7 @@ const router = createBrowserRouter(
       ],
     },
   ],
-  { basename: "/ODML" }
+  { basename: "/" }
 );
 
 export default function App() {
