@@ -51,12 +51,15 @@ export async function generateText(
   return instance.generateResponse(prompt, onStream);
 }
 
+export type MultimodalPart = string | { imageSource: string } | { audioSource: string };
+
 export async function generateMultimodal(
-  parts: (string | { imageSource: string })[],
+  parts: MultimodalPart[],
   onStream: StreamCallback
 ): Promise<string> {
   if (!instance) throw new Error("No model loaded");
-  return instance.generateResponse(parts, onStream);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return instance.generateResponse(parts as any, onStream);
 }
 
 export function countTokens(prompt: string): number | undefined {

@@ -13,6 +13,7 @@ import {
   generateMultimodal,
   cancelGeneration,
   type StreamCallback,
+  type MultimodalPart,
 } from "../lib/mediapipe";
 
 interface ModelContextValue {
@@ -24,7 +25,7 @@ interface ModelContextValue {
   unloadModel: () => Promise<void>;
   generate: (prompt: string, onStream: StreamCallback) => Promise<string>;
   generateWithImage: (
-    parts: (string | { imageSource: string })[],
+    parts: MultimodalPart[],
     onStream: StreamCallback
   ) => Promise<string>;
   cancel: () => void;
@@ -73,7 +74,7 @@ export function ModelProvider({ children }: { children: ReactNode }) {
 
   const generateWithImage = useCallback(
     async (
-      parts: (string | { imageSource: string })[],
+      parts: MultimodalPart[],
       onStream: StreamCallback
     ): Promise<string> => {
       setIsGenerating(true);

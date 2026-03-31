@@ -7,6 +7,7 @@ const navLinks = [
   { to: "/", label: "Gallery", end: true },
   { to: "/chat", label: "Chat" },
   { to: "/ask-image", label: "Ask Image" },
+  { to: "/ask-audio", label: "Ask Audio" },
   { to: "/benchmarks", label: "Benchmarks" },
   { to: "/prompt-lab", label: "Prompt Lab" },
 ];
