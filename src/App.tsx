@@ -15,6 +15,8 @@ const router = createBrowserRouter(
         { path: "prompt-lab", lazy: () => import("./features/prompt-lab/PromptLabPage") },
         { path: "web-actions", lazy: () => import("./features/web-actions/WebActionsPage") },
         { path: "tiny-garden", lazy: () => import("./features/tiny-garden/TinyGardenPage") },
+        { path: "compare", lazy: () => import("./features/compare/ComparePage") },
+        { path: "how-it-works", lazy: () => import("./features/how-it-works/HowItWorksPage") },
       ],
     },
   ],

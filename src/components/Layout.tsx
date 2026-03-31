@@ -2,6 +2,7 @@ import { Outlet, NavLink } from "react-router";
 import { ModelIndicator } from "./ModelIndicator";
 import { WebGPUWarning } from "./WebGPUWarning";
 import { DarkModeToggle } from "./DarkModeToggle";
+import { OfflineToggle } from "./OfflineToggle";
 import { useWebGPU } from "../hooks/useWebGPU";
 
 const navLinks = [
@@ -13,6 +14,8 @@ const navLinks = [
   { to: "/prompt-lab", label: "Prompt Lab" },
   { to: "/web-actions", label: "Web Actions" },
   { to: "/tiny-garden", label: "Tiny Garden" },
+  { to: "/compare", label: "Compare" },
+  { to: "/how-it-works", label: "How It Works" },
 ];
 
 export function Layout() {
@@ -66,6 +69,7 @@ export function Layout() {
 
         {/* Controls */}
         <div className="flex items-center gap-2">
+          <OfflineToggle />
           <DarkModeToggle />
           <ModelIndicator />
         </div>

@@ -98,12 +98,18 @@ export function MessageList({ messages, streamingContent, isGenerating, onSendPr
 
       {isGenerating && streamingContent && (
         <div className="flex justify-start">
-          <div
-            className="max-w-[76%] mr-12 px-4 py-3 text-sm bubble-agent leading-relaxed"
-            style={{ backgroundColor: "var(--color-chat-agent)", color: "var(--color-on-surface)" }}
-          >
-            <pre className="whitespace-pre-wrap font-sans">{streamingContent}</pre>
-            <span className="inline-block w-1.5 h-4 animate-pulse ml-0.5 rounded-sm align-middle" style={{ backgroundColor: "var(--color-primary)" }} />
+          <div>
+            <div
+              className="max-w-[76%] mr-12 px-4 py-3 text-sm bubble-agent leading-relaxed"
+              style={{ backgroundColor: "var(--color-chat-agent)", color: "var(--color-on-surface)" }}
+            >
+              <pre className="whitespace-pre-wrap font-sans">{streamingContent}</pre>
+              <span className="inline-block w-1.5 h-4 animate-pulse ml-0.5 rounded-sm" style={{ backgroundColor: "var(--color-primary)" }} />
+            </div>
+            <div className="mt-1 text-[10px] flex items-center gap-1.5" style={{ color: "var(--color-on-surface-variant)" }}>
+              <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: "#34A853" }} />
+              Running on-device
+            </div>
           </div>
         </div>
       )}
