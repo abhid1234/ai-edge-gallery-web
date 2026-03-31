@@ -7,19 +7,30 @@ export function Component() {
   const { currentModel } = useModel();
   const [selectedTemplate, setSelectedTemplate] = useState<PromptTemplate>(TEMPLATES[0]);
   const [userInput, setUserInput] = useState("");
+  const [systemPrompt, setSystemPrompt] = useState(TEMPLATES[0].systemPrompt);
+  const [systemPromptOpen, setSystemPromptOpen] = useState(false);
   const { output, streamingOutput, isGenerating, error, run, clear, cancelGeneration } =
     usePromptLab();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const systemPromptRef = useRef<HTMLTextAreaElement>(null);
   const outputRef = useRef<HTMLDivElement>(null);
 
-  // Auto-grow textarea
+  // Auto-grow user input textarea
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, 300)}px`;
   }, [userInput]);
+
+  // Auto-grow system prompt textarea
+  useEffect(() => {
+    const el = systemPromptRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.max(el.scrollHeight, 80)}px`;
+  }, [systemPrompt, systemPromptOpen]);
 
   // Scroll output into view when it appears
   useEffect(() => {
@@ -30,6 +41,7 @@ export function Component() {
 
   const handleTemplateChange = (tpl: PromptTemplate) => {
     setSelectedTemplate(tpl);
+    setSystemPrompt(tpl.systemPrompt);
     setUserInput("");
     clear();
   };
@@ -37,7 +49,7 @@ export function Component() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!userInput.trim() || isGenerating) return;
-    run(selectedTemplate, userInput);
+    run({ ...selectedTemplate, systemPrompt }, userInput);
   };
 
   const handleClear = () => {
@@ -77,12 +89,43 @@ export function Component() {
       <div className="bg-white rounded-2xl shadow-sm p-4 flex flex-col gap-3">
         <p className="text-xs font-semibold text-[#444746] uppercase tracking-wide">Template</p>
         <TemplateSelector selected={selectedTemplate} onChange={handleTemplateChange} />
-        {selectedTemplate.systemPrompt && (
-          <p className="text-xs text-[#5F6368] bg-[#F0F4F9] rounded-xl px-3 py-2 leading-relaxed">
-            <span className="font-medium text-[#444746]">System: </span>
-            {selectedTemplate.systemPrompt}
-          </p>
-        )}
+
+        {/* Collapsible system prompt */}
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => setSystemPromptOpen((prev) => !prev)}
+            className="flex items-center gap-1.5 w-fit text-xs font-medium text-[#444746] hover:text-[#1F1F1F] transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-transform duration-200"
+              style={{ transform: systemPromptOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+            Edit system prompt
+          </button>
+          {systemPromptOpen && (
+            <textarea
+              ref={systemPromptRef}
+              value={systemPrompt}
+              onChange={(e) => setSystemPrompt(e.target.value)}
+              placeholder="Enter a system prompt (optional)…"
+              rows={3}
+              className="w-full resize-none rounded-lg bg-[#F0F4F9] px-3 py-2.5 text-xs font-mono text-[#1F1F1F] placeholder:text-[#9AA0A6] focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/40 transition"
+              style={{ minHeight: "80px" }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Input Form */}
@@ -99,7 +142,7 @@ export function Component() {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
               e.preventDefault();
               if (userInput.trim() && !isGenerating && currentModel) {
-                run(selectedTemplate, userInput);
+                run({ ...selectedTemplate, systemPrompt }, userInput);
               }
             }
           }}
