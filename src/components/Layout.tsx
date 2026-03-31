@@ -8,6 +8,7 @@ const navLinks = [
   { to: "/chat", label: "Chat" },
   { to: "/ask-image", label: "Ask Image" },
   { to: "/benchmarks", label: "Benchmarks" },
+  { to: "/prompt-lab", label: "Prompt Lab" },
 ];
 
 export function Layout() {

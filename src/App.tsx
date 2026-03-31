@@ -11,6 +11,7 @@ const router = createBrowserRouter(
         { path: "chat", lazy: () => import("./features/chat/ChatPage") },
         { path: "ask-image", lazy: () => import("./features/ask-image/AskImagePage") },
         { path: "benchmarks", lazy: () => import("./features/benchmarks/BenchmarksPage") },
+        { path: "prompt-lab", lazy: () => import("./features/prompt-lab/PromptLabPage") },
       ],
     },
   ],
