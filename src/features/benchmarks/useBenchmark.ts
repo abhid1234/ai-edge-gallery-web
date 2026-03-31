@@ -6,17 +6,38 @@ import type { BenchmarkResult } from "../../types";
 const BENCHMARK_PROMPT =
   "<start_of_turn>user\nExplain what on-device machine learning means in 3 sentences.<end_of_turn>\n<start_of_turn>model\n";
 
+const STORAGE_KEY = "benchmark_history";
+
+function loadHistory(): BenchmarkResult[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    return JSON.parse(raw) as BenchmarkResult[];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(results: BenchmarkResult[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
+  } catch {
+    // ignore quota errors
+  }
+}
+
 export function useBenchmark() {
-  const [result, setResult] = useState<BenchmarkResult | null>(null);
+  const [results, setResults] = useState<BenchmarkResult[]>(loadHistory);
   const [isRunning, setIsRunning] = useState(false);
   const { currentModel, generate } = useModel();
   const { info: gpuInfo } = useWebGPU();
+
+  const latestResult = results.length > 0 ? results[results.length - 1] : null;
 
   const runBenchmark = useCallback(async () => {
     if (!currentModel) return;
 
     setIsRunning(true);
-    setResult(null);
 
     const startTime = performance.now();
     let ttft = 0;
@@ -51,9 +72,26 @@ export function useBenchmark() {
       timestamp: Date.now(),
     };
 
-    setResult(benchmarkResult);
+    setResults((prev) => {
+      const next = [...prev, benchmarkResult];
+      saveHistory(next);
+      return next;
+    });
     setIsRunning(false);
   }, [currentModel, generate, gpuInfo]);
 
-  return { result, isRunning, runBenchmark };
+  const removeResult = useCallback((timestamp: number) => {
+    setResults((prev) => {
+      const next = prev.filter((r) => r.timestamp !== timestamp);
+      saveHistory(next);
+      return next;
+    });
+  }, []);
+
+  const clearHistory = useCallback(() => {
+    setResults([]);
+    saveHistory([]);
+  }, []);
+
+  return { results, latestResult, isRunning, runBenchmark, removeResult, clearHistory };
 }
