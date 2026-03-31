@@ -75,11 +75,15 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
 
     try {
       const headers: Record<string, string> = {};
-      if (hfToken) {
+      // Only send auth header to HuggingFace, not to R2 or other hosts
+      if (hfToken && model.downloadUrl.includes("huggingface.co")) {
         headers["Authorization"] = `Bearer ${hfToken}`;
       }
 
-      const response = await fetch(model.downloadUrl, { headers });
+      const response = await fetch(model.downloadUrl, {
+        headers,
+        mode: "cors",
+      });
 
       if (response.status === 401 || response.status === 403) {
         throw new Error("Authentication required. Please add your HuggingFace token in the Gallery page.");
