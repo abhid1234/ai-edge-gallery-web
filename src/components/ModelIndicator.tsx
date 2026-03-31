@@ -1,25 +1,7 @@
 import { useModel } from "../contexts/ModelContext";
 
-function ChevronDownIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="6 9 12 15 18 9" />
-    </svg>
-  );
-}
-
 export function ModelIndicator() {
-  const { currentModel, isLoading, isGenerating } = useModel();
+  const { currentModel, isLoading, isGenerating, unloadModel } = useModel();
 
   // Determine status dot color
   let dotColor = "#9AA0A6"; // gray — no model
@@ -55,11 +37,18 @@ export function ModelIndicator() {
         {label}
       </span>
 
-      {/* Dropdown chevron — only shown when a model is present */}
-      {currentModel && !isLoading && (
-        <span className="flex-shrink-0" style={{ color: "var(--color-on-surface-variant)" }}>
-          <ChevronDownIcon />
-        </span>
+      {/* Unload button — only shown when a model is loaded and idle */}
+      {currentModel && !isLoading && !isGenerating && (
+        <button
+          onClick={unloadModel}
+          title="Unload model (free memory)"
+          className="flex-shrink-0 ml-1 w-5 h-5 rounded-full flex items-center justify-center hover:bg-[#FCE8E6] transition-colors"
+          style={{ color: "var(--color-on-surface-variant)" }}
+        >
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+          </svg>
+        </button>
       )}
     </div>
   );

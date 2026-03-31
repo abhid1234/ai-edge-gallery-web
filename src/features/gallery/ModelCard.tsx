@@ -4,6 +4,7 @@ import { useDownload } from "../../contexts/DownloadContext";
 import { useModel } from "../../contexts/ModelContext";
 import { DownloadProgress } from "./DownloadProgress";
 import { formatSize } from "../../lib/catalog";
+import { checkMemoryForModel } from "../../lib/memory";
 
 interface Props {
   model: ModelInfo;
@@ -12,16 +13,28 @@ interface Props {
 export function ModelCard({ model }: Props) {
   const { getModelStatus, downloadProgress, startDownload, removeModel, getModelBlob } =
     useDownload();
-  const { currentModel, isLoading, loadModel, error: modelError } = useModel();
+  const { currentModel, isLoading, loadModel, unloadModel, error: modelError } = useModel();
   const [expanded, setExpanded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   const status = getModelStatus(model.id);
   const progress = downloadProgress[model.id];
   const isActive = currentModel?.id === model.id;
+  const memCheck = checkMemoryForModel(model.sizeBytes);
 
   const handleLoad = async () => {
     setLoadError(null);
+
+    // Memory check before loading
+    if (!memCheck.canLoadModel) {
+      const proceed = window.confirm(
+        `${memCheck.warning}\n\nLoading this model may freeze your system. Continue anyway?`
+      );
+      if (!proceed) return;
+    } else if (memCheck.warning) {
+      window.confirm(memCheck.warning + "\n\nContinue?");
+    }
+
     try {
       const blob = await getModelBlob(model);
       await loadModel(model, blob);
@@ -162,11 +175,25 @@ export function ModelCard({ model }: Props) {
           )}
 
           {status === "ready" && isActive && (
-            <div className="flex items-center gap-2 text-sm text-[#146C2E] font-medium">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-              </svg>
-              Model is loaded and ready
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm text-[#146C2E] font-medium">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                </svg>
+                Model is loaded and ready
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); unloadModel(); }}
+                className="py-1.5 px-3 bg-[#FCE8E6] text-[#D93025] rounded-lg text-xs font-medium hover:bg-[#F9DEDC] transition-colors"
+              >
+                Unload (free memory)
+              </button>
+            </div>
+          )}
+
+          {!memCheck.canLoadModel && status !== "not_downloaded" && !isActive && (
+            <div className="mt-3 bg-[#FEF7E0] text-[#E37400] text-xs rounded-lg px-3 py-2">
+              {memCheck.warning}
             </div>
           )}
 
