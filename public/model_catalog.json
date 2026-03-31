@@ -39,38 +39,14 @@
     {
       "id": "deepseek-r1",
       "name": "DeepSeek R1 1.5B",
-      "fileName": "DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.litertlm",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.litertlm",
-      "sizeBytes": 1833451520,
+      "fileName": "DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.task",
+      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.task",
+      "sizeBytes": 1834078546,
       "capabilities": ["text"],
       "quantization": "q8",
       "parameterCount": "1.5B",
       "description": "Reasoning model with chain-of-thought. Best for complex problem solving.",
       "maxTokens": 4096
-    },
-    {
-      "id": "tinygarden-270m",
-      "name": "TinyGarden 270M",
-      "fileName": "tiny_garden_q8_ekv1024.litertlm",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/tiny_garden_q8_ekv1024.litertlm",
-      "sizeBytes": 288964608,
-      "capabilities": ["text"],
-      "quantization": "q8",
-      "parameterCount": "270M",
-      "description": "Fine-tuned for Tiny Garden game. Best accuracy for garden function calls.",
-      "maxTokens": 1024
-    },
-    {
-      "id": "mobileactions-270m",
-      "name": "Web Actions 270M",
-      "fileName": "mobile_actions_q8_ekv1024.litertlm",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/mobile_actions_q8_ekv1024.litertlm",
-      "sizeBytes": 288964608,
-      "capabilities": ["text"],
-      "quantization": "q8",
-      "parameterCount": "270M",
-      "description": "Fine-tuned for function calling. Best accuracy for Web Actions commands.",
-      "maxTokens": 1024
     }
   ]
 }
