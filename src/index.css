@@ -66,6 +66,27 @@
   --font-sans: "Nunito", system-ui, sans-serif;
 }
 
+.dark {
+  --color-primary: #A8C7FA;
+  --color-on-primary: #062E6F;
+  --color-surface: #131314;
+  --color-surface-container: #1E1F20;
+  --color-surface-container-low: #131314;
+  --color-surface-container-high: #282A2C;
+  --color-surface-container-highest: #2F3133;
+  --color-on-surface: #E3E3E3;
+  --color-on-surface-variant: #C4C7C5;
+  --color-outline: #8E918F;
+  --color-outline-variant: #444746;
+  --color-chat-user: #1F3760;
+  --color-chat-agent: #1B1C1D;
+  --color-primary-container: #0D2D6E;
+  --color-on-primary-container: #A8C7FA;
+  --color-tab-selected: #A8C7FA;
+  --color-title-gradient-start: #A8C7FA;
+  --color-title-gradient-end: #669DF6;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;

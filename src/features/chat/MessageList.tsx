@@ -16,10 +16,10 @@ export function MessageList({ messages, streamingContent, isGenerating }: Props)
 
   if (messages.length === 0 && !isGenerating) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center gap-3 text-[#444746]">
+      <div className="flex-1 flex flex-col items-center justify-center gap-3" style={{ color: "var(--color-on-surface-variant)" }}>
         {/* Decorative icon */}
-        <div className="w-14 h-14 rounded-full bg-[#F0F4F9] flex items-center justify-center">
-          <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 text-[#3174F1]">
+        <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: "var(--color-surface-container-high)" }}>
+          <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7" style={{ color: "var(--color-primary)" }}>
             <path
               d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"
               fill="currentColor"
@@ -27,8 +27,8 @@ export function MessageList({ messages, streamingContent, isGenerating }: Props)
           </svg>
         </div>
         <div className="text-center">
-          <p className="text-sm font-semibold text-[#1F1F1F]">Start a conversation</p>
-          <p className="text-xs text-[#747775] mt-0.5">
+          <p className="text-sm font-semibold" style={{ color: "var(--color-on-surface)" }}>Start a conversation</p>
+          <p className="text-xs mt-0.5" style={{ color: "var(--color-outline)" }}>
             Type a message below to chat with your on-device model
           </p>
         </div>
@@ -45,10 +45,13 @@ export function MessageList({ messages, streamingContent, isGenerating }: Props)
         >
           <div
             className={`max-w-[76%] px-4 py-3 text-sm leading-relaxed ${
-              msg.role === "user"
-                ? "bubble-user bg-[#32628D] text-white ml-12"
-                : "bubble-agent bg-[#E9EEF6] text-[#1F1F1F] mr-12"
+              msg.role === "user" ? "bubble-user ml-12" : "bubble-agent mr-12"
             }`}
+            style={
+              msg.role === "user"
+                ? { backgroundColor: "var(--color-chat-user)", color: "#ffffff" }
+                : { backgroundColor: "var(--color-chat-agent)", color: "var(--color-on-surface)" }
+            }
           >
             <pre className="whitespace-pre-wrap font-sans">{msg.content}</pre>
           </div>
@@ -57,20 +60,23 @@ export function MessageList({ messages, streamingContent, isGenerating }: Props)
 
       {isGenerating && streamingContent && (
         <div className="flex justify-start">
-          <div className="max-w-[76%] mr-12 px-4 py-3 text-sm bubble-agent bg-[#E9EEF6] text-[#1F1F1F] leading-relaxed">
+          <div
+            className="max-w-[76%] mr-12 px-4 py-3 text-sm bubble-agent leading-relaxed"
+            style={{ backgroundColor: "var(--color-chat-agent)", color: "var(--color-on-surface)" }}
+          >
             <pre className="whitespace-pre-wrap font-sans">{streamingContent}</pre>
-            <span className="inline-block w-1.5 h-4 bg-[#3174F1] animate-pulse ml-0.5 rounded-sm align-middle" />
+            <span className="inline-block w-1.5 h-4 animate-pulse ml-0.5 rounded-sm align-middle" style={{ backgroundColor: "var(--color-primary)" }} />
           </div>
         </div>
       )}
 
       {isGenerating && !streamingContent && (
         <div className="flex justify-start">
-          <div className="px-4 py-3 bubble-agent bg-[#E9EEF6]">
+          <div className="px-4 py-3 bubble-agent" style={{ backgroundColor: "var(--color-chat-agent)" }}>
             <div className="flex gap-1 items-center h-4">
-              <span className="w-2 h-2 rounded-full bg-[#3174F1] animate-bounce [animation-delay:0ms]" />
-              <span className="w-2 h-2 rounded-full bg-[#3174F1] animate-bounce [animation-delay:150ms]" />
-              <span className="w-2 h-2 rounded-full bg-[#3174F1] animate-bounce [animation-delay:300ms]" />
+              <span className="w-2 h-2 rounded-full animate-bounce [animation-delay:0ms]" style={{ backgroundColor: "var(--color-primary)" }} />
+              <span className="w-2 h-2 rounded-full animate-bounce [animation-delay:150ms]" style={{ backgroundColor: "var(--color-primary)" }} />
+              <span className="w-2 h-2 rounded-full animate-bounce [animation-delay:300ms]" style={{ backgroundColor: "var(--color-primary)" }} />
             </div>
           </div>
         </div>

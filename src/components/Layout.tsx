@@ -1,6 +1,7 @@
 import { Outlet, NavLink } from "react-router";
 import { ModelIndicator } from "./ModelIndicator";
 import { WebGPUWarning } from "./WebGPUWarning";
+import { DarkModeToggle } from "./DarkModeToggle";
 import { useWebGPU } from "../hooks/useWebGPU";
 
 const navLinks = [
@@ -19,7 +20,7 @@ export function Layout() {
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "var(--color-surface-container)" }}>
       {/* Top App Bar */}
-      <header className="bg-white shadow-sm px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+      <header className="shadow-sm px-6 py-3 flex items-center justify-between sticky top-0 z-10" style={{ backgroundColor: "var(--color-surface)", borderBottom: "1px solid var(--color-outline-variant)" }}>
         {/* Title */}
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-extrabold leading-none" style={{ fontFamily: "var(--font-sans)" }}>
@@ -49,12 +50,15 @@ export function Layout() {
           </span>
         </div>
 
-        {/* Model Indicator */}
-        <ModelIndicator />
+        {/* Controls */}
+        <div className="flex items-center gap-2">
+          <DarkModeToggle />
+          <ModelIndicator />
+        </div>
       </header>
 
       {/* Pill Tab Navigation */}
-      <div className="bg-white border-b px-6 py-2 flex gap-2 overflow-x-auto" style={{ borderColor: "var(--color-outline-variant)" }}>
+      <div className="border-b px-6 py-2 flex gap-2 overflow-x-auto" style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-outline-variant)" }}>
         {navLinks.map(({ to, label, end }) => (
           <NavLink
             key={to}

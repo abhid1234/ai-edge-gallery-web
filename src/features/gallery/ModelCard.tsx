@@ -46,24 +46,28 @@ export function ModelCard({ model }: Props) {
 
   return (
     <div
-      className={`bg-white rounded-xl shadow-sm overflow-hidden transition-all ${
+      className={`rounded-xl shadow-sm overflow-hidden transition-all ${
         isActive ? "ring-2 ring-[#3174F1]/40" : ""
       }`}
+      style={{ backgroundColor: "var(--color-surface)" }}
     >
       {/* Card header — always visible, clickable to expand */}
       <div
         role="button"
         tabIndex={0}
-        className="w-full text-left px-5 py-4 cursor-pointer hover:bg-[#F8FAFD] transition-colors"
+        className="w-full text-left px-5 py-4 cursor-pointer transition-colors"
+        style={{ backgroundColor: "transparent" }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "var(--color-surface-container-low)"; }}
+        onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = "transparent"; }}
         onClick={() => setExpanded((v) => !v)}
         onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setExpanded((v) => !v); }}
       >
         <div className="flex items-center justify-between">
           <div className="flex-1 min-w-0 mr-3">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-semibold text-[#1F1F1F] text-sm">{model.name}</span>
+              <span className="font-semibold text-sm" style={{ color: "var(--color-on-surface)" }}>{model.name}</span>
               {isActive && (
-                <span className="text-[10px] font-semibold bg-[#D3E3FD] text-[#0842A0] px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "var(--color-primary-container)", color: "var(--color-on-primary-container)" }}>
                   Active
                 </span>
               )}
@@ -74,13 +78,13 @@ export function ModelCard({ model }: Props) {
               )}
             </div>
             <div className="flex gap-2 mt-1.5 flex-wrap">
-              <span className="text-[11px] text-[#444746] bg-[#F0F4F9] px-2 py-0.5 rounded">
+              <span className="text-[11px] px-2 py-0.5 rounded" style={{ color: "var(--color-on-surface-variant)", backgroundColor: "var(--color-surface-container-high)" }}>
                 {model.parameterCount}
               </span>
-              <span className="text-[11px] text-[#444746] bg-[#F0F4F9] px-2 py-0.5 rounded">
+              <span className="text-[11px] px-2 py-0.5 rounded" style={{ color: "var(--color-on-surface-variant)", backgroundColor: "var(--color-surface-container-high)" }}>
                 {formatSize(model.sizeBytes)}
               </span>
-              <span className="text-[11px] text-[#444746] bg-[#F0F4F9] px-2 py-0.5 rounded">
+              <span className="text-[11px] px-2 py-0.5 rounded" style={{ color: "var(--color-on-surface-variant)", backgroundColor: "var(--color-surface-container-high)" }}>
                 {model.quantization}
               </span>
             </div>
@@ -129,8 +133,8 @@ export function ModelCard({ model }: Props) {
 
       {/* Expandable section with action buttons */}
       {expanded && (
-        <div className="px-5 pb-5 border-t border-[#E9EEF6]">
-          <p className="text-sm text-[#444746] mt-3 mb-3 leading-relaxed">
+        <div className="px-5 pb-5 border-t" style={{ borderColor: "var(--color-outline-variant)" }}>
+          <p className="text-sm mt-3 mb-3 leading-relaxed" style={{ color: "var(--color-on-surface-variant)" }}>
             {model.description}
           </p>
 
@@ -167,7 +171,8 @@ export function ModelCard({ model }: Props) {
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); removeModel(model); }}
-                className="py-2.5 px-4 border border-[#C4C7C5] text-[#444746] rounded-xl text-sm hover:bg-[#F0F4F9] transition-colors"
+                className="py-2.5 px-4 rounded-xl text-sm transition-colors"
+                style={{ border: "1px solid var(--color-outline-variant)", color: "var(--color-on-surface-variant)", backgroundColor: "transparent" }}
               >
                 Delete
               </button>
@@ -176,7 +181,7 @@ export function ModelCard({ model }: Props) {
 
           {status === "ready" && isActive && (
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-[#146C2E] font-medium">
+              <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "var(--color-primary)" }}>
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                 </svg>
