@@ -25,7 +25,7 @@ export function ChatInput({ onSend, onCancel, disabled, isGenerating }: Props) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-end gap-2 px-4 py-3 border-t border-[#E9EEF6] bg-white"
+      className="flex items-end gap-2 px-4 py-3 border-t border-[var(--color-surface-container-high)] bg-[var(--color-surface)]"
     >
       <textarea
         rows={1}
@@ -44,7 +44,7 @@ export function ChatInput({ onSend, onCancel, disabled, isGenerating }: Props) {
         }}
         placeholder={disabled ? "Load a model first…" : "Message"}
         disabled={disabled || isGenerating}
-        className="flex-1 resize-none bg-[#F0F4F9] text-[#1F1F1F] placeholder-[#747775] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#3174F1]/30 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
+        className="flex-1 resize-none bg-[var(--color-surface-container)] text-[var(--color-on-surface)] placeholder-[#747775] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#3174F1]/30 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
         style={{ height: "40px" }}
       />
 

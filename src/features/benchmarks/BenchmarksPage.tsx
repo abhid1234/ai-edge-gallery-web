@@ -69,10 +69,10 @@ function ComparisonTable({ results, onRemove }: ComparisonTableProps) {
       {/* Comparison Table */}
       <div>
         <h3 className="text-sm font-semibold text-gray-700 mb-3">Results Table</h3>
-        <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <div className="overflow-x-auto rounded-lg border border-[var(--color-outline-variant)]">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
+              <tr className="bg-[var(--color-surface-container)] border-b border-[var(--color-outline-variant)]">
                 <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Model</th>
                 <th className="text-right px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">TTFT (ms)</th>
                 <th className="text-right px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Decode Speed</th>
@@ -89,11 +89,11 @@ function ComparisonTable({ results, onRemove }: ComparisonTableProps) {
                 return (
                   <tr
                     key={result.timestamp}
-                    className={isFastest ? "bg-green-50" : i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                    className={isFastest ? "bg-[var(--color-tertiary-container)]" : i % 2 === 0 ? "bg-[var(--color-surface)]" : "bg-[var(--color-surface-container)]"}
                   >
                     <td className="px-3 py-2 font-medium text-gray-800 max-w-[10rem] truncate" title={result.modelId}>
                       {isFastest && (
-                        <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1.5 align-middle" />
+                        <span className="inline-block w-2 h-2 rounded-full bg-[var(--color-tertiary-container)]0 mr-1.5 align-middle" />
                       )}
                       {result.modelId}
                     </td>
@@ -141,14 +141,14 @@ export function Component() {
         {hasHistory && (
           <button
             onClick={clearHistory}
-            className="px-3 py-1.5 text-xs text-gray-500 border border-gray-200 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+            className="px-3 py-1.5 text-xs text-gray-500 border border-[var(--color-outline-variant)] rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
           >
             Clear History
           </button>
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
+      <div className="bg-[var(--color-surface)] rounded-xl border border-[var(--color-outline-variant)] p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-600">
             {currentModel ? (
@@ -175,7 +175,7 @@ export function Component() {
         )}
 
         {gpuInfo.supported && (
-          <div className="border-t border-gray-200 pt-4">
+          <div className="border-t border-[var(--color-outline-variant)] pt-4">
             <h3 className="text-sm font-medium text-gray-700 mb-2">WebGPU Device Info</h3>
             <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
               <span>GPU: <strong>{gpuInfo.adapterName}</strong></span>
@@ -187,7 +187,7 @@ export function Component() {
       </div>
 
       {/* Comparison section */}
-      <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6">
+      <div className="mt-6 bg-[var(--color-surface)] rounded-xl border border-[var(--color-outline-variant)] p-6">
         <h3 className="text-base font-semibold text-gray-900 mb-4">Model Comparison</h3>
         {hasHistory ? (
           <ComparisonTable results={results} onRemove={removeResult} />

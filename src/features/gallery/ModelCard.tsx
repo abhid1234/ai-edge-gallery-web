@@ -99,7 +99,7 @@ export function ModelCard({ model }: Props) {
           {/* Status icon + expand chevron */}
           <div className="flex items-center gap-2 flex-shrink-0">
             {status === "not_downloaded" && (
-              <div className="w-9 h-9 rounded-full border-2 border-[#C4C7C5] flex items-center justify-center text-[#747775]">
+              <div className="w-9 h-9 rounded-full border-2 border-[var(--color-outline-variant)] flex items-center justify-center text-[var(--color-outline)]">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                   <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
                 </svg>
@@ -122,7 +122,7 @@ export function ModelCard({ model }: Props) {
             <svg
               viewBox="0 0 24 24"
               fill="currentColor"
-              className={`w-5 h-5 text-[#747775] transition-transform ${expanded ? "rotate-180" : ""}`}
+              className={`w-5 h-5 text-[var(--color-outline)] transition-transform ${expanded ? "rotate-180" : ""}`}
             >
               <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" />
             </svg>

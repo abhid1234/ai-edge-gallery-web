@@ -6,7 +6,7 @@ interface Props {
 
 function MetricCard({ label, value, unit }: { label: string; value: string | number; unit: string }) {
   return (
-    <div className="bg-gray-50 rounded-lg p-4">
+    <div className="bg-[var(--color-surface-container)] rounded-lg p-4">
       <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className="text-2xl font-bold text-gray-900">
         {value}

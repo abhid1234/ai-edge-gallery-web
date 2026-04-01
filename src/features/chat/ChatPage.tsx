@@ -12,13 +12,13 @@ export function Component() {
   const [genConfig, setGenConfig] = useState<GenerationConfig>({ temperature: 0.8, topK: 40, topP: 0.95 });
 
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem)] bg-[#F0F4F9] max-w-3xl mx-auto w-full">
+    <div className="flex flex-col h-[calc(100vh-3.5rem)] bg-[var(--color-surface-container)] max-w-3xl mx-auto w-full">
       {/* Subtle header */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0">
         <div>
-          <h2 className="text-xl font-bold text-[#1F1F1F]">Chat</h2>
+          <h2 className="text-xl font-bold text-[var(--color-on-surface)]">Chat</h2>
           {currentModel && (
-            <p className="text-xs text-[#444746] mt-0.5">
+            <p className="text-xs text-[var(--color-on-surface-variant)] mt-0.5">
               {currentModel.name} · on-device via WebGPU
             </p>
           )}
@@ -39,7 +39,7 @@ export function Component() {
       </div>
 
       {/* Chat area */}
-      <div className="flex-1 flex flex-col mx-4 mb-4 bg-white rounded-2xl overflow-hidden shadow-sm">
+      <div className="flex-1 flex flex-col mx-4 mb-4 bg-[var(--color-surface)] rounded-2xl overflow-hidden shadow-sm">
         <MessageList
           messages={messages}
           streamingContent={streamingContent}

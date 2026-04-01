@@ -65,9 +65,9 @@ export function Component() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-[#1F1F1F]">Prompt Lab</h2>
+          <h2 className="text-xl font-bold text-[var(--color-on-surface)]">Prompt Lab</h2>
           {currentModel ? (
-            <p className="text-xs text-[#444746] mt-0.5">
+            <p className="text-xs text-[var(--color-on-surface-variant)] mt-0.5">
               {currentModel.name} · on-device via WebGPU
             </p>
           ) : (
@@ -86,8 +86,8 @@ export function Component() {
       </div>
 
       {/* Template Picker */}
-      <div className="bg-white rounded-2xl shadow-sm p-4 flex flex-col gap-3">
-        <p className="text-xs font-semibold text-[#444746] uppercase tracking-wide">Template</p>
+      <div className="bg-[var(--color-surface)] rounded-2xl shadow-sm p-4 flex flex-col gap-3">
+        <p className="text-xs font-semibold text-[var(--color-on-surface-variant)] uppercase tracking-wide">Template</p>
         <TemplateSelector selected={selectedTemplate} onChange={handleTemplateChange} />
 
         {/* Collapsible system prompt */}
@@ -95,7 +95,7 @@ export function Component() {
           <button
             type="button"
             onClick={() => setSystemPromptOpen((prev) => !prev)}
-            className="flex items-center gap-1.5 w-fit text-xs font-medium text-[#444746] hover:text-[#1F1F1F] transition-colors"
+            className="flex items-center gap-1.5 w-fit text-xs font-medium text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +121,7 @@ export function Component() {
               onChange={(e) => setSystemPrompt(e.target.value)}
               placeholder="Enter a system prompt (optional)…"
               rows={3}
-              className="w-full resize-none rounded-lg bg-[#F0F4F9] px-3 py-2.5 text-xs font-mono text-[#1F1F1F] placeholder:text-[#9AA0A6] focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/40 transition"
+              className="w-full resize-none rounded-lg bg-[var(--color-surface-container)] px-3 py-2.5 text-xs font-mono text-[var(--color-on-surface)] placeholder:text-[#9AA0A6] focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/40 transition"
               style={{ minHeight: "80px" }}
             />
           )}
@@ -129,7 +129,7 @@ export function Component() {
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-4 flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="bg-[var(--color-surface)] rounded-2xl shadow-sm p-4 flex flex-col gap-3">
         <textarea
           ref={textareaRef}
           value={userInput}
@@ -137,7 +137,7 @@ export function Component() {
           placeholder={selectedTemplate.placeholder}
           disabled={isGenerating || !currentModel}
           rows={3}
-          className="w-full resize-none rounded-xl border border-[#C4C7C5] bg-[#F0F4F9] px-4 py-3 text-sm text-[#1F1F1F] placeholder:text-[#9AA0A6] focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/40 disabled:opacity-50 transition"
+          className="w-full resize-none rounded-xl border border-[var(--color-outline-variant)] bg-[var(--color-surface-container)] px-4 py-3 text-sm text-[var(--color-on-surface)] placeholder:text-[#9AA0A6] focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/40 disabled:opacity-50 transition"
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
               e.preventDefault();
@@ -174,9 +174,9 @@ export function Component() {
 
       {/* Output */}
       {hasOutput && (
-        <div ref={outputRef} className="bg-white rounded-2xl shadow-sm p-4 flex flex-col gap-2">
-          <p className="text-xs font-semibold text-[#444746] uppercase tracking-wide">Response</p>
-          <div className="rounded-xl bg-[#F0F4F9] px-4 py-3 text-sm text-[#1F1F1F] leading-relaxed whitespace-pre-wrap">
+        <div ref={outputRef} className="bg-[var(--color-surface)] rounded-2xl shadow-sm p-4 flex flex-col gap-2">
+          <p className="text-xs font-semibold text-[var(--color-on-surface-variant)] uppercase tracking-wide">Response</p>
+          <div className="rounded-xl bg-[var(--color-surface-container)] px-4 py-3 text-sm text-[var(--color-on-surface)] leading-relaxed whitespace-pre-wrap">
             {displayText}
             {isGenerating && (
               <span className="inline-block w-1.5 h-4 ml-0.5 bg-[#0B57D0] rounded-sm animate-pulse align-text-bottom" />

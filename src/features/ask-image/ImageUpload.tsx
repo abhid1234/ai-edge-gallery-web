@@ -39,7 +39,7 @@ export function ImageUpload({ onImageSelected }: Props) {
           <img src={preview} alt="Uploaded" className="max-h-64 rounded-lg object-contain mx-auto" />
           <button
             onClick={() => { setPreview(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
-            className="absolute top-2 right-2 bg-white/80 rounded-full px-2 py-0.5 text-xs text-gray-600 hover:bg-white"
+            className="absolute top-2 right-2 bg-[var(--color-surface)]/80 rounded-full px-2 py-0.5 text-xs text-gray-600 hover:bg-[var(--color-surface)]"
           >
             Clear
           </button>

@@ -8,7 +8,7 @@ function ExamplePill({ label, onClick }: { label: string; onClick: () => void })
     <button
       type="button"
       onClick={onClick}
-      className="flex-shrink-0 h-8 px-3.5 rounded-full text-xs font-medium border border-[#C2D8F7] bg-white text-[#0B57D0] hover:bg-[#D3E3FD]/60 transition-colors"
+      className="flex-shrink-0 h-8 px-3.5 rounded-full text-xs font-medium border border-[#C2D8F7] bg-[var(--color-surface)] text-[#0B57D0] hover:bg-[#D3E3FD]/60 transition-colors"
     >
       {label}
     </button>
@@ -51,12 +51,12 @@ export function Component() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem)] bg-[#F0F4F9] max-w-4xl mx-auto w-full">
+    <div className="flex flex-col h-[calc(100vh-3.5rem)] bg-[var(--color-surface-container)] max-w-4xl mx-auto w-full">
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0">
         <div>
-          <h2 className="text-xl font-bold text-[#1F1F1F]">Web Actions</h2>
-          <p className="text-xs text-[#444746] mt-0.5">
+          <h2 className="text-xl font-bold text-[var(--color-on-surface)]">Web Actions</h2>
+          <p className="text-xs text-[var(--color-on-surface-variant)] mt-0.5">
             On-device function calling via WebGPU
           </p>
         </div>
@@ -71,7 +71,7 @@ export function Component() {
       </div>
 
       {/* Main panel */}
-      <div className="flex-1 flex flex-col mx-4 mb-4 bg-white rounded-2xl overflow-hidden shadow-sm">
+      <div className="flex-1 flex flex-col mx-4 mb-4 bg-[var(--color-surface)] rounded-2xl overflow-hidden shadow-sm">
         {/* Info banner */}
         <div className="flex items-start gap-3 px-5 py-3.5 bg-[#E8F0FE] border-b border-[#C5D8FB]">
           <svg viewBox="0 0 24 24" fill="#0B57D0" className="w-4 h-4 flex-shrink-0 mt-0.5">
@@ -90,15 +90,15 @@ export function Component() {
             <div className="flex flex-col items-center justify-center h-full gap-6 pb-10">
               {/* Tool chips */}
               <div className="text-center">
-                <p className="text-sm font-semibold text-[#1F1F1F] mb-1">Available tools</p>
-                <p className="text-xs text-[#747775] mb-4">
+                <p className="text-sm font-semibold text-[var(--color-on-surface)] mb-1">Available tools</p>
+                <p className="text-xs text-[var(--color-outline)] mb-4">
                   {tools.length} actions the model can invoke
                 </p>
                 <div className="flex flex-wrap gap-2 justify-center max-w-md">
                   {tools.map((t) => (
                     <span
                       key={t.name}
-                      className="h-7 px-3 rounded-full text-xs font-mono font-medium border border-[#E9EEF6] bg-[#F8FAFF] text-[#444746]"
+                      className="h-7 px-3 rounded-full text-xs font-mono font-medium border border-[var(--color-surface-container-high)] bg-[#F8FAFF] text-[var(--color-on-surface-variant)]"
                     >
                       {t.name}()
                     </span>
@@ -108,7 +108,7 @@ export function Component() {
 
               {/* Example prompts */}
               <div className="text-center">
-                <p className="text-xs text-[#747775] mb-2">Try an example</p>
+                <p className="text-xs text-[var(--color-outline)] mb-2">Try an example</p>
                 <div className="flex flex-wrap gap-2 justify-center max-w-md">
                   {EXAMPLES.map((ex) => (
                     <ExamplePill key={ex} label={ex} onClick={() => handleExample(ex)} />
@@ -125,10 +125,10 @@ export function Component() {
 
           {/* Processing skeleton */}
           {isProcessing && (
-            <div className="rounded-2xl border border-[#E9EEF6] bg-white p-4 shadow-sm animate-pulse">
+            <div className="rounded-2xl border border-[var(--color-surface-container-high)] bg-[var(--color-surface)] p-4 shadow-sm animate-pulse">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-7 h-7 rounded-full bg-[#E9EEF6]" />
-                <div className="h-3.5 bg-[#E9EEF6] rounded-full w-1/2" />
+                <div className="w-7 h-7 rounded-full bg-[var(--color-surface-container-high)]" />
+                <div className="h-3.5 bg-[var(--color-surface-container-high)] rounded-full w-1/2" />
               </div>
               <div className="h-20 bg-[#F8FAFF] rounded-xl mb-3" />
               <div className="h-8 bg-[#E6F4EA] rounded-xl" />
@@ -139,7 +139,7 @@ export function Component() {
         </div>
 
         {/* Input bar */}
-        <div className="border-t border-[#E9EEF6]">
+        <div className="border-t border-[var(--color-surface-container-high)]">
           {/* Example pills (compact row when history exists) */}
           {actions.length > 0 && (
             <div className="px-4 pt-2 pb-0 flex gap-2 overflow-x-auto scrollbar-hide">
@@ -151,7 +151,7 @@ export function Component() {
 
           <form
             onSubmit={handleSubmit}
-            className="flex items-end gap-2 px-4 py-3 bg-white"
+            className="flex items-end gap-2 px-4 py-3 bg-[var(--color-surface)]"
           >
             <textarea
               rows={1}
@@ -175,7 +175,7 @@ export function Component() {
                   : "Type a command, e.g. open google maps"
               }
               disabled={!hasModel || isProcessing}
-              className="flex-1 resize-none bg-[#F0F4F9] text-[#1F1F1F] placeholder-[#747775] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#3174F1]/30 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
+              className="flex-1 resize-none bg-[var(--color-surface-container)] text-[var(--color-on-surface)] placeholder-[#747775] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#3174F1]/30 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
               style={{ height: "40px" }}
             />
 

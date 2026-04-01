@@ -39,7 +39,7 @@ export function Component() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4">
+      <div className="bg-[var(--color-surface)] rounded-2xl border border-[var(--color-outline-variant)] p-6 space-y-4">
         <AudioRecorder onAudioReady={setAudioUrl} />
 
         {audioUrl && (
@@ -50,7 +50,7 @@ export function Component() {
               onChange={(e) => setQuestion(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAsk()}
               placeholder="Ask a question about this audio..."
-              className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="flex-1 px-4 py-2.5 border border-[var(--color-outline-variant)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             />
             {isProcessing ? (
               <button
@@ -74,7 +74,7 @@ export function Component() {
         )}
 
         {response && (
-          <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-900 leading-relaxed">
+          <div className="bg-[var(--color-surface-container)] rounded-lg p-4 text-sm text-gray-900 leading-relaxed">
             <pre className="whitespace-pre-wrap font-sans">{response}</pre>
           </div>
         )}

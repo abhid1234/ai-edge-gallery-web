@@ -73,7 +73,7 @@ export function ModelImport({ onImported }: Props) {
 
   return (
     <div className="mt-6">
-      <h2 className="text-lg font-bold text-[#1F1F1F] mb-3">Import Local Model</h2>
+      <h2 className="text-lg font-bold text-[var(--color-on-surface)] mb-3">Import Local Model</h2>
 
       {/* Drop zone */}
       <div
@@ -82,11 +82,11 @@ export function ModelImport({ onImported }: Props) {
         onDragLeave={handleDragLeave}
         onClick={() => !selectedFile && inputRef.current?.click()}
         className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-3 transition-colors cursor-pointer
-          ${dragOver ? "border-[#3174F1] bg-[#EEF3FC]" : "border-[#C4C7C5] bg-white hover:bg-[#F8FAFD]"}
+          ${dragOver ? "border-[#3174F1] bg-[#EEF3FC]" : "border-[var(--color-outline-variant)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-container-low)]"}
           ${selectedFile ? "cursor-default" : ""}`}
       >
         {/* Upload icon */}
-        <div className="w-12 h-12 rounded-full bg-[#F0F4F9] flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full bg-[var(--color-surface-container)] flex items-center justify-center">
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-[#3174F1]">
             <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z" />
           </svg>
@@ -94,8 +94,8 @@ export function ModelImport({ onImported }: Props) {
 
         {selectedFile ? (
           <div className="text-center">
-            <p className="text-sm font-semibold text-[#1F1F1F]">{selectedFile.name}</p>
-            <p className="text-xs text-[#747775] mt-0.5">{formatSize(selectedFile.size)}</p>
+            <p className="text-sm font-semibold text-[var(--color-on-surface)]">{selectedFile.name}</p>
+            <p className="text-xs text-[var(--color-outline)] mt-0.5">{formatSize(selectedFile.size)}</p>
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -110,10 +110,10 @@ export function ModelImport({ onImported }: Props) {
           </div>
         ) : (
           <div className="text-center">
-            <p className="text-sm font-semibold text-[#1F1F1F]">
+            <p className="text-sm font-semibold text-[var(--color-on-surface)]">
               Import a local .task or .litertlm model file
             </p>
-            <p className="text-xs text-[#747775] mt-1">
+            <p className="text-xs text-[var(--color-outline)] mt-1">
               Drag and drop here, or click to browse
             </p>
           </div>
@@ -132,11 +132,11 @@ export function ModelImport({ onImported }: Props) {
       {/* Progress bar */}
       {importing && (
         <div className="mt-3">
-          <div className="flex justify-between text-xs text-[#444746] mb-1">
+          <div className="flex justify-between text-xs text-[var(--color-on-surface-variant)] mb-1">
             <span>Copying to storage…</span>
             <span>{progress}%</span>
           </div>
-          <div className="w-full h-2 bg-[#E9EEF6] rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-[var(--color-surface-container-high)] rounded-full overflow-hidden">
             <div
               className="h-full bg-[#3174F1] rounded-full transition-all duration-150"
               style={{ width: `${progress}%` }}

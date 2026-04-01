@@ -48,7 +48,7 @@ export function ActionResult({ action }: Props) {
   const failed = action.error !== null;
 
   return (
-    <div className="rounded-2xl overflow-hidden shadow-sm border border-[#E9EEF6] bg-white">
+    <div className="rounded-2xl overflow-hidden shadow-sm border border-[var(--color-surface-container-high)] bg-[var(--color-surface)]">
       {/* Section 1: User request */}
       <div className="px-4 pt-4 pb-3 flex items-start gap-3">
         <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#0B57D0] flex items-center justify-center mt-0.5">
@@ -57,8 +57,8 @@ export function ActionResult({ action }: Props) {
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[#1F1F1F] text-sm font-medium leading-snug">{action.request}</p>
-          <p className="text-[#747775] text-xs mt-1">{time}</p>
+          <p className="text-[var(--color-on-surface)] text-sm font-medium leading-snug">{action.request}</p>
+          <p className="text-[var(--color-outline)] text-xs mt-1">{time}</p>
         </div>
       </div>
 

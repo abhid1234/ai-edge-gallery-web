@@ -142,10 +142,10 @@ export function Component() {
   }, [checkStoredModels]);
 
   return (
-    <div className="min-h-full bg-[#F0F4F9] max-w-6xl mx-auto">
+    <div className="min-h-full bg-[var(--color-surface-container)] max-w-6xl mx-auto">
       {/* Hero title section */}
       <div className="px-10 pt-12 pb-8">
-        <h1 className="text-5xl font-extrabold leading-tight text-[#1F1F1F] tracking-tight">
+        <h1 className="text-5xl font-extrabold leading-tight text-[var(--color-on-surface)] tracking-tight">
           Google AI
         </h1>
         <h1 className="text-5xl font-extrabold leading-tight tracking-tight">
@@ -158,7 +158,7 @@ export function Component() {
             Edge Gallery
           </span>
         </h1>
-        <p className="mt-4 text-base text-[#444746] max-w-md leading-relaxed">
+        <p className="mt-4 text-base text-[var(--color-on-surface-variant)] max-w-md leading-relaxed">
           Run powerful AI models entirely in your browser — no cloud, no API keys, no data
           leaving your device.
         </p>
@@ -199,8 +199,8 @@ export function Component() {
                 className={`${color.bg} rounded-3xl px-6 py-5 flex items-center justify-between shadow-sm hover:opacity-90 transition-opacity`}
               >
                 <div>
-                  <p className="text-base font-bold text-[#1F1F1F]">{card.title}</p>
-                  <p className="text-sm text-[#444746] mt-0.5">{card.subtitle}</p>
+                  <p className="text-base font-bold text-[var(--color-on-surface)]">{card.title}</p>
+                  <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">{card.subtitle}</p>
                 </div>
                 <div
                   className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${color.iconBgGrad} flex items-center justify-center shadow-sm`}
@@ -216,7 +216,7 @@ export function Component() {
       {/* Models section */}
       <div className="px-6 pt-8 pb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-[#1F1F1F]">
+          <h2 className="text-lg font-bold text-[var(--color-on-surface)]">
             Available Models
           </h2>
           <button
@@ -232,8 +232,8 @@ export function Component() {
         </div>
 
         {showTokenInput && (
-          <div className="bg-white rounded-xl p-4 mb-4 shadow-sm">
-            <p className="text-xs text-[#444746] mb-2">
+          <div className="bg-[var(--color-surface)] rounded-xl p-4 mb-4 shadow-sm">
+            <p className="text-xs text-[var(--color-on-surface-variant)] mb-2">
               Gemma models are gated on HuggingFace. Get a token at{" "}
               <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-[#0B57D0] underline">
                 huggingface.co/settings/tokens
@@ -246,7 +246,7 @@ export function Component() {
                 value={tokenInput}
                 onChange={(e) => setTokenInput(e.target.value)}
                 placeholder="hf_..."
-                className="flex-1 px-3 py-2 text-sm border border-[#C4C7C5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/30"
+                className="flex-1 px-3 py-2 text-sm border border-[var(--color-outline-variant)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/30"
               />
               <button
                 onClick={() => { setHfToken(tokenInput); setShowTokenInput(false); }}
@@ -260,7 +260,7 @@ export function Component() {
         )}
 
         {loading ? (
-          <div className="flex items-center justify-center h-32 text-[#444746] text-sm">
+          <div className="flex items-center justify-center h-32 text-[var(--color-on-surface-variant)] text-sm">
             Loading model catalog…
           </div>
         ) : (
