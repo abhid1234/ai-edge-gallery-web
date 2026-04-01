@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-gallery-v3';
+const CACHE_NAME = 'ai-gallery-v4';
 const PRECACHE_URLS = ['/', '/index.html'];
 
 self.addEventListener('install', (event) => {
