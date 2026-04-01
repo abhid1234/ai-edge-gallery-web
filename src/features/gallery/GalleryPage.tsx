@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { loadCatalog } from "../../lib/catalog";
 import { useDownload } from "../../contexts/DownloadContext";
+import { useWebGPU } from "../../hooks/useWebGPU";
 import { ModelCard } from "./ModelCard";
 import { ModelImport } from "./ModelImport";
 import type { ModelInfo } from "../../types";
@@ -125,6 +126,7 @@ export function Component() {
   const [tokenInput, setTokenInput] = useState("");
   const [showTokenInput, setShowTokenInput] = useState(false);
   const { checkStoredModels, hfToken, setHfToken } = useDownload();
+  const { info: gpuInfo } = useWebGPU();
 
   useEffect(() => {
     async function init() {
@@ -160,6 +162,65 @@ export function Component() {
           Run powerful AI models entirely in your browser — no cloud, no API keys, no data
           leaving your device.
         </p>
+        <div className="mt-3 flex items-center gap-2">
+          {gpuInfo.supported ? (
+            <span
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full"
+              style={{ backgroundColor: "#C4EED0", color: "#146C2E" }}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+              WebGPU Active — Full GPU acceleration
+            </span>
+          ) : (
+            <span
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full"
+              style={{ backgroundColor: "#FEF7E0", color: "#E37400" }}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+              </svg>
+              WASM mode — Slower inference (WebGPU not available)
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Starting point selector */}
+      <div className="px-6 pt-6 pb-2">
+        <div className="grid grid-cols-3 gap-3">
+          <Link
+            to="/chat"
+            className="rounded-xl p-4 text-center transition-all hover:shadow-md"
+            style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-outline-variant)" }}
+          >
+            <div className="text-2xl mb-2">💬</div>
+            <p className="text-xs font-bold" style={{ color: "var(--color-on-surface)" }}>Explore Demos</p>
+            <p className="text-[10px] mt-0.5" style={{ color: "var(--color-on-surface-variant)" }}>Try chat, image, audio</p>
+          </Link>
+          <Link
+            to="/benchmarks"
+            className="rounded-xl p-4 text-center transition-all hover:shadow-md"
+            style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-outline-variant)" }}
+          >
+            <div className="text-2xl mb-2">🚀</div>
+            <p className="text-xs font-bold" style={{ color: "var(--color-on-surface)" }}>Run a Model</p>
+            <p className="text-[10px] mt-0.5" style={{ color: "var(--color-on-surface-variant)" }}>Benchmark & compare</p>
+          </Link>
+          <button
+            onClick={() => {
+              const importSection = document.getElementById("import-section");
+              importSection?.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="rounded-xl p-4 text-center transition-all hover:shadow-md"
+            style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-outline-variant)" }}
+          >
+            <div className="text-2xl mb-2">📦</div>
+            <p className="text-xs font-bold" style={{ color: "var(--color-on-surface)" }}>Import Your Own</p>
+            <p className="text-[10px] mt-0.5" style={{ color: "var(--color-on-surface-variant)" }}>Drag-drop a .task file</p>
+          </button>
+        </div>
       </div>
 
       {/* Feature task cards */}
@@ -249,13 +310,15 @@ export function Component() {
           </div>
         )}
 
-        <ModelImport
-          onImported={(model) =>
-            setCustomModels((prev) =>
-              prev.some((m) => m.id === model.id) ? prev : [...prev, model]
-            )
-          }
-        />
+        <div id="import-section">
+          <ModelImport
+            onImported={(model) =>
+              setCustomModels((prev) =>
+                prev.some((m) => m.id === model.id) ? prev : [...prev, model]
+              )
+            }
+          />
+        </div>
       </div>
     </div>
   );

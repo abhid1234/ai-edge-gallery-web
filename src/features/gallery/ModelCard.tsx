@@ -76,6 +76,12 @@ export function ModelCard({ model }: Props) {
                   Downloaded
                 </span>
               )}
+              {(model.fileName.includes("-Web") || model.fileName.includes("web")) && (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                  style={{ backgroundColor: "#C2E7FF", color: "#00639B" }}>
+                  Web-Optimized
+                </span>
+              )}
             </div>
             <div className="flex gap-2 mt-1.5 flex-wrap">
               <span className="text-[11px] px-2 py-0.5 rounded" style={{ color: "var(--color-on-surface-variant)", backgroundColor: "var(--color-surface-container-high)" }}>

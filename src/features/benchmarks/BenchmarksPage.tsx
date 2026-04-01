@@ -2,6 +2,7 @@ import { useModel } from "../../contexts/ModelContext";
 import { useWebGPU } from "../../hooks/useWebGPU";
 import { useBenchmark } from "./useBenchmark";
 import { MetricsPanel } from "./MetricsPanel";
+import { SpeedGauge } from "./SpeedGauge";
 import type { BenchmarkResult } from "../../types";
 
 const BAR_COLORS = ["#ef4444", "#22c55e", "#3b82f6", "#eab308"] as const;
@@ -166,6 +167,12 @@ export function Component() {
         </div>
 
         <MetricsPanel result={latestResult} />
+
+        {latestResult && (
+          <div className="flex justify-center mt-6">
+            <SpeedGauge tokensPerSecond={latestResult.tokensPerSecond} />
+          </div>
+        )}
 
         {gpuInfo.supported && (
           <div className="border-t border-gray-200 pt-4">
