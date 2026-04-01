@@ -82,12 +82,12 @@ export function ModelImport({ onImported }: Props) {
         onDragLeave={handleDragLeave}
         onClick={() => !selectedFile && inputRef.current?.click()}
         className={`border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center gap-3 transition-colors cursor-pointer
-          ${dragOver ? "border-[#3174F1] bg-[#EEF3FC]" : "border-[var(--color-outline-variant)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-container-low)]"}
+          ${dragOver ? "border-[var(--color-primary)] bg-[#EEF3FC]" : "border-[var(--color-outline-variant)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-container-low)]"}
           ${selectedFile ? "cursor-default" : ""}`}
       >
         {/* Upload icon */}
         <div className="w-12 h-12 rounded-full bg-[var(--color-surface-container)] flex items-center justify-center">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-[#3174F1]">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-[var(--color-primary)]">
             <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z" />
           </svg>
         </div>
@@ -103,7 +103,7 @@ export function ModelImport({ onImported }: Props) {
                 setError(null);
                 if (inputRef.current) inputRef.current.value = "";
               }}
-              className="mt-2 text-xs text-[#D93025] hover:underline"
+              className="mt-2 text-xs text-[var(--color-error)] hover:underline"
             >
               Remove
             </button>
@@ -138,7 +138,7 @@ export function ModelImport({ onImported }: Props) {
           </div>
           <div className="w-full h-2 bg-[var(--color-surface-container-high)] rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#3174F1] rounded-full transition-all duration-150"
+              className="h-full bg-[var(--color-tab-selected)] rounded-full transition-all duration-150"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -147,7 +147,7 @@ export function ModelImport({ onImported }: Props) {
 
       {/* Error */}
       {error && (
-        <div className="mt-3 bg-[#FCE8E6] text-[#D93025] text-xs rounded-lg px-3 py-2">
+        <div className="mt-3 bg-[var(--color-error-container)] text-[var(--color-error)] text-xs rounded-lg px-3 py-2">
           {error}
         </div>
       )}
@@ -156,7 +156,7 @@ export function ModelImport({ onImported }: Props) {
       {selectedFile && !importing && (
         <button
           onClick={handleImport}
-          className="mt-3 w-full py-2.5 px-4 bg-[#0B57D0] text-white rounded-xl text-sm font-semibold hover:bg-[#0842A0] transition-colors"
+          className="mt-3 w-full py-2.5 px-4 bg-[var(--color-primary)] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-colors"
         >
           Import {selectedFile.name}
         </button>

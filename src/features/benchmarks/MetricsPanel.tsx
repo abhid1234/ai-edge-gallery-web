@@ -7,10 +7,10 @@ interface Props {
 function MetricCard({ label, value, unit }: { label: string; value: string | number; unit: string }) {
   return (
     <div className="bg-[var(--color-surface-container)] rounded-lg p-4">
-      <p className="text-xs text-gray-500 mb-1">{label}</p>
-      <p className="text-2xl font-bold text-gray-900">
+      <p className="text-xs text-[var(--color-on-surface-variant)] mb-1">{label}</p>
+      <p className="text-2xl font-bold text-[var(--color-on-surface)]">
         {value}
-        <span className="text-sm font-normal text-gray-500 ml-1">{unit}</span>
+        <span className="text-sm font-normal text-[var(--color-on-surface-variant)] ml-1">{unit}</span>
       </p>
     </div>
   );
@@ -19,7 +19,7 @@ function MetricCard({ label, value, unit }: { label: string; value: string | num
 export function MetricsPanel({ result }: Props) {
   if (!result) {
     return (
-      <div className="text-center py-12 text-gray-400 text-sm">
+      <div className="text-center py-12 text-[var(--color-outline)] text-sm">
         Run a benchmark to see performance metrics
       </div>
     );
@@ -33,7 +33,7 @@ export function MetricsPanel({ result }: Props) {
         <MetricCard label="Total Tokens" value={result.tokenCount} unit="tokens" />
         <MetricCard label="Total Time" value={(result.totalTimeMs / 1000).toFixed(1)} unit="s" />
       </div>
-      <div className="flex gap-4 text-xs text-gray-500">
+      <div className="flex gap-4 text-xs text-[var(--color-on-surface-variant)]">
         <span>Backend: <strong>{result.backend}</strong></span>
         <span>GPU: <strong>{result.gpuAdapterName}</strong></span>
       </div>

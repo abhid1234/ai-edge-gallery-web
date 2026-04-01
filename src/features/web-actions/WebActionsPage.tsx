@@ -8,7 +8,7 @@ function ExamplePill({ label, onClick }: { label: string; onClick: () => void })
     <button
       type="button"
       onClick={onClick}
-      className="flex-shrink-0 h-8 px-3.5 rounded-full text-xs font-medium border border-[#C2D8F7] bg-[var(--color-surface)] text-[#0B57D0] hover:bg-[#D3E3FD]/60 transition-colors"
+      className="flex-shrink-0 h-8 px-3.5 rounded-full text-xs font-medium border border-[var(--color-primary-container)] bg-[var(--color-surface)] text-[var(--color-primary)] hover:bg-[var(--color-primary-container)]/60 transition-colors"
     >
       {label}
     </button>
@@ -63,7 +63,7 @@ export function Component() {
         {actions.length > 0 && (
           <button
             onClick={clearHistory}
-            className="text-sm text-[#0B57D0] hover:text-[#0842A0] px-3 py-1.5 rounded-xl hover:bg-[#D3E3FD]/50 transition-colors font-medium"
+            className="text-sm text-[var(--color-primary)] hover:text-[var(--color-on-primary-container)] px-3 py-1.5 rounded-xl hover:bg-[var(--color-primary-container)]/50 transition-colors font-medium"
           >
             Clear history
           </button>
@@ -73,11 +73,11 @@ export function Component() {
       {/* Main panel */}
       <div className="flex-1 flex flex-col mx-4 mb-4 bg-[var(--color-surface)] rounded-2xl overflow-hidden shadow-sm">
         {/* Info banner */}
-        <div className="flex items-start gap-3 px-5 py-3.5 bg-[#E8F0FE] border-b border-[#C5D8FB]">
+        <div className="flex items-start gap-3 px-5 py-3.5 bg-[var(--color-primary-container)] border-b border-[var(--color-primary-container)]">
           <svg viewBox="0 0 24 24" fill="#0B57D0" className="w-4 h-4 flex-shrink-0 mt-0.5">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
           </svg>
-          <p className="text-xs text-[#0842A0] leading-relaxed">
+          <p className="text-xs text-[var(--color-on-primary-container)] leading-relaxed">
             Type a natural language command and the model will translate it into a structured
             function call that executes locally in your browser. Works best with
             FunctionGemma-270M; any loaded model will be used.
@@ -98,7 +98,7 @@ export function Component() {
                   {tools.map((t) => (
                     <span
                       key={t.name}
-                      className="h-7 px-3 rounded-full text-xs font-mono font-medium border border-[var(--color-surface-container-high)] bg-[#F8FAFF] text-[var(--color-on-surface-variant)]"
+                      className="h-7 px-3 rounded-full text-xs font-mono font-medium border border-[var(--color-surface-container-high)] bg-[var(--color-surface-container)] text-[var(--color-on-surface-variant)]"
                     >
                       {t.name}()
                     </span>
@@ -130,8 +130,8 @@ export function Component() {
                 <div className="w-7 h-7 rounded-full bg-[var(--color-surface-container-high)]" />
                 <div className="h-3.5 bg-[var(--color-surface-container-high)] rounded-full w-1/2" />
               </div>
-              <div className="h-20 bg-[#F8FAFF] rounded-xl mb-3" />
-              <div className="h-8 bg-[#E6F4EA] rounded-xl" />
+              <div className="h-20 bg-[var(--color-surface-container)] rounded-xl mb-3" />
+              <div className="h-8 bg-[var(--color-tertiary-container)] rounded-xl" />
             </div>
           )}
 
@@ -175,7 +175,7 @@ export function Component() {
                   : "Type a command, e.g. open google maps"
               }
               disabled={!hasModel || isProcessing}
-              className="flex-1 resize-none bg-[var(--color-surface-container)] text-[var(--color-on-surface)] placeholder-[#747775] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#3174F1]/30 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
+              className="flex-1 resize-none bg-[var(--color-surface-container)] text-[var(--color-on-surface)] placeholder-[var(--color-outline)] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#3174F1]/30 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
               style={{ height: "40px" }}
             />
 
@@ -183,7 +183,7 @@ export function Component() {
               <button
                 type="button"
                 onClick={cancelAction}
-                className="w-10 h-10 flex-shrink-0 rounded-full bg-[#D93025] text-white flex items-center justify-center hover:bg-[#B3261E] transition-colors"
+                className="w-10 h-10 flex-shrink-0 rounded-full bg-[var(--color-error)] text-white flex items-center justify-center hover:opacity-90 transition-colors"
                 title="Cancel"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -194,7 +194,7 @@ export function Component() {
               <button
                 type="submit"
                 disabled={!hasModel || !input.trim() || isProcessing}
-                className="w-10 h-10 flex-shrink-0 rounded-full bg-[#0B57D0] text-white flex items-center justify-center hover:bg-[#0842A0] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-10 h-10 flex-shrink-0 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center hover:opacity-90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 title="Run action"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">

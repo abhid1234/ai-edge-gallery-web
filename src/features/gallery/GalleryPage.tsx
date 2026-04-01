@@ -216,8 +216,8 @@ export function Component() {
             onClick={() => setShowTokenInput((v) => !v)}
             className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
               hfToken
-                ? "bg-[#C4EED0] text-[#146C2E]"
-                : "bg-[#FEF7E0] text-[#E37400]"
+                ? "bg-[var(--color-tertiary-container)] text-[var(--color-tertiary)]"
+                : "bg-[var(--color-warning-container)] text-[var(--color-warning)]"
             }`}
           >
             {hfToken ? "HF Token Set" : "Add HF Token"}
@@ -228,7 +228,7 @@ export function Component() {
           <div className="bg-[var(--color-surface)] rounded-xl p-4 mb-4 shadow-sm">
             <p className="text-xs text-[var(--color-on-surface-variant)] mb-2">
               Gemma models are gated on HuggingFace. Get a token at{" "}
-              <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-[#0B57D0] underline">
+              <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer" className="text-[var(--color-primary)] underline">
                 huggingface.co/settings/tokens
               </a>
               {" "}and accept the model license first.
@@ -244,7 +244,7 @@ export function Component() {
               <button
                 onClick={() => { setHfToken(tokenInput); setShowTokenInput(false); }}
                 disabled={!tokenInput.trim()}
-                className="px-4 py-2 bg-[#0B57D0] text-white rounded-lg text-sm font-semibold disabled:opacity-50"
+                className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg text-sm font-semibold disabled:opacity-50"
               >
                 Save
               </button>

@@ -71,14 +71,14 @@ export function Component() {
               {currentModel.name} · on-device via WebGPU
             </p>
           ) : (
-            <p className="text-xs text-[#C01C1C] mt-0.5">No model loaded — go to Gallery to load one</p>
+            <p className="text-xs text-[var(--color-error)] mt-0.5">No model loaded — go to Gallery to load one</p>
           )}
         </div>
         {(hasOutput || userInput) && (
           <button
             type="button"
             onClick={handleClear}
-            className="text-sm text-[#0B57D0] hover:text-[#0842A0] px-3 py-1.5 rounded-xl hover:bg-[#D3E3FD]/50 transition-colors font-medium"
+            className="text-sm text-[var(--color-primary)] hover:text-[var(--color-on-primary-container)] px-3 py-1.5 rounded-xl hover:bg-[var(--color-primary-container)]/50 transition-colors font-medium"
           >
             Clear
           </button>
@@ -121,7 +121,7 @@ export function Component() {
               onChange={(e) => setSystemPrompt(e.target.value)}
               placeholder="Enter a system prompt (optional)…"
               rows={3}
-              className="w-full resize-none rounded-lg bg-[var(--color-surface-container)] px-3 py-2.5 text-xs font-mono text-[var(--color-on-surface)] placeholder:text-[#9AA0A6] focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/40 transition"
+              className="w-full resize-none rounded-lg bg-[var(--color-surface-container)] px-3 py-2.5 text-xs font-mono text-[var(--color-on-surface)] placeholder:text-[var(--color-outline)] focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/40 transition"
               style={{ minHeight: "80px" }}
             />
           )}
@@ -137,7 +137,7 @@ export function Component() {
           placeholder={selectedTemplate.placeholder}
           disabled={isGenerating || !currentModel}
           rows={3}
-          className="w-full resize-none rounded-xl border border-[var(--color-outline-variant)] bg-[var(--color-surface-container)] px-4 py-3 text-sm text-[var(--color-on-surface)] placeholder:text-[#9AA0A6] focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/40 disabled:opacity-50 transition"
+          className="w-full resize-none rounded-xl border border-[var(--color-outline-variant)] bg-[var(--color-surface-container)] px-4 py-3 text-sm text-[var(--color-on-surface)] placeholder:text-[var(--color-outline)] focus:outline-none focus:ring-2 focus:ring-[#0B57D0]/40 disabled:opacity-50 transition"
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
               e.preventDefault();
@@ -148,13 +148,13 @@ export function Component() {
           }}
         />
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs text-[#9AA0A6]">⌘ Enter to run</p>
+          <p className="text-xs text-[var(--color-outline)]">⌘ Enter to run</p>
           <div className="flex gap-2">
             {isGenerating ? (
               <button
                 type="button"
                 onClick={cancelGeneration}
-                className="h-9 px-5 rounded-full text-sm font-semibold bg-[#FDECEA] text-[#C01C1C] hover:bg-[#F9BFBF] transition-colors"
+                className="h-9 px-5 rounded-full text-sm font-semibold bg-[var(--color-error-container)] text-[var(--color-error)] hover:bg-[var(--color-error-container)] transition-colors"
               >
                 Stop
               </button>
@@ -179,7 +179,7 @@ export function Component() {
           <div className="rounded-xl bg-[var(--color-surface-container)] px-4 py-3 text-sm text-[var(--color-on-surface)] leading-relaxed whitespace-pre-wrap">
             {displayText}
             {isGenerating && (
-              <span className="inline-block w-1.5 h-4 ml-0.5 bg-[#0B57D0] rounded-sm animate-pulse align-text-bottom" />
+              <span className="inline-block w-1.5 h-4 ml-0.5 bg-[var(--color-primary)] rounded-sm animate-pulse align-text-bottom" />
             )}
           </div>
         </div>
@@ -187,7 +187,7 @@ export function Component() {
 
       {/* Error */}
       {error && (
-        <div className="rounded-2xl bg-[#FDECEA] border border-[#F9BFBF] px-4 py-3 text-sm text-[#C01C1C]">
+        <div className="rounded-2xl bg-[var(--color-error-container)] border border-[var(--color-error)] px-4 py-3 text-sm text-[var(--color-error)]">
           {error}
         </div>
       )}

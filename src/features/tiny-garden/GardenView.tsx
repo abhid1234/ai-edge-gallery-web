@@ -74,7 +74,7 @@ export function GardenView({ garden }: Props) {
       </div>
 
       {/* Legend */}
-      <div className="mt-3 flex flex-wrap gap-3 text-xs text-[#5C4B30]">
+      <div className="mt-3 flex flex-wrap gap-3 text-xs text-[var(--color-on-surface-variant)]">
         <span className="flex items-center gap-1">
           <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: "#D4A574" }} />
           Empty

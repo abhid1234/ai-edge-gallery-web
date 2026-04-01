@@ -72,7 +72,7 @@ export function ModelCard({ model }: Props) {
                 </span>
               )}
               {status === "ready" && !isActive && (
-                <span className="text-[10px] font-semibold bg-[#C4EED0] text-[#146C2E] px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-semibold bg-[var(--color-tertiary-container)] text-[var(--color-tertiary)] px-2 py-0.5 rounded-full">
                   Downloaded
                 </span>
               )}
@@ -106,14 +106,14 @@ export function ModelCard({ model }: Props) {
               </div>
             )}
             {status === "downloading" && (
-              <div className="w-9 h-9 rounded-full border-2 border-[#3174F1] flex items-center justify-center text-[#3174F1] animate-spin">
+              <div className="w-9 h-9 rounded-full border-2 border-[var(--color-primary)] flex items-center justify-center text-[var(--color-primary)] animate-spin">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
                   <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                 </svg>
               </div>
             )}
             {status === "ready" && (
-              <div className="w-9 h-9 rounded-full bg-[#C4EED0] flex items-center justify-center text-[#146C2E]">
+              <div className="w-9 h-9 rounded-full bg-[var(--color-tertiary-container)] flex items-center justify-center text-[var(--color-tertiary)]">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
                 </svg>
@@ -149,7 +149,7 @@ export function ModelCard({ model }: Props) {
               {model.capabilities.map((cap) => (
                 <span
                   key={cap}
-                  className="text-[11px] bg-[#D3E3FD] text-[#0842A0] px-2 py-0.5 rounded-full"
+                  className="text-[11px] bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)] px-2 py-0.5 rounded-full"
                 >
                   {cap}
                 </span>
@@ -173,7 +173,7 @@ export function ModelCard({ model }: Props) {
           {status === "not_downloaded" && (
             <button
               onClick={(e) => { e.stopPropagation(); startDownload(model); }}
-              className="w-full py-2.5 px-4 bg-[#0B57D0] text-white rounded-xl text-sm font-semibold hover:bg-[#0842A0] transition-colors"
+              className="w-full py-2.5 px-4 bg-[var(--color-primary)] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-colors"
             >
               Download ({formatSize(model.sizeBytes)})
             </button>
@@ -184,7 +184,7 @@ export function ModelCard({ model }: Props) {
               <button
                 onClick={(e) => { e.stopPropagation(); handleLoad(); }}
                 disabled={isLoading}
-                className="flex-1 py-2.5 px-4 bg-[#0B57D0] text-white rounded-xl text-sm font-semibold hover:bg-[#0842A0] transition-colors disabled:opacity-50"
+                className="flex-1 py-2.5 px-4 bg-[var(--color-primary)] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-colors disabled:opacity-50"
               >
                 {isLoading ? "Loading…" : "Load Model"}
               </button>
@@ -208,7 +208,7 @@ export function ModelCard({ model }: Props) {
               </div>
               <button
                 onClick={(e) => { e.stopPropagation(); unloadModel(); }}
-                className="py-1.5 px-3 bg-[#FCE8E6] text-[#D93025] rounded-lg text-xs font-medium hover:bg-[#F9DEDC] transition-colors"
+                className="py-1.5 px-3 bg-[var(--color-error-container)] text-[var(--color-error)] rounded-lg text-xs font-medium hover:bg-[#F9DEDC] transition-colors"
               >
                 Unload (free memory)
               </button>
@@ -216,25 +216,25 @@ export function ModelCard({ model }: Props) {
           )}
 
           {!memCheck.canLoadModel && status !== "not_downloaded" && !isActive && (
-            <div className="mt-3 bg-[#FEF7E0] text-[#E37400] text-xs rounded-lg px-3 py-2">
+            <div className="mt-3 bg-[var(--color-warning-container)] text-[var(--color-warning)] text-xs rounded-lg px-3 py-2">
               {memCheck.warning}
             </div>
           )}
 
           {progress?.status === "error" && progress.error && (
-            <div className="mt-3 bg-[#FCE8E6] text-[#D93025] text-xs rounded-lg px-3 py-2">
+            <div className="mt-3 bg-[var(--color-error-container)] text-[var(--color-error)] text-xs rounded-lg px-3 py-2">
               Download error: {progress.error}
             </div>
           )}
 
           {loadError && (
-            <div className="mt-3 bg-[#FCE8E6] text-[#D93025] text-xs rounded-lg px-3 py-2">
+            <div className="mt-3 bg-[var(--color-error-container)] text-[var(--color-error)] text-xs rounded-lg px-3 py-2">
               Load error: {loadError}
             </div>
           )}
 
           {modelError && isActive && (
-            <div className="mt-3 bg-[#FCE8E6] text-[#D93025] text-xs rounded-lg px-3 py-2">
+            <div className="mt-3 bg-[var(--color-error-container)] text-[var(--color-error)] text-xs rounded-lg px-3 py-2">
               Model error: {modelError}
             </div>
           )}

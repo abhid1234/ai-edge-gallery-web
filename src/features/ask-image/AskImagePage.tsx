@@ -19,8 +19,8 @@ export function Component() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Ask Image</h2>
-        <p className="text-sm text-gray-500 mt-1">Upload an image and ask questions — powered by Gemma 3n E2B multimodal</p>
+        <h2 className="text-2xl font-bold text-[var(--color-on-surface)]">Ask Image</h2>
+        <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Upload an image and ask questions — powered by Gemma 3n E2B multimodal</p>
       </div>
 
       {needsMultimodal && (
@@ -48,7 +48,7 @@ export function Component() {
         )}
 
         {response && (
-          <div className="bg-[var(--color-surface-container)] rounded-lg p-4 text-sm text-gray-900 leading-relaxed">
+          <div className="bg-[var(--color-surface-container)] rounded-lg p-4 text-sm text-[var(--color-on-surface)] leading-relaxed">
             <pre className="whitespace-pre-wrap font-sans">{response}</pre>
           </div>
         )}

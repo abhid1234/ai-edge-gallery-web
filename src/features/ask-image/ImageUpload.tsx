@@ -39,7 +39,7 @@ export function ImageUpload({ onImageSelected }: Props) {
           <img src={preview} alt="Uploaded" className="max-h-64 rounded-lg object-contain mx-auto" />
           <button
             onClick={() => { setPreview(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
-            className="absolute top-2 right-2 bg-[var(--color-surface)]/80 rounded-full px-2 py-0.5 text-xs text-gray-600 hover:bg-[var(--color-surface)]"
+            className="absolute top-2 right-2 bg-[var(--color-surface)]/80 rounded-full px-2 py-0.5 text-xs text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface)]"
           >
             Clear
           </button>
@@ -49,11 +49,11 @@ export function ImageUpload({ onImageSelected }: Props) {
           onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave}
           onClick={() => fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
-            isDragging ? "border-primary bg-primary/5" : "border-gray-300 hover:border-gray-400"
+            isDragging ? "border-primary bg-primary/5" : "border-[var(--color-outline-variant)] hover:border-gray-400"
           }`}
         >
-          <p className="text-sm text-gray-500">Drag and drop an image here, or click to browse</p>
-          <p className="text-xs text-gray-400 mt-1">Supports JPG, PNG, WebP</p>
+          <p className="text-sm text-[var(--color-on-surface-variant)]">Drag and drop an image here, or click to browse</p>
+          <p className="text-xs text-[var(--color-outline)] mt-1">Supports JPG, PNG, WebP</p>
         </div>
       )}
       <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp"

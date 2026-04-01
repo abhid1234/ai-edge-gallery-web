@@ -28,7 +28,7 @@ function ComparisonTable({ results, onRemove }: ComparisonTableProps) {
     <div className="space-y-6">
       {/* Bar Chart */}
       <div>
-        <h3 className="text-sm font-semibold text-gray-700 mb-3">Decode Speed Comparison</h3>
+        <h3 className="text-sm font-semibold text-[var(--color-on-surface)] mb-3">Decode Speed Comparison</h3>
         <div className="space-y-2">
           {sorted.map((result, i) => {
             const pct = fastestSpeed > 0 ? (result.tokensPerSecond / fastestSpeed) * 100 : 0;
@@ -37,13 +37,13 @@ function ComparisonTable({ results, onRemove }: ComparisonTableProps) {
             return (
               <div key={result.timestamp} className="flex items-center gap-3">
                 <span
-                  className="text-xs text-gray-600 truncate"
+                  className="text-xs text-[var(--color-on-surface-variant)] truncate"
                   style={{ minWidth: "8rem", maxWidth: "10rem" }}
                   title={result.modelId}
                 >
                   {result.modelId}
                 </span>
-                <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                <div className="flex-1 bg-[var(--color-surface-container)] rounded-full h-6 overflow-hidden">
                   <div
                     className="h-full rounded-full flex items-center justify-end pr-2 transition-all duration-500"
                     style={{
@@ -68,18 +68,18 @@ function ComparisonTable({ results, onRemove }: ComparisonTableProps) {
 
       {/* Comparison Table */}
       <div>
-        <h3 className="text-sm font-semibold text-gray-700 mb-3">Results Table</h3>
+        <h3 className="text-sm font-semibold text-[var(--color-on-surface)] mb-3">Results Table</h3>
         <div className="overflow-x-auto rounded-lg border border-[var(--color-outline-variant)]">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-[var(--color-surface-container)] border-b border-[var(--color-outline-variant)]">
-                <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Model</th>
-                <th className="text-right px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">TTFT (ms)</th>
-                <th className="text-right px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Decode Speed</th>
-                <th className="text-right px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Tokens</th>
-                <th className="text-right px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Total Time</th>
-                <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Backend</th>
-                <th className="text-left px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Time</th>
+                <th className="text-left px-3 py-2 text-xs font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide">Model</th>
+                <th className="text-right px-3 py-2 text-xs font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide">TTFT (ms)</th>
+                <th className="text-right px-3 py-2 text-xs font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide">Decode Speed</th>
+                <th className="text-right px-3 py-2 text-xs font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide">Tokens</th>
+                <th className="text-right px-3 py-2 text-xs font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide">Total Time</th>
+                <th className="text-left px-3 py-2 text-xs font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide">Backend</th>
+                <th className="text-left px-3 py-2 text-xs font-medium text-[var(--color-on-surface-variant)] uppercase tracking-wide">Time</th>
                 <th className="px-3 py-2" />
               </tr>
             </thead>
@@ -97,18 +97,18 @@ function ComparisonTable({ results, onRemove }: ComparisonTableProps) {
                       )}
                       {result.modelId}
                     </td>
-                    <td className="px-3 py-2 text-right text-gray-700 tabular-nums">{result.ttft}</td>
-                    <td className={`px-3 py-2 text-right font-semibold tabular-nums ${isFastest ? "text-green-700" : "text-gray-700"}`}>
+                    <td className="px-3 py-2 text-right text-[var(--color-on-surface)] tabular-nums">{result.ttft}</td>
+                    <td className={`px-3 py-2 text-right font-semibold tabular-nums ${isFastest ? "text-green-700" : "text-[var(--color-on-surface)]"}`}>
                       {result.tokensPerSecond} tok/s
                     </td>
-                    <td className="px-3 py-2 text-right text-gray-700 tabular-nums">{result.tokenCount}</td>
-                    <td className="px-3 py-2 text-right text-gray-700 tabular-nums">{formatTime(result.totalTimeMs)}s</td>
-                    <td className="px-3 py-2 text-gray-500">{result.backend}</td>
-                    <td className="px-3 py-2 text-gray-400 text-xs whitespace-nowrap">{formatTimestamp(result.timestamp)}</td>
+                    <td className="px-3 py-2 text-right text-[var(--color-on-surface)] tabular-nums">{result.tokenCount}</td>
+                    <td className="px-3 py-2 text-right text-[var(--color-on-surface)] tabular-nums">{formatTime(result.totalTimeMs)}s</td>
+                    <td className="px-3 py-2 text-[var(--color-on-surface-variant)]">{result.backend}</td>
+                    <td className="px-3 py-2 text-[var(--color-outline)] text-xs whitespace-nowrap">{formatTimestamp(result.timestamp)}</td>
                     <td className="px-3 py-2">
                       <button
                         onClick={() => onRemove(result.timestamp)}
-                        className="text-xs text-gray-400 hover:text-red-500 transition-colors px-1.5 py-0.5 rounded hover:bg-red-50"
+                        className="text-xs text-[var(--color-outline)] hover:text-red-500 transition-colors px-1.5 py-0.5 rounded hover:bg-red-50"
                       >
                         Remove
                       </button>
@@ -135,13 +135,13 @@ export function Component() {
     <div className="max-w-5xl mx-auto">
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Benchmarks</h2>
-          <p className="text-sm text-gray-500 mt-1">Measure on-device inference performance</p>
+          <h2 className="text-2xl font-bold text-[var(--color-on-surface)]">Benchmarks</h2>
+          <p className="text-sm text-[var(--color-on-surface-variant)] mt-1">Measure on-device inference performance</p>
         </div>
         {hasHistory && (
           <button
             onClick={clearHistory}
-            className="px-3 py-1.5 text-xs text-gray-500 border border-[var(--color-outline-variant)] rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
+            className="px-3 py-1.5 text-xs text-[var(--color-on-surface-variant)] border border-[var(--color-outline-variant)] rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
           >
             Clear History
           </button>
@@ -150,11 +150,11 @@ export function Component() {
 
       <div className="bg-[var(--color-surface)] rounded-xl border border-[var(--color-outline-variant)] p-6 space-y-6">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-[var(--color-on-surface-variant)]">
             {currentModel ? (
               <span>Model: <strong>{currentModel.name}</strong> ({currentModel.quantization})</span>
             ) : (
-              <span className="text-gray-400">No model loaded</span>
+              <span className="text-[var(--color-outline)]">No model loaded</span>
             )}
           </div>
           <button
@@ -176,8 +176,8 @@ export function Component() {
 
         {gpuInfo.supported && (
           <div className="border-t border-[var(--color-outline-variant)] pt-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">WebGPU Device Info</h3>
-            <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
+            <h3 className="text-sm font-medium text-[var(--color-on-surface)] mb-2">WebGPU Device Info</h3>
+            <div className="grid grid-cols-2 gap-2 text-xs text-[var(--color-on-surface-variant)]">
               <span>GPU: <strong>{gpuInfo.adapterName}</strong></span>
               <span>Vendor: <strong>{gpuInfo.vendor}</strong></span>
               <span>Max Buffer: <strong>{(gpuInfo.maxBufferSize / 1_073_741_824).toFixed(1)} GB</strong></span>
@@ -188,11 +188,11 @@ export function Component() {
 
       {/* Comparison section */}
       <div className="mt-6 bg-[var(--color-surface)] rounded-xl border border-[var(--color-outline-variant)] p-6">
-        <h3 className="text-base font-semibold text-gray-900 mb-4">Model Comparison</h3>
+        <h3 className="text-base font-semibold text-[var(--color-on-surface)] mb-4">Model Comparison</h3>
         {hasHistory ? (
           <ComparisonTable results={results} onRemove={removeResult} />
         ) : (
-          <div className="text-center py-12 text-gray-400 text-sm">
+          <div className="text-center py-12 text-[var(--color-outline)] text-sm">
             Run benchmarks with different models to see a comparison
           </div>
         )}

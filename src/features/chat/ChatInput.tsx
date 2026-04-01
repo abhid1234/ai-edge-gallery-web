@@ -44,7 +44,7 @@ export function ChatInput({ onSend, onCancel, disabled, isGenerating }: Props) {
         }}
         placeholder={disabled ? "Load a model first…" : "Message"}
         disabled={disabled || isGenerating}
-        className="flex-1 resize-none bg-[var(--color-surface-container)] text-[var(--color-on-surface)] placeholder-[#747775] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#3174F1]/30 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
+        className="flex-1 resize-none bg-[var(--color-surface-container)] text-[var(--color-on-surface)] placeholder-[var(--color-outline)] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#3174F1]/30 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
         style={{ height: "40px" }}
       />
 
@@ -52,7 +52,7 @@ export function ChatInput({ onSend, onCancel, disabled, isGenerating }: Props) {
         <button
           type="button"
           onClick={onCancel}
-          className="w-10 h-10 flex-shrink-0 rounded-full bg-[#D93025] text-white flex items-center justify-center hover:bg-[#B3261E] transition-colors"
+          className="w-10 h-10 flex-shrink-0 rounded-full bg-[var(--color-error)] text-white flex items-center justify-center hover:opacity-90 transition-colors"
           title="Stop generating"
         >
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -63,7 +63,7 @@ export function ChatInput({ onSend, onCancel, disabled, isGenerating }: Props) {
         <button
           type="submit"
           disabled={!canSend}
-          className="w-10 h-10 flex-shrink-0 rounded-full bg-[#0B57D0] text-white flex items-center justify-center hover:bg-[#0842A0] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="w-10 h-10 flex-shrink-0 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center hover:opacity-90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           title="Send message"
         >
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">

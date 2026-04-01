@@ -13,8 +13,8 @@ const EXAMPLE_COMMANDS = [
 
 function LogEntry({ log }: { log: ActionLog }) {
   const colors: Record<ActionLog["type"], string> = {
-    success: "text-[#128937]",
-    error: "text-[#D93025]",
+    success: "text-[var(--color-tertiary)]",
+    error: "text-[var(--color-error)]",
     info: "text-[var(--color-on-surface-variant)]",
   };
   return (
@@ -50,12 +50,12 @@ export function Component() {
               {currentModel.name} · function calling
             </p>
           ) : (
-            <p className="text-xs text-[#E37400] mt-0.5">Load a model to start gardening</p>
+            <p className="text-xs text-[var(--color-warning)] mt-0.5">Load a model to start gardening</p>
           )}
         </div>
         <button
           onClick={resetGarden}
-          className="text-sm text-[#CAA12A] hover:text-[#9B7A1E] px-3 py-1.5 rounded-xl hover:bg-[#FFFBF0] transition-colors font-medium border border-[#CAA12A]/30"
+          className="text-sm text-[var(--color-task-yellow)] hover:text-[var(--color-task-yellow)] px-3 py-1.5 rounded-xl hover:bg-[var(--color-task-yellow-bg)] transition-colors font-medium border border-[var(--color-task-yellow)]/30"
         >
           Reset Garden
         </button>
@@ -67,7 +67,7 @@ export function Component() {
         <div className="bg-[var(--color-surface)] rounded-2xl shadow-sm flex-shrink-0 overflow-auto">
           <div className="px-4 pt-4 pb-1">
             <h3 className="text-sm font-semibold text-[var(--color-on-surface)] flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#CAA12A] inline-block" />
+              <span className="w-2 h-2 rounded-full bg-[var(--color-task-yellow)] inline-block" />
               Your Garden
             </h3>
           </div>
@@ -79,14 +79,14 @@ export function Component() {
           {/* Action log */}
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-2 min-h-0">
             <h3 className="text-sm font-semibold text-[var(--color-on-surface)] flex items-center gap-1.5 mb-3">
-              <span className="w-2 h-2 rounded-full bg-[#128937] inline-block" />
+              <span className="w-2 h-2 rounded-full bg-[var(--color-tertiary)] inline-block" />
               Garden Log
             </h3>
             {logs.map((log) => (
               <LogEntry key={log.id} log={log} />
             ))}
             {isProcessing && (
-              <p className="text-sm text-[#CAA12A] animate-pulse">
+              <p className="text-sm text-[var(--color-task-yellow)] animate-pulse">
                 Garden assistant is thinking…
               </p>
             )}
@@ -104,7 +104,7 @@ export function Component() {
                   onClick={() => {
                     setInput(cmd);
                   }}
-                  className="text-xs px-2.5 py-1 rounded-full bg-[#FFFBF0] text-[#9B7A1E] border border-[#CAA12A]/30 hover:bg-[#FFF3CC] transition-colors"
+                  className="text-xs px-2.5 py-1 rounded-full bg-[var(--color-task-yellow-bg)] text-[var(--color-task-yellow)] border border-[var(--color-task-yellow)]/30 hover:bg-[var(--color-warning-container)] transition-colors"
                 >
                   {cmd}
                 </button>
@@ -137,7 +137,7 @@ export function Component() {
                   : "Load a model first…"
               }
               disabled={!currentModel || isProcessing}
-              className="flex-1 resize-none bg-[#FFFBF0] text-[var(--color-on-surface)] placeholder-[#A0866E] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#CAA12A]/40 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
+              className="flex-1 resize-none bg-[var(--color-task-yellow-bg)] text-[var(--color-on-surface)] placeholder-[#A0866E] text-sm px-4 py-2.5 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#CAA12A]/40 disabled:opacity-50 leading-relaxed overflow-hidden min-h-[40px]"
               style={{ height: "40px" }}
             />
 
@@ -145,7 +145,7 @@ export function Component() {
               <button
                 type="button"
                 onClick={cancelGeneration}
-                className="w-10 h-10 flex-shrink-0 rounded-full bg-[#D93025] text-white flex items-center justify-center hover:bg-[#B3261E] transition-colors"
+                className="w-10 h-10 flex-shrink-0 rounded-full bg-[var(--color-error)] text-white flex items-center justify-center hover:opacity-90 transition-colors"
                 title="Stop"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">

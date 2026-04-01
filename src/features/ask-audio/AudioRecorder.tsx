@@ -199,7 +199,7 @@ export function AudioRecorder({ onAudioReady }: Props) {
               <audio src={audioUrl} controls className="w-full rounded-lg" />
               <button
                 onClick={clearAudio}
-                className="text-xs text-gray-500 hover:text-gray-700 underline"
+                className="text-xs text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] underline"
               >
                 Clear recording
               </button>
@@ -216,7 +216,7 @@ export function AudioRecorder({ onAudioReady }: Props) {
               <audio src={audioUrl} controls className="w-full rounded-lg" />
               <button
                 onClick={clearAudio}
-                className="text-xs text-gray-500 hover:text-gray-700 underline"
+                className="text-xs text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] underline"
               >
                 Clear file
               </button>
@@ -224,10 +224,10 @@ export function AudioRecorder({ onAudioReady }: Props) {
           ) : (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors border-gray-300 hover:border-gray-400"
+              className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors border-[var(--color-outline-variant)] hover:border-gray-400"
             >
-              <p className="text-sm text-gray-500">Click to upload an audio file</p>
-              <p className="text-xs text-gray-400 mt-1">Supports WAV, MP3, WebM, OGG</p>
+              <p className="text-sm text-[var(--color-on-surface-variant)]">Click to upload an audio file</p>
+              <p className="text-xs text-[var(--color-outline)] mt-1">Supports WAV, MP3, WebM, OGG</p>
             </div>
           )}
           <input
