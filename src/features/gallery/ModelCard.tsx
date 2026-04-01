@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import type { ModelInfo } from "../../types";
 import { useDownload } from "../../contexts/DownloadContext";
 import { useModel } from "../../contexts/ModelContext";
@@ -14,13 +15,45 @@ export function ModelCard({ model }: Props) {
   const { getModelStatus, downloadProgress, startDownload, removeModel, getModelBlob } =
     useDownload();
   const { currentModel, isLoading, loadModel, unloadModel, error: modelError } = useModel();
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [autoRun, setAutoRun] = useState(false);
 
   const status = getModelStatus(model.id);
   const progress = downloadProgress[model.id];
   const isActive = currentModel?.id === model.id;
   const memCheck = checkMemoryForModel(model.sizeBytes);
+
+  useEffect(() => {
+    if (autoRun && status === "ready" && !isActive) {
+      (async () => {
+        try {
+          const blob = await getModelBlob(model);
+          await loadModel(model, blob);
+          navigate("/chat");
+        } catch (e) {
+          setLoadError(e instanceof Error ? e.message : "Failed to load");
+        } finally {
+          setAutoRun(false);
+        }
+      })();
+    } else if (autoRun && isActive) {
+      navigate("/chat");
+      setAutoRun(false);
+    }
+  }, [autoRun, status, isActive]);
+
+  const handleRun = () => {
+    if (status === "not_downloaded") {
+      startDownload(model);
+      setAutoRun(true);
+    } else if (status === "ready" && !isActive) {
+      setAutoRun(true);
+    } else if (isActive) {
+      navigate("/chat");
+    }
+  };
 
   const handleLoad = async () => {
     setLoadError(null);
@@ -96,8 +129,21 @@ export function ModelCard({ model }: Props) {
             </div>
           </div>
 
-          {/* Status icon + expand chevron */}
+          {/* Run button + Status icon + expand chevron */}
           <div className="flex items-center gap-2 flex-shrink-0">
+            <button
+              onClick={(e) => { e.stopPropagation(); handleRun(); }}
+              disabled={isLoading || (status === "downloading" && !autoRun)}
+              className="px-3 py-1 rounded-full text-xs font-semibold text-white transition-colors disabled:opacity-50"
+              style={{ backgroundColor: "var(--color-tertiary)" }}
+            >
+              {autoRun && status === "downloading" ? "Downloading..." :
+               autoRun && status === "ready" ? "Loading..." :
+               isLoading ? "Loading..." :
+               isActive ? "Open Chat →" :
+               "Run →"}
+            </button>
+
             {status === "not_downloaded" && (
               <div className="w-9 h-9 rounded-full border-2 border-[var(--color-outline-variant)] flex items-center justify-center text-[var(--color-outline)]">
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
@@ -143,6 +189,49 @@ export function ModelCard({ model }: Props) {
           <p className="text-sm mt-3 mb-3 leading-relaxed" style={{ color: "var(--color-on-surface-variant)" }}>
             {model.description}
           </p>
+
+          {/* Author, released, and category metadata */}
+          {(model.author || model.released || model.category) && (
+            <div className="flex items-center gap-3 mb-3 flex-wrap">
+              {model.author && (
+                <span className="text-[11px] font-medium" style={{ color: "var(--color-on-surface-variant)" }}>
+                  By <span style={{ color: "var(--color-on-surface)" }}>{model.author}</span>
+                </span>
+              )}
+              {model.released && (
+                <span className="text-[11px]" style={{ color: "var(--color-on-surface-variant)" }}>
+                  Released {model.released}
+                </span>
+              )}
+              {model.category && (
+                <span
+                  className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                  style={{ backgroundColor: "var(--color-secondary-container)", color: "var(--color-on-secondary-container)" }}
+                >
+                  {model.category}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Tags */}
+          {model.tags && model.tags.length > 0 && (
+            <div className="flex gap-1.5 flex-wrap mb-3">
+              {model.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[10px] px-2 py-0.5 rounded-full border"
+                  style={{
+                    borderColor: "var(--color-outline-variant)",
+                    color: "var(--color-on-surface-variant)",
+                    backgroundColor: "var(--color-surface-container-high)",
+                  }}
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
 
           {model.capabilities.length > 0 && (
             <div className="flex gap-2 flex-wrap mb-4">

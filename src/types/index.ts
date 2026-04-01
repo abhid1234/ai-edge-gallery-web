@@ -18,6 +18,10 @@ export interface ModelInfo {
   parameterCount: string;
   description: string;
   maxTokens: number;
+  tags?: string[];
+  category?: string;
+  author?: string;
+  released?: string;
 }
 
 export interface ChatMessage {

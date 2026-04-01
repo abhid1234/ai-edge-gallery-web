@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router";
 import { loadCatalog } from "../../lib/catalog";
 import { useDownload } from "../../contexts/DownloadContext";
 import { useWebGPU } from "../../hooks/useWebGPU";
 import { ModelCard } from "./ModelCard";
+import { ModelFilters } from "./ModelFilters";
 import { ModelImport } from "./ModelImport";
 import type { ModelInfo } from "../../types";
 
@@ -117,6 +118,9 @@ export function Component() {
   const [loading, setLoading] = useState(true);
   const [tokenInput, setTokenInput] = useState("");
   const [showTokenInput, setShowTokenInput] = useState(false);
+  const [search, setSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("default");
   const { checkStoredModels, hfToken, setHfToken } = useDownload();
   const { info: gpuInfo } = useWebGPU();
 
@@ -132,6 +136,50 @@ export function Component() {
     }
     init();
   }, [checkStoredModels]);
+
+  const allModels = useMemo(() => [...models, ...customModels], [models, customModels]);
+
+  const filteredModels = useMemo(() => {
+    let result = allModels;
+
+    // Text search
+    if (search.trim()) {
+      const q = search.trim().toLowerCase();
+      result = result.filter(
+        (m) =>
+          m.name.toLowerCase().includes(q) ||
+          m.description.toLowerCase().includes(q) ||
+          m.parameterCount.toLowerCase().includes(q) ||
+          (m.author?.toLowerCase().includes(q) ?? false) ||
+          (m.tags?.some((t) => t.toLowerCase().includes(q)) ?? false)
+      );
+    }
+
+    // Category filter
+    if (activeFilter !== "all") {
+      result = result.filter((m) => {
+        if (activeFilter === "text") {
+          return m.capabilities.length === 1 && m.capabilities[0] === "text";
+        }
+        if (activeFilter === "multimodal") {
+          return m.capabilities.includes("image") || m.capabilities.includes("audio");
+        }
+        if (activeFilter === "reasoning") {
+          return m.tags?.includes("reasoning") ?? false;
+        }
+        return true;
+      });
+    }
+
+    // Sort
+    if (sortBy === "smallest") {
+      result = [...result].sort((a, b) => a.sizeBytes - b.sizeBytes);
+    } else if (sortBy === "largest") {
+      result = [...result].sort((a, b) => b.sizeBytes - a.sizeBytes);
+    }
+
+    return result;
+  }, [allModels, search, activeFilter, sortBy]);
 
   return (
     <div className="min-h-full bg-[var(--color-surface-container)] max-w-6xl mx-auto">
@@ -252,16 +300,28 @@ export function Component() {
           </div>
         )}
 
+        {!loading && (
+          <ModelFilters
+            search={search}
+            onSearchChange={setSearch}
+            activeFilter={activeFilter}
+            onFilterChange={setActiveFilter}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+          />
+        )}
+
         {loading ? (
           <div className="flex items-center justify-center h-32 text-[var(--color-on-surface-variant)] text-sm">
             Loading model catalog…
           </div>
+        ) : filteredModels.length === 0 ? (
+          <div className="flex items-center justify-center h-32 text-[var(--color-on-surface-variant)] text-sm">
+            No models match your search.
+          </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {models.map((model) => (
-              <ModelCard key={model.id} model={model} />
-            ))}
-            {customModels.map((model) => (
+            {filteredModels.map((model) => (
               <ModelCard key={model.id} model={model} />
             ))}
           </div>

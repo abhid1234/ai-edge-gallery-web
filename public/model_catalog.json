@@ -10,7 +10,11 @@
       "quantization": "q4",
       "parameterCount": "1B",
       "description": "Balanced text generation with 4-bit quantization. Good for multi-turn conversations.",
-      "maxTokens": 1024
+      "maxTokens": 1024,
+      "tags": ["fast", "chat", "code"],
+      "category": "text-gen",
+      "author": "Google",
+      "released": "2025-12-01"
     },
     {
       "id": "gemma-3n-e2b",
@@ -22,7 +26,11 @@
       "quantization": "int4",
       "parameterCount": "E2B (~2B active)",
       "description": "Multimodal: text + image + audio. Web-optimized. Requires 8GB+ free RAM.",
-      "maxTokens": 4096
+      "maxTokens": 4096,
+      "tags": ["multimodal", "vision", "audio"],
+      "category": "multimodal",
+      "author": "Google",
+      "released": "2025-06-01"
     },
     {
       "id": "gemma-3n-e4b",
@@ -34,7 +42,11 @@
       "quantization": "int4",
       "parameterCount": "E4B (~4B active)",
       "description": "Largest multimodal model. Higher quality than E2B. Requires 12GB+ free RAM.",
-      "maxTokens": 4096
+      "maxTokens": 4096,
+      "tags": ["multimodal", "vision", "audio", "high-quality"],
+      "category": "multimodal",
+      "author": "Google",
+      "released": "2025-06-01"
     },
     {
       "id": "qwen-1.5b",
@@ -46,7 +58,11 @@
       "quantization": "q8",
       "parameterCount": "1.5B",
       "description": "High quality text generation with 8-bit quantization.",
-      "maxTokens": 1024
+      "maxTokens": 1024,
+      "tags": ["multilingual", "long-context"],
+      "category": "text-gen",
+      "author": "Alibaba",
+      "released": "2025-09-01"
     },
     {
       "id": "deepseek-r1",
@@ -58,7 +74,11 @@
       "quantization": "q8",
       "parameterCount": "1.5B",
       "description": "Reasoning model with chain-of-thought. Best for complex problem solving.",
-      "maxTokens": 4096
+      "maxTokens": 4096,
+      "tags": ["reasoning", "chain-of-thought", "math"],
+      "category": "reasoning",
+      "author": "DeepSeek",
+      "released": "2025-01-01"
     }
   ]
 }
