@@ -1,11 +1,45 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import { useChatSession } from "./useChatSession";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import { GenerationSettings, type GenerationConfig } from "../../components/GenerationSettings";
+import type { ChatMessage } from "../../types";
 
 type OutputMode = "text" | "json" | "schema";
+
+function formatAsMarkdown(messages: ChatMessage[], modelName: string): string {
+  const date = new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  const lines = [
+    "## Chat Export",
+    `**Model:** ${modelName} | **Date:** ${date}`,
+    "",
+  ];
+  for (const msg of messages) {
+    const role = msg.role === "user" ? "User" : "Assistant";
+    lines.push(`**${role}:** ${msg.content}`, "");
+  }
+  return lines.join("\n");
+}
+
+function formatAsJSON(messages: ChatMessage[], modelName: string): string {
+  const date = new Date().toISOString().split("T")[0];
+  return JSON.stringify({ model: modelName, date, messages }, null, 2);
+}
+
+function downloadFile(content: string, filename: string, mimeType: string) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const DEFAULT_CONFIG: GenerationConfig = {
   temperature: 0.8,
@@ -38,6 +72,47 @@ export function Component() {
   const [outputMode, setOutputMode] = useState<OutputMode>("text");
   const [schema, setSchema] = useState("");
   const [schemaOpen, setSchemaOpen] = useState(false);
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [exportToast, setExportToast] = useState("");
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!exportMenuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setExportMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [exportMenuOpen]);
+
+  useEffect(() => {
+    if (exportToast) {
+      const t = setTimeout(() => setExportToast(""), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [exportToast]);
+
+  const modelName = currentModel?.name ?? "Unknown Model";
+
+  const handleCopyMarkdown = () => {
+    const md = formatAsMarkdown(messages, modelName);
+    navigator.clipboard.writeText(md).then(() => {
+      setExportToast("Copied to clipboard");
+      setExportMenuOpen(false);
+    });
+  };
+
+  const handleDownloadMarkdown = () => {
+    downloadFile(formatAsMarkdown(messages, modelName), "chat-export.md", "text/markdown");
+    setExportMenuOpen(false);
+  };
+
+  const handleDownloadJSON = () => {
+    downloadFile(formatAsJSON(messages, modelName), "chat-export.json", "application/json");
+    setExportMenuOpen(false);
+  };
 
   // Estimate token count from all messages + streaming
   const tokenEstimate = useMemo(() => {
@@ -62,6 +137,16 @@ export function Component() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-3.5rem)] bg-[var(--color-surface-container)] max-w-3xl mx-auto w-full">
+      {/* Export toast */}
+      {exportToast && (
+        <div
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-xl text-sm font-medium shadow-lg"
+          style={{ backgroundColor: "var(--color-primary)", color: "#fff" }}
+        >
+          {exportToast}
+        </div>
+      )}
+
       {/* Subtle header */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0">
         <div>
@@ -72,14 +157,77 @@ export function Component() {
             </p>
           )}
         </div>
-        {messages.length > 0 && (
-          <button
-            onClick={resetSession}
-            className="text-sm text-[var(--color-primary)] hover:text-[var(--color-on-primary-container)] px-3 py-1.5 rounded-xl hover:bg-[var(--color-primary-container)]/50 transition-colors font-medium"
-          >
-            New chat
-          </button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Export button + dropdown */}
+          {messages.length > 0 && (
+            <div ref={exportRef} className="relative">
+              <button
+                onClick={() => setExportMenuOpen((v) => !v)}
+                className="text-sm px-3 py-1.5 rounded-xl transition-colors font-medium flex items-center gap-1.5"
+                style={{
+                  color: "var(--color-on-surface-variant)",
+                  backgroundColor: exportMenuOpen
+                    ? "var(--color-surface-container-high)"
+                    : "transparent",
+                }}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                </svg>
+                Export
+              </button>
+              {exportMenuOpen && (
+                <div
+                  className="absolute right-0 top-full mt-1 z-20 rounded-xl shadow-lg overflow-hidden min-w-[200px]"
+                  style={{
+                    backgroundColor: "var(--color-surface)",
+                    border: "1px solid var(--color-outline-variant)",
+                  }}
+                >
+                  <button
+                    onClick={handleCopyMarkdown}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition-colors hover:bg-[var(--color-surface-container)]"
+                    style={{ color: "var(--color-on-surface)" }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 flex-shrink-0">
+                      <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" />
+                    </svg>
+                    Copy as Markdown
+                  </button>
+                  <div style={{ borderTop: "1px solid var(--color-outline-variant)" }} />
+                  <button
+                    onClick={handleDownloadMarkdown}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition-colors hover:bg-[var(--color-surface-container)]"
+                    style={{ color: "var(--color-on-surface)" }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 flex-shrink-0">
+                      <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z" />
+                    </svg>
+                    Download as Markdown
+                  </button>
+                  <button
+                    onClick={handleDownloadJSON}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition-colors hover:bg-[var(--color-surface-container)]"
+                    style={{ color: "var(--color-on-surface)" }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 flex-shrink-0">
+                      <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z" />
+                    </svg>
+                    Download as JSON
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          {messages.length > 0 && (
+            <button
+              onClick={resetSession}
+              className="text-sm text-[var(--color-primary)] hover:text-[var(--color-on-primary-container)] px-3 py-1.5 rounded-xl hover:bg-[var(--color-primary-container)]/50 transition-colors font-medium"
+            >
+              New chat
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Generation settings */}

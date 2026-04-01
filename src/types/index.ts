@@ -22,6 +22,11 @@ export interface ModelInfo {
   category?: string;
   author?: string;
   released?: string;
+  architecture?: {
+    family: string;
+    contextLength: number;
+    embeddingSize: number;
+  };
 }
 
 export interface ChatMessage {
