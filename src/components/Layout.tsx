@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router";
 import { ModelIndicator } from "./ModelIndicator";
 import { WebGPUWarning } from "./WebGPUWarning";
 import { OfflineToggle } from "./OfflineToggle";
 import { Sidebar } from "./Sidebar";
+import { CommandBar } from "./CommandBar";
 import { useWebGPU } from "../hooks/useWebGPU";
 
 export function Layout() {
@@ -12,6 +13,18 @@ export function Layout() {
     return localStorage.getItem("sidebar_collapsed") === "true";
   });
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [commandBarOpen, setCommandBarOpen] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setCommandBarOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const toggleSidebar = () => {
     const next = !sidebarCollapsed;
@@ -100,6 +113,31 @@ export function Layout() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Cmd+K trigger button */}
+            <button
+              onClick={() => setCommandBarOpen(true)}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs transition-colors"
+              style={{
+                backgroundColor: "var(--color-surface-container)",
+                color: "var(--color-on-surface-variant)",
+                border: "1px solid var(--color-outline-variant)",
+              }}
+              title="Open command bar (Cmd+K)"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
+                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+              </svg>
+              <span>Search</span>
+              <kbd
+                className="px-1 py-0.5 text-[10px] rounded font-mono"
+                style={{
+                  backgroundColor: "var(--color-surface-container-high)",
+                  border: "1px solid var(--color-outline-variant)",
+                }}
+              >
+                ⌘K
+              </kbd>
+            </button>
             <OfflineToggle />
             <ModelIndicator />
           </div>
@@ -117,6 +155,11 @@ export function Layout() {
           <Outlet />
         </main>
       </div>
+
+      <CommandBar
+        open={commandBarOpen}
+        onClose={() => setCommandBarOpen(false)}
+      />
     </div>
   );
 }
