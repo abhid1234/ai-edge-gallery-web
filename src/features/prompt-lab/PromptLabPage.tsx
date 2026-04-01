@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect, type FormEvent } from "react";
+import { useState, useRef, useEffect, useCallback, type FormEvent } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import { TemplateSelector, TEMPLATES, type PromptTemplate } from "./TemplateSelector";
+import { ProfileManager, type Profile } from "./ProfileManager";
 import { usePromptLab } from "./usePromptLab";
 
 export function Component() {
@@ -46,6 +47,18 @@ export function Component() {
     clear();
   };
 
+  // Stable callbacks for ProfileManager (useCallback to avoid child re-renders)
+  const handleLoadProfile = useCallback((profile: Profile) => {
+    setSystemPrompt(profile.systemPrompt);
+    setSystemPromptOpen(true);
+  }, []);
+
+  // onSaveProfile is a no-op here — ProfileManager owns localStorage persistence.
+  // The callback exists so callers can hook in additional logic if needed.
+  const handleSaveProfile = useCallback((_name: string, _systemPrompt: string) => {
+    // Profile already persisted by ProfileManager; nothing extra needed here.
+  }, []);
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!userInput.trim() || isGenerating) return;
@@ -84,6 +97,13 @@ export function Component() {
           </button>
         )}
       </div>
+
+      {/* Profile Manager */}
+      <ProfileManager
+        currentSystemPrompt={systemPrompt}
+        onLoadProfile={handleLoadProfile}
+        onSaveProfile={handleSaveProfile}
+      />
 
       {/* Template Picker */}
       <div className="bg-[var(--color-surface)] rounded-2xl shadow-sm p-4 flex flex-col gap-3">
