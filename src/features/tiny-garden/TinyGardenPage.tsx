@@ -38,7 +38,7 @@ export function Component() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)] bg-[#F0F4F9]">
+    <div className="flex flex-col h-[calc(100vh-3.5rem)] bg-[#F0F4F9] max-w-4xl mx-auto w-full">
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-5 pb-3 flex-shrink-0">
         <div>

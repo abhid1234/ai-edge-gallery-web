@@ -59,7 +59,7 @@ export function Component() {
   };
 
   return (
-    <div>
+    <div className="max-w-5xl mx-auto">
       <div className="mb-6">
         <h2 className="text-2xl font-bold" style={{ color: "var(--color-on-surface)" }}>Model Comparison</h2>
         <p className="text-sm mt-1" style={{ color: "var(--color-on-surface-variant)" }}>

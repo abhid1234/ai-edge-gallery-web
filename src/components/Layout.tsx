@@ -1,116 +1,122 @@
-import { Outlet, NavLink } from "react-router";
+import { useState } from "react";
+import { Outlet } from "react-router";
 import { ModelIndicator } from "./ModelIndicator";
 import { WebGPUWarning } from "./WebGPUWarning";
-import { DarkModeToggle } from "./DarkModeToggle";
 import { OfflineToggle } from "./OfflineToggle";
+import { Sidebar } from "./Sidebar";
 import { useWebGPU } from "../hooks/useWebGPU";
-
-const navLinks = [
-  { to: "/", label: "Gallery", end: true },
-  { to: "/chat", label: "Chat" },
-  { to: "/ask-image", label: "Ask Image" },
-  { to: "/ask-audio", label: "Ask Audio" },
-  { to: "/benchmarks", label: "Benchmarks" },
-  { to: "/prompt-lab", label: "Prompt Lab" },
-  { to: "/web-actions", label: "Web Actions" },
-  { to: "/tiny-garden", label: "Tiny Garden" },
-  { to: "/compare", label: "Compare" },
-  { to: "/how-it-works", label: "How It Works" },
-];
 
 export function Layout() {
   const { info } = useWebGPU();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    return localStorage.getItem("sidebar_collapsed") === "true";
+  });
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    const next = !sidebarCollapsed;
+    setSidebarCollapsed(next);
+    localStorage.setItem("sidebar_collapsed", String(next));
+  };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "var(--color-surface-container)" }}>
-      {/* Top App Bar */}
-      <header className="shadow-sm px-6 py-3 flex items-center justify-between sticky top-0 z-10" style={{ backgroundColor: "var(--color-surface)", borderBottom: "1px solid var(--color-outline-variant)" }}>
-        {/* Title */}
-        <div className="flex items-center gap-2">
-          <h1 className="text-xl font-extrabold leading-none" style={{ fontFamily: "var(--font-sans)" }}>
-            <span
-              style={{
-                background: "linear-gradient(90deg, var(--color-title-gradient-start), var(--color-title-gradient-end))",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Google AI
-            </span>
-            <span className="text-on-surface ml-1" style={{ color: "var(--color-on-surface)" }}>
-              Edge Gallery
-            </span>
-          </h1>
-          <span
-            className="text-xs font-semibold px-2 py-0.5 rounded-full"
-            style={{
-              backgroundColor: "var(--color-primary-container)",
-              color: "var(--color-on-primary-container)",
-              fontSize: "11px",
-            }}
-          >
-            Web
-          </span>
-          <span
-            className="text-[10px] ml-2 px-2 py-0.5 rounded-full flex items-center gap-1"
-            style={{
-              backgroundColor: "var(--color-tertiary-container)",
-              color: "var(--color-tertiary)",
-            }}
-            title="All inference runs on your device. No data is sent to any server."
-          >
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
-              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
-            </svg>
-            On-Device
-          </span>
-        </div>
-
-        {/* Controls */}
-        <div className="flex items-center gap-2">
-          <OfflineToggle />
-          <DarkModeToggle />
-          <ModelIndicator />
-        </div>
-      </header>
-
-      {/* Pill Tab Navigation */}
-      <div className="border-b px-6 py-2 flex gap-2 overflow-x-auto" style={{ backgroundColor: "var(--color-surface)", borderColor: "var(--color-outline-variant)" }}>
-        {navLinks.map(({ to, label, end }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            className={({ isActive }) =>
-              `flex-shrink-0 h-10 px-5 rounded-full text-sm font-semibold transition-colors flex items-center ${
-                isActive
-                  ? "text-white"
-                  : "hover:opacity-80"
-              }`
-            }
-            style={({ isActive }) =>
-              isActive
-                ? { backgroundColor: "var(--color-tab-selected)", color: "#ffffff" }
-                : { backgroundColor: "transparent", color: "var(--color-on-surface-variant)" }
-            }
-          >
-            {label}
-          </NavLink>
-        ))}
-      </div>
-
-      {/* WebGPU Warning */}
-      {!info.supported && (
-        <div className="px-6 pt-4">
-          <WebGPUWarning />
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: "var(--color-surface-container)" }}>
+      {/* Mobile sidebar overlay */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-40 md:hidden">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileSidebarOpen(false)} />
+          <div className="relative z-50 h-full w-60">
+            <Sidebar collapsed={false} onToggle={() => setMobileSidebarOpen(false)} />
+          </div>
         </div>
       )}
 
-      {/* Content Area */}
-      <main className="flex-1 p-6">
-        <Outlet />
-      </main>
+      {/* Desktop/tablet sidebar */}
+      <div className="hidden md:block">
+        <Sidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+      </div>
+
+      {/* Main content column */}
+      <div className="flex flex-col flex-1 min-w-0">
+        {/* Slim header */}
+        <header
+          className="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-6"
+          style={{
+            backgroundColor: "var(--color-surface)",
+            borderBottom: "1px solid var(--color-outline-variant)",
+          }}
+        >
+          <div className="flex items-center gap-3">
+            {/* Mobile hamburger */}
+            <button
+              className="md:hidden p-2 rounded-lg"
+              onClick={() => setMobileSidebarOpen(true)}
+              style={{ color: "var(--color-on-surface)" }}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+              </svg>
+            </button>
+
+            {/* Title + badges */}
+            <h1
+              className="text-base font-bold hidden sm:block"
+              style={{ fontFamily: "var(--font-sans)" }}
+            >
+              <span
+                style={{
+                  background: "linear-gradient(90deg, var(--color-title-gradient-start), var(--color-title-gradient-end))",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Google AI
+              </span>
+              <span style={{ color: "var(--color-on-surface)" }}> Edge Gallery</span>
+            </h1>
+            <span
+              className="text-[10px] font-semibold px-2 py-0.5 rounded-full hidden sm:inline"
+              style={{
+                backgroundColor: "var(--color-primary-container)",
+                color: "var(--color-on-primary-container)",
+              }}
+            >
+              Web
+            </span>
+            <span
+              className="text-[10px] px-2 py-0.5 rounded-full items-center gap-1 hidden lg:inline-flex"
+              style={{
+                backgroundColor: "var(--color-tertiary-container)",
+                color: "var(--color-tertiary)",
+              }}
+              title="All inference runs on your device. No data is sent to any server."
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
+              </svg>
+              On-Device
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <OfflineToggle />
+            <ModelIndicator />
+          </div>
+        </header>
+
+        {/* WebGPU Warning */}
+        {!info.supported && (
+          <div className="px-6 pt-4">
+            <WebGPUWarning />
+          </div>
+        )}
+
+        {/* Content */}
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }

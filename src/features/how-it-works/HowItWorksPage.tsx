@@ -46,7 +46,7 @@ export function Component() {
       </div>
 
       {/* Animated pipeline */}
-      <div className="max-w-lg mx-auto">
+      <div className="max-w-3xl mx-auto">
         {STEPS.map((step, i) => (
           <div key={step.title} className="flex items-start gap-4 mb-2">
             {/* Vertical line + dot */}
@@ -80,7 +80,7 @@ export function Component() {
 
       {/* Key stats */}
       <div
-        className="max-w-lg mx-auto mt-8 rounded-xl p-5"
+        className="max-w-3xl mx-auto mt-8 rounded-xl p-5"
         style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-outline-variant)" }}
       >
         <h3 className="text-sm font-bold mb-3" style={{ color: "var(--color-on-surface)" }}>Why On-Device?</h3>
@@ -107,7 +107,7 @@ export function Component() {
       {/* Current model info */}
       {currentModel && (
         <div
-          className="max-w-lg mx-auto mt-4 rounded-xl p-4 text-center"
+          className="max-w-3xl mx-auto mt-4 rounded-xl p-4 text-center"
           style={{ backgroundColor: "var(--color-primary-container)", color: "var(--color-on-primary-container)" }}
         >
           <p className="text-xs font-medium">

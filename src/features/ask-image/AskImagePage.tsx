@@ -17,7 +17,7 @@ export function Component() {
   };
 
   return (
-    <div>
+    <div className="max-w-4xl mx-auto">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Ask Image</h2>
         <p className="text-sm text-gray-500 mt-1">Upload an image and ask questions — powered by Gemma 3n E2B multimodal</p>

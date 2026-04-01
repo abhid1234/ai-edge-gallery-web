@@ -132,7 +132,7 @@ export function Component() {
   const hasHistory = results.length > 0;
 
   return (
-    <div>
+    <div className="max-w-5xl mx-auto">
       <div className="mb-6 flex items-start justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Benchmarks</h2>

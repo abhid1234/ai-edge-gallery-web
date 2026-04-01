@@ -142,7 +142,7 @@ export function Component() {
   }, [checkStoredModels]);
 
   return (
-    <div className="min-h-full bg-[#F0F4F9]">
+    <div className="min-h-full bg-[#F0F4F9] max-w-6xl mx-auto">
       {/* Hero title section */}
       <div className="px-10 pt-12 pb-8">
         <h1 className="text-5xl font-extrabold leading-tight text-[#1F1F1F] tracking-tight">
@@ -187,45 +187,9 @@ export function Component() {
         </div>
       </div>
 
-      {/* Starting point selector */}
-      <div className="px-6 pt-6 pb-2">
-        <div className="grid grid-cols-3 gap-3">
-          <Link
-            to="/chat"
-            className="rounded-xl p-4 text-center transition-all hover:shadow-md"
-            style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-outline-variant)" }}
-          >
-            <div className="text-2xl mb-2">💬</div>
-            <p className="text-xs font-bold" style={{ color: "var(--color-on-surface)" }}>Explore Demos</p>
-            <p className="text-[10px] mt-0.5" style={{ color: "var(--color-on-surface-variant)" }}>Try chat, image, audio</p>
-          </Link>
-          <Link
-            to="/benchmarks"
-            className="rounded-xl p-4 text-center transition-all hover:shadow-md"
-            style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-outline-variant)" }}
-          >
-            <div className="text-2xl mb-2">🚀</div>
-            <p className="text-xs font-bold" style={{ color: "var(--color-on-surface)" }}>Run a Model</p>
-            <p className="text-[10px] mt-0.5" style={{ color: "var(--color-on-surface-variant)" }}>Benchmark & compare</p>
-          </Link>
-          <button
-            onClick={() => {
-              const importSection = document.getElementById("import-section");
-              importSection?.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="rounded-xl p-4 text-center transition-all hover:shadow-md"
-            style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-outline-variant)" }}
-          >
-            <div className="text-2xl mb-2">📦</div>
-            <p className="text-xs font-bold" style={{ color: "var(--color-on-surface)" }}>Import Your Own</p>
-            <p className="text-[10px] mt-0.5" style={{ color: "var(--color-on-surface-variant)" }}>Drag-drop a .task file</p>
-          </button>
-        </div>
-      </div>
-
       {/* Feature task cards */}
       <div className="px-6 pb-2">
-        <div className="space-y-2.5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {FEATURE_CARDS.map((card, i) => {
             const color = TASK_COLORS[i % TASK_COLORS.length];
             return (
@@ -300,7 +264,7 @@ export function Component() {
             Loading model catalog…
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {models.map((model) => (
               <ModelCard key={model.id} model={model} />
             ))}
