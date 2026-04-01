@@ -7,31 +7,23 @@ import { ModelCard } from "./ModelCard";
 import { ModelImport } from "./ModelImport";
 import type { ModelInfo } from "../../types";
 
-// Task card color rotation: red → green → blue → yellow
+// Task card color rotation: red → green → blue → yellow (uses CSS variables for dark mode)
 const TASK_COLORS = [
   {
-    bg: "bg-[#FFF5F5]",
-    iconBg: "bg-[#DB372D]",
+    bgVar: "--color-task-red-bg",
     iconBgGrad: "from-[#E25F57] to-[#DB372D]",
-    label: "text-[#DB372D]",
   },
   {
-    bg: "bg-[#F4FBF6]",
-    iconBg: "bg-[#128937]",
+    bgVar: "--color-task-green-bg",
     iconBgGrad: "from-[#41A15F] to-[#128937]",
-    label: "text-[#128937]",
   },
   {
-    bg: "bg-[#F1F6FE]",
-    iconBg: "bg-[#3174F1]",
+    bgVar: "--color-task-blue-bg",
     iconBgGrad: "from-[#669DF6] to-[#3174F1]",
-    label: "text-[#3174F1]",
   },
   {
-    bg: "bg-[#FFFBF0]",
-    iconBg: "bg-[#CAA12A]",
+    bgVar: "--color-task-yellow-bg",
     iconBgGrad: "from-[#FDD45D] to-[#CAA12A]",
-    label: "text-[#CAA12A]",
   },
 ] as const;
 
@@ -196,7 +188,8 @@ export function Component() {
               <Link
                 key={card.title}
                 to={card.path}
-                className={`${color.bg} rounded-3xl px-6 py-5 flex items-center justify-between shadow-sm hover:opacity-90 transition-opacity`}
+                className="rounded-3xl px-6 py-5 flex items-center justify-between shadow-sm hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: `var(${color.bgVar})` }}
               >
                 <div>
                   <p className="text-base font-bold text-[var(--color-on-surface)]">{card.title}</p>

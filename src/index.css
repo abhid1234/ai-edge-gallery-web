@@ -85,6 +85,14 @@
   --color-tab-selected: #A8C7FA;
   --color-title-gradient-start: #A8C7FA;
   --color-title-gradient-end: #669DF6;
+  --color-task-red-bg: #281210;
+  --color-task-green-bg: #131711;
+  --color-task-blue-bg: #191924;
+  --color-task-yellow-bg: #1A1813;
+  --color-tertiary-container: #0D3519;
+  --color-secondary-container: #003B5C;
+  --color-error-container: #3B1014;
+  --color-warning-container: #332B00;
 }
 
 /* Smooth scrolling */
