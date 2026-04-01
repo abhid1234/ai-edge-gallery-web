@@ -190,6 +190,37 @@ const NAV_GROUPS: { items: NavItem[] }[] = [
           </svg>
         ),
       },
+      {
+        to: "/hybrid",
+        label: "Hybrid Local+Cloud",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11C20.43 12.17 22 13.56 22 15.2c0 1.65-1.35 2.8-3 2.8z" />
+          </svg>
+        ),
+      },
+    ],
+  },
+  {
+    items: [
+      {
+        to: "/modelfile",
+        label: "Modelfile Editor",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zm-2 8H7v-2h4v2zm2-4H7v-2h6v2z" />
+          </svg>
+        ),
+      },
+      {
+        to: "/vision-rag",
+        label: "Vision RAG",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z" />
+          </svg>
+        ),
+      },
     ],
   },
 ];
