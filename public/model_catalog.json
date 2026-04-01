@@ -14,7 +14,8 @@
       "tags": ["fast", "chat", "code"],
       "category": "text-gen",
       "author": "Google",
-      "released": "2025-12-01"
+      "released": "2025-12-01",
+      "architecture": { "family": "gemma", "contextLength": 2048, "embeddingSize": 2048 }
     },
     {
       "id": "gemma-3n-e2b",
@@ -30,7 +31,8 @@
       "tags": ["multimodal", "vision", "audio"],
       "category": "multimodal",
       "author": "Google",
-      "released": "2025-06-01"
+      "released": "2025-06-01",
+      "architecture": { "family": "gemma", "contextLength": 4096, "embeddingSize": 2560 }
     },
     {
       "id": "gemma-3n-e4b",
@@ -46,7 +48,8 @@
       "tags": ["multimodal", "vision", "audio", "high-quality"],
       "category": "multimodal",
       "author": "Google",
-      "released": "2025-06-01"
+      "released": "2025-06-01",
+      "architecture": { "family": "gemma", "contextLength": 4096, "embeddingSize": 3072 }
     },
     {
       "id": "qwen-1.5b",
@@ -62,7 +65,8 @@
       "tags": ["multilingual", "long-context"],
       "category": "text-gen",
       "author": "Alibaba",
-      "released": "2025-09-01"
+      "released": "2025-09-01",
+      "architecture": { "family": "qwen", "contextLength": 4096, "embeddingSize": 1536 }
     },
     {
       "id": "deepseek-r1",
@@ -78,7 +82,59 @@
       "tags": ["reasoning", "chain-of-thought", "math"],
       "category": "reasoning",
       "author": "DeepSeek",
-      "released": "2025-01-01"
+      "released": "2025-01-01",
+      "architecture": { "family": "deepseek", "contextLength": 4096, "embeddingSize": 1536 }
+    },
+    {
+      "id": "smollm-135m",
+      "name": "SmolLM 135M",
+      "fileName": "SmolLM-135M-Instruct_multi-prefill-seq_q8_ekv1280.task",
+      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/SmolLM-135M-Instruct_multi-prefill-seq_q8_ekv1280.task",
+      "sizeBytes": 166723584,
+      "capabilities": ["text"],
+      "quantization": "q8",
+      "parameterCount": "135M",
+      "description": "Tiny model — loads instantly. Great for testing and quick experiments.",
+      "maxTokens": 1024,
+      "tags": ["tiny", "fast", "lightweight"],
+      "category": "text-gen",
+      "author": "HuggingFace",
+      "released": "2024-07-01",
+      "architecture": { "family": "llama", "contextLength": 1280, "embeddingSize": 576 }
+    },
+    {
+      "id": "qwen-0.5b",
+      "name": "Qwen 2.5 0.5B",
+      "fileName": "Qwen2.5-0.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
+      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/Qwen2.5-0.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
+      "sizeBytes": 546308096,
+      "capabilities": ["text"],
+      "quantization": "q8",
+      "parameterCount": "0.5B",
+      "description": "Small and fast. Good balance of quality and speed for text tasks.",
+      "maxTokens": 1024,
+      "tags": ["small", "multilingual", "fast"],
+      "category": "text-gen",
+      "author": "Alibaba",
+      "released": "2025-09-01",
+      "architecture": { "family": "qwen", "contextLength": 1280, "embeddingSize": 896 }
+    },
+    {
+      "id": "tinyllama-1.1b",
+      "name": "TinyLlama 1.1B",
+      "fileName": "TinyLlama-1.1B-Chat-v1.0_multi-prefill-seq_q8_ekv1280.task",
+      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/TinyLlama-1.1B-Chat-v1.0_multi-prefill-seq_q8_ekv1280.task",
+      "sizeBytes": 1148846080,
+      "capabilities": ["text"],
+      "quantization": "q8",
+      "parameterCount": "1.1B",
+      "description": "Classic small LLM. Trained on 3 trillion tokens. Good general-purpose chat.",
+      "maxTokens": 1024,
+      "tags": ["chat", "general-purpose"],
+      "category": "text-gen",
+      "author": "TinyLlama Project",
+      "released": "2024-01-01",
+      "architecture": { "family": "llama", "contextLength": 1280, "embeddingSize": 2048 }
     }
   ]
 }
