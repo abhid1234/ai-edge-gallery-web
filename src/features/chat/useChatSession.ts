@@ -43,13 +43,35 @@ export function useChatSession() {
       const prompt = formatGemmaPrompt(messages, content);
 
       let fullResponse = "";
+      const genStart = performance.now();
+      let firstTokenTime = -1;
+      let tokenCount = 0;
       try {
         await generate(prompt, (partial, done) => {
+          const now = performance.now();
+          if (firstTokenTime < 0) firstTokenTime = now;
           fullResponse += partial;
+          tokenCount = Math.round(fullResponse.length / 4);
           setStreamingContent(fullResponse);
 
           if (done && !doneHandledRef.current) {
             doneHandledRef.current = true;
+            const totalMs = now - genStart;
+            const ttft = firstTokenTime >= 0 ? firstTokenTime - genStart : 0;
+            const tokensPerSec = totalMs > 0 ? (tokenCount / totalMs) * 1000 : 0;
+            try {
+              const existing = JSON.parse(localStorage.getItem("session_perf_stats") || "[]");
+              existing.push({
+                prompt: content.slice(0, 50),
+                tokenCount,
+                ttft: Math.round(ttft),
+                tokensPerSec: parseFloat(tokensPerSec.toFixed(2)),
+                totalMs: Math.round(totalMs),
+                timestamp: Date.now(),
+              });
+              localStorage.setItem("session_perf_stats", JSON.stringify(existing.slice(-50)));
+            } catch { /* storage quota or parse error — ignore */ }
+
             const modelMessage: ChatMessage = {
               id: crypto.randomUUID(),
               role: "model",
@@ -64,6 +86,22 @@ export function useChatSession() {
         // Fallback: if callback never fired done=true, use the return value
         if (!doneHandledRef.current && fullResponse.trim()) {
           doneHandledRef.current = true;
+          const totalMs = performance.now() - genStart;
+          const ttft = firstTokenTime >= 0 ? firstTokenTime - genStart : 0;
+          const tokensPerSec = totalMs > 0 ? (tokenCount / totalMs) * 1000 : 0;
+          try {
+            const existing = JSON.parse(localStorage.getItem("session_perf_stats") || "[]");
+            existing.push({
+              prompt: content.slice(0, 50),
+              tokenCount,
+              ttft: Math.round(ttft),
+              tokensPerSec: parseFloat(tokensPerSec.toFixed(2)),
+              totalMs: Math.round(totalMs),
+              timestamp: Date.now(),
+            });
+            localStorage.setItem("session_perf_stats", JSON.stringify(existing.slice(-50)));
+          } catch { /* ignore */ }
+
           const modelMessage: ChatMessage = {
             id: crypto.randomUUID(),
             role: "model",

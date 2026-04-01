@@ -111,6 +111,28 @@ const NAV_GROUPS: { items: NavItem[] }[] = [
   {
     items: [
       {
+        to: "/token-viz",
+        label: "Token Viz",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+          </svg>
+        ),
+      },
+      {
+        to: "/perf-dashboard",
+        label: "Perf Dashboard",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" />
+          </svg>
+        ),
+      },
+    ],
+  },
+  {
+    items: [
+      {
         to: "/web-actions",
         label: "Web Actions",
         icon: (
@@ -156,6 +178,15 @@ const NAV_GROUPS: { items: NavItem[] }[] = [
         icon: (
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
+          </svg>
+        ),
+      },
+      {
+        to: "/quant-explorer",
+        label: "Quant Explorer",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z" />
           </svg>
         ),
       },
