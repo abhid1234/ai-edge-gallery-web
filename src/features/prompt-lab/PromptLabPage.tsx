@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback, type FormEvent } from "react"
 import { useModel } from "../../contexts/ModelContext";
 import { TemplateSelector, TEMPLATES, type PromptTemplate } from "./TemplateSelector";
 import { ProfileManager, type Profile } from "./ProfileManager";
-import { usePromptLab } from "./usePromptLab";
+import { usePromptLab, type FewShotExample } from "./usePromptLab";
 
 export function Component() {
   const { currentModel } = useModel();
@@ -10,6 +10,8 @@ export function Component() {
   const [userInput, setUserInput] = useState("");
   const [systemPrompt, setSystemPrompt] = useState(TEMPLATES[0].systemPrompt);
   const [systemPromptOpen, setSystemPromptOpen] = useState(false);
+  const [fewShotOpen, setFewShotOpen] = useState(false);
+  const [fewShotExamples, setFewShotExamples] = useState<FewShotExample[]>([]);
   const { output, streamingOutput, isGenerating, error, run, clear, cancelGeneration } =
     usePromptLab();
 
@@ -59,10 +61,27 @@ export function Component() {
     // Profile already persisted by ProfileManager; nothing extra needed here.
   }, []);
 
+  const addFewShotExample = useCallback(() => {
+    setFewShotExamples((prev) => [...prev, { user: "", assistant: "" }]);
+  }, []);
+
+  const removeFewShotExample = useCallback((index: number) => {
+    setFewShotExamples((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const updateFewShotExample = useCallback(
+    (index: number, field: "user" | "assistant", value: string) => {
+      setFewShotExamples((prev) =>
+        prev.map((ex, i) => (i === index ? { ...ex, [field]: value } : ex))
+      );
+    },
+    []
+  );
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!userInput.trim() || isGenerating) return;
-    run({ ...selectedTemplate, systemPrompt }, userInput);
+    run({ ...selectedTemplate, systemPrompt }, userInput, fewShotExamples);
   };
 
   const handleClear = () => {
@@ -146,6 +165,93 @@ export function Component() {
             />
           )}
         </div>
+
+        {/* Collapsible few-shot examples */}
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => setFewShotOpen((prev) => !prev)}
+            className="flex items-center gap-1.5 w-fit text-xs font-medium text-[var(--color-on-surface-variant)] hover:text-[var(--color-on-surface)] transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="transition-transform duration-200"
+              style={{ transform: fewShotOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+            Few-shot examples
+            {fewShotExamples.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--color-primary-container)] text-[var(--color-on-primary-container)]">
+                {fewShotExamples.length}
+              </span>
+            )}
+          </button>
+
+          {fewShotOpen && (
+            <div className="flex flex-col gap-2">
+              {fewShotExamples.length === 0 && (
+                <p className="text-xs text-[var(--color-outline)] italic px-1">
+                  No examples yet. Add example user/assistant pairs to teach the model the expected format.
+                </p>
+              )}
+              {fewShotExamples.map((example, index) => (
+                <div
+                  key={index}
+                  className="rounded-lg border border-[var(--color-outline-variant)] bg-[var(--color-surface-container)] p-3 flex flex-col gap-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-semibold text-[var(--color-on-surface-variant)] uppercase tracking-wide">
+                      Example {index + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeFewShotExample(index)}
+                      className="text-[10px] text-[var(--color-error)] hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-semibold text-[var(--color-primary)] uppercase tracking-wide">User:</label>
+                    <textarea
+                      value={example.user}
+                      onChange={(e) => updateFewShotExample(index, "user", e.target.value)}
+                      placeholder="User message…"
+                      rows={2}
+                      className="w-full resize-none rounded bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-mono text-[var(--color-on-surface)] placeholder:text-[var(--color-outline)] focus:outline-none focus:ring-1 focus:ring-[#0B57D0]/40 transition"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[10px] font-semibold text-[var(--color-secondary)] uppercase tracking-wide">Assistant:</label>
+                    <textarea
+                      value={example.assistant}
+                      onChange={(e) => updateFewShotExample(index, "assistant", e.target.value)}
+                      placeholder="Expected assistant response…"
+                      rows={2}
+                      className="w-full resize-none rounded bg-[var(--color-surface)] px-2.5 py-1.5 text-xs font-mono text-[var(--color-on-surface)] placeholder:text-[var(--color-outline)] focus:outline-none focus:ring-1 focus:ring-[#0B57D0]/40 transition"
+                    />
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addFewShotExample}
+                className="self-start text-xs font-medium text-[var(--color-primary)] hover:text-[var(--color-on-primary-container)] px-2.5 py-1.5 rounded-lg hover:bg-[var(--color-primary-container)]/50 transition-colors border border-dashed border-[var(--color-primary)]/40"
+              >
+                + Add Example
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Input Form */}
@@ -162,7 +268,7 @@ export function Component() {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
               e.preventDefault();
               if (userInput.trim() && !isGenerating && currentModel) {
-                run({ ...selectedTemplate, systemPrompt }, userInput);
+                run({ ...selectedTemplate, systemPrompt }, userInput, fewShotExamples);
               }
             }
           }}

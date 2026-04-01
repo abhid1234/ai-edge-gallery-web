@@ -2,11 +2,31 @@ import { useState, useCallback, useRef } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import type { PromptTemplate } from "./TemplateSelector";
 
-function formatGemmaPrompt(systemPrompt: string, userInput: string): string {
+export interface FewShotExample {
+  user: string;
+  assistant: string;
+}
+
+function formatGemmaPrompt(
+  systemPrompt: string,
+  userInput: string,
+  fewShotExamples: FewShotExample[] = []
+): string {
+  let prompt = "";
+
+  // Prepend few-shot examples as conversation history
+  for (const example of fewShotExamples) {
+    if (example.user.trim() && example.assistant.trim()) {
+      prompt += `<start_of_turn>user\n${example.user.trim()}<end_of_turn>\n`;
+      prompt += `<start_of_turn>model\n${example.assistant.trim()}<end_of_turn>\n`;
+    }
+  }
+
   const combined = systemPrompt
     ? `${systemPrompt}\n\n${userInput}`
     : userInput;
-  return `<start_of_turn>user\n${combined}<end_of_turn>\n<start_of_turn>model\n`;
+  prompt += `<start_of_turn>user\n${combined}<end_of_turn>\n<start_of_turn>model\n`;
+  return prompt;
 }
 
 export interface PromptLabState {
@@ -14,7 +34,7 @@ export interface PromptLabState {
   streamingOutput: string;
   isGenerating: boolean;
   error: string | null;
-  run: (template: PromptTemplate, userInput: string) => Promise<void>;
+  run: (template: PromptTemplate, userInput: string, fewShotExamples?: FewShotExample[]) => Promise<void>;
   clear: () => void;
   cancelGeneration: () => void;
 }
@@ -27,7 +47,7 @@ export function usePromptLab(): PromptLabState {
   const doneHandledRef = useRef(false);
 
   const run = useCallback(
-    async (template: PromptTemplate, userInput: string) => {
+    async (template: PromptTemplate, userInput: string, fewShotExamples: FewShotExample[] = []) => {
       if (!userInput.trim()) return;
 
       setOutput("");
@@ -35,7 +55,7 @@ export function usePromptLab(): PromptLabState {
       setError(null);
       doneHandledRef.current = false;
 
-      const prompt = formatGemmaPrompt(template.systemPrompt, userInput.trim());
+      const prompt = formatGemmaPrompt(template.systemPrompt, userInput.trim(), fewShotExamples);
 
       let fullResponse = "";
       try {

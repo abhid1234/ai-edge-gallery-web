@@ -88,6 +88,24 @@ const NAV_GROUPS: { items: NavItem[] }[] = [
           </svg>
         ),
       },
+      {
+        to: "/code-complete",
+        label: "Code Complete",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
+          </svg>
+        ),
+      },
+      {
+        to: "/embeddings",
+        label: "Embeddings",
+        icon: (
+          <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+            <path d="M22 11V3h-7v3H9V3H2v8h7V8h2v10h4v3h7v-8h-7v3h-2V8h2v3h7zM7 9H4V5h3v4zm10 6h3v4h-3v-4zm0-10h3v4h-3V5z" />
+          </svg>
+        ),
+      },
     ],
   },
   {
