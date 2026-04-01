@@ -246,6 +246,29 @@ export function ModelCard({ model }: Props) {
             </div>
           )}
 
+          {model.architecture && (
+            <div className="grid grid-cols-3 gap-2 mb-4 p-3 rounded-lg" style={{ backgroundColor: "var(--color-surface-container-high)" }}>
+              {model.architecture.family && (
+                <div className="text-center">
+                  <div className="text-[10px] font-medium mb-0.5" style={{ color: "var(--color-on-surface-variant)" }}>Family</div>
+                  <div className="text-[11px] font-semibold" style={{ color: "var(--color-on-surface)" }}>{model.architecture.family}</div>
+                </div>
+              )}
+              {model.architecture.contextLength != null && (
+                <div className="text-center">
+                  <div className="text-[10px] font-medium mb-0.5" style={{ color: "var(--color-on-surface-variant)" }}>Context</div>
+                  <div className="text-[11px] font-semibold" style={{ color: "var(--color-on-surface)" }}>{model.architecture.contextLength.toLocaleString()}</div>
+                </div>
+              )}
+              {model.architecture.embeddingSize != null && (
+                <div className="text-center">
+                  <div className="text-[10px] font-medium mb-0.5" style={{ color: "var(--color-on-surface-variant)" }}>Embedding</div>
+                  <div className="text-[11px] font-semibold" style={{ color: "var(--color-on-surface)" }}>{model.architecture.embeddingSize.toLocaleString()}</div>
+                </div>
+              )}
+            </div>
+          )}
+
           {model.downloadUrl.includes('huggingface.co') && (
             <a
               href={model.downloadUrl.replace('/resolve/main/', '/').replace(/\/[^/]+$/, '')}

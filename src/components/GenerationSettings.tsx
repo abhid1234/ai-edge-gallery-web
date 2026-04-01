@@ -4,6 +4,10 @@ interface GenerationConfig {
   temperature: number;
   topK: number;
   topP: number;
+  minP: number;
+  maxTokens: number;
+  repeatPenalty: number;
+  seed: number;
 }
 
 interface Props {
@@ -11,8 +15,18 @@ interface Props {
   onChange: (config: GenerationConfig) => void;
 }
 
+const PRESETS: { label: string; values: Partial<GenerationConfig> }[] = [
+  { label: "Creative", values: { temperature: 1.2, topK: 80, topP: 0.95 } },
+  { label: "Balanced", values: { temperature: 0.8, topK: 40, topP: 0.95 } },
+  { label: "Precise",  values: { temperature: 0.2, topK: 20, topP: 0.8  } },
+];
+
 export function GenerationSettings({ config, onChange }: Props) {
   const [open, setOpen] = useState(false);
+
+  const applyPreset = (values: Partial<GenerationConfig>) => {
+    onChange({ ...config, ...values });
+  };
 
   return (
     <div className="mb-4">
@@ -32,6 +46,26 @@ export function GenerationSettings({ config, onChange }: Props) {
 
       {open && (
         <div className="mt-2 p-4 rounded-xl space-y-4" style={{ backgroundColor: "var(--color-surface-container)" }}>
+
+          {/* Preset buttons */}
+          <div className="flex gap-2">
+            {PRESETS.map((preset) => (
+              <button
+                key={preset.label}
+                onClick={() => applyPreset(preset.values)}
+                className="flex-1 text-xs font-semibold py-1.5 rounded-lg transition-colors border"
+                style={{
+                  borderColor: "var(--color-outline-variant)",
+                  color: "var(--color-primary)",
+                  backgroundColor: "var(--color-surface-container-high)",
+                }}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Temperature */}
           <div>
             <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-on-surface-variant)" }}>
               <span>Temperature</span>
@@ -42,6 +76,8 @@ export function GenerationSettings({ config, onChange }: Props) {
               className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#0B57D0]"
               style={{ backgroundColor: "var(--color-outline-variant)" }} />
           </div>
+
+          {/* Top K */}
           <div>
             <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-on-surface-variant)" }}>
               <span>Top K</span>
@@ -52,6 +88,8 @@ export function GenerationSettings({ config, onChange }: Props) {
               className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#0B57D0]"
               style={{ backgroundColor: "var(--color-outline-variant)" }} />
           </div>
+
+          {/* Top P */}
           <div>
             <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-on-surface-variant)" }}>
               <span>Top P</span>
@@ -62,6 +100,63 @@ export function GenerationSettings({ config, onChange }: Props) {
               className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#0B57D0]"
               style={{ backgroundColor: "var(--color-outline-variant)" }} />
           </div>
+
+          {/* Min P */}
+          <div>
+            <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-on-surface-variant)" }}>
+              <span>Min P</span>
+              <span className="font-mono">{config.minP.toFixed(2)}</span>
+            </div>
+            <input type="range" min="0" max="0.5" step="0.01" value={config.minP}
+              onChange={(e) => onChange({ ...config, minP: parseFloat(e.target.value) })}
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#0B57D0]"
+              style={{ backgroundColor: "var(--color-outline-variant)" }} />
+          </div>
+
+          {/* Max Tokens */}
+          <div>
+            <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-on-surface-variant)" }}>
+              <span>Max Tokens</span>
+              <span className="font-mono">{config.maxTokens}</span>
+            </div>
+            <input type="range" min="64" max="4096" step="64" value={config.maxTokens}
+              onChange={(e) => onChange({ ...config, maxTokens: parseInt(e.target.value) })}
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#0B57D0]"
+              style={{ backgroundColor: "var(--color-outline-variant)" }} />
+          </div>
+
+          {/* Repeat Penalty */}
+          <div>
+            <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-on-surface-variant)" }}>
+              <span>Repeat Penalty</span>
+              <span className="font-mono">{config.repeatPenalty.toFixed(1)}</span>
+            </div>
+            <input type="range" min="0" max="2" step="0.1" value={config.repeatPenalty}
+              onChange={(e) => onChange({ ...config, repeatPenalty: parseFloat(e.target.value) })}
+              className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#0B57D0]"
+              style={{ backgroundColor: "var(--color-outline-variant)" }} />
+          </div>
+
+          {/* Seed */}
+          <div>
+            <div className="flex justify-between text-xs mb-1" style={{ color: "var(--color-on-surface-variant)" }}>
+              <span>Seed <span className="opacity-60">(-1 = random)</span></span>
+            </div>
+            <input
+              type="number"
+              value={config.seed}
+              min={-1}
+              onChange={(e) => onChange({ ...config, seed: parseInt(e.target.value) || -1 })}
+              className="w-full text-xs px-3 py-1.5 rounded-lg font-mono"
+              style={{
+                backgroundColor: "var(--color-surface-container-high)",
+                color: "var(--color-on-surface)",
+                border: "1px solid var(--color-outline-variant)",
+                outline: "none",
+              }}
+            />
+          </div>
+
         </div>
       )}
     </div>
