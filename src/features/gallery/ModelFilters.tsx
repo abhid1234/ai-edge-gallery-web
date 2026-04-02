@@ -13,7 +13,7 @@ const FILTERS = [
   { key: "multimodal", label: "Multimodal" },
   { key: "reasoning", label: "Reasoning" },
   { key: "code", label: "Code" },
-  { key: "vision", label: "Vision" },
+  { key: "multilingual", label: "Multilingual" },
   { key: "tiny", label: "Tiny (<500MB)" },
 ];
 
