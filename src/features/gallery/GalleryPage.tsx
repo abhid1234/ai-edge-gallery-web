@@ -169,13 +169,22 @@ export function Component() {
     if (activeFilter !== "all") {
       result = result.filter((m) => {
         if (activeFilter === "text") {
-          return m.capabilities.length === 1 && m.capabilities[0] === "text";
+          return m.capabilities.length === 1 && m.capabilities[0] === "text" && !m.tags?.includes("reasoning") && !m.tags?.includes("code");
         }
         if (activeFilter === "multimodal") {
           return m.capabilities.includes("image") || m.capabilities.includes("audio");
         }
         if (activeFilter === "reasoning") {
           return m.tags?.includes("reasoning") ?? false;
+        }
+        if (activeFilter === "code") {
+          return m.tags?.includes("code") ?? false;
+        }
+        if (activeFilter === "vision") {
+          return m.capabilities.includes("image");
+        }
+        if (activeFilter === "tiny") {
+          return m.sizeBytes < 500_000_000;
         }
         return true;
       });

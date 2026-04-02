@@ -12,6 +12,9 @@ const FILTERS = [
   { key: "text", label: "Text" },
   { key: "multimodal", label: "Multimodal" },
   { key: "reasoning", label: "Reasoning" },
+  { key: "code", label: "Code" },
+  { key: "vision", label: "Vision" },
+  { key: "tiny", label: "Tiny (<500MB)" },
 ];
 
 const SORTS = [
