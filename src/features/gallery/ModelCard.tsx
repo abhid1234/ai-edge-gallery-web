@@ -144,27 +144,13 @@ export function ModelCard({ model }: Props) {
                "Run →"}
             </button>
 
-            {status === "not_downloaded" && (
-              <div className="w-9 h-9 rounded-full border-2 border-[var(--color-outline-variant)] flex items-center justify-center text-[var(--color-outline)]">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                </svg>
-              </div>
-            )}
-            {status === "downloading" && (
-              <div className="w-9 h-9 rounded-full border-2 border-[var(--color-primary)] flex items-center justify-center text-[var(--color-primary)] animate-spin">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-                </svg>
-              </div>
-            )}
-            {status === "ready" && (
-              <div className="w-9 h-9 rounded-full bg-[var(--color-tertiary-container)] flex items-center justify-center text-[var(--color-tertiary)]">
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                </svg>
-              </div>
-            )}
+            {/* Small status dot */}
+            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{
+              backgroundColor: isActive ? "var(--color-tertiary)" :
+                status === "ready" ? "var(--color-tertiary)" :
+                status === "downloading" ? "var(--color-primary)" :
+                "var(--color-outline-variant)"
+            }} />
             <svg
               viewBox="0 0 24 24"
               fill="currentColor"

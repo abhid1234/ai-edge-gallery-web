@@ -71,23 +71,7 @@ export function Layout() {
               </svg>
             </button>
 
-            {/* Title + badges */}
-            <h1
-              className="text-base font-bold hidden sm:block"
-              style={{ fontFamily: "var(--font-sans)" }}
-            >
-              <span
-                style={{
-                  background: "linear-gradient(90deg, var(--color-title-gradient-start), var(--color-title-gradient-end))",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                Google AI
-              </span>
-              <span style={{ color: "var(--color-on-surface)" }}> Edge Gallery</span>
-            </h1>
+            {/* Badges only — title is in sidebar */}
             <span
               className="text-[10px] font-semibold px-2 py-0.5 rounded-full hidden sm:inline"
               style={{
@@ -98,7 +82,7 @@ export function Layout() {
               Web
             </span>
             <span
-              className="text-[10px] px-2 py-0.5 rounded-full items-center gap-1 hidden lg:inline-flex"
+              className="text-[10px] px-2 py-0.5 rounded-full items-center gap-1 hidden sm:inline-flex"
               style={{
                 backgroundColor: "var(--color-tertiary-container)",
                 color: "var(--color-tertiary)",
