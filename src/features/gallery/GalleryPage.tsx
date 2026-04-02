@@ -1,7 +1,4 @@
 import { useEffect, useState, useMemo } from "react";
-
-const RECOMMENDED_MODEL_ID = "gemma-3-1b";
-const FIRST_VISIT_KEY = "gallery_first_visit";
 import { Link } from "react-router";
 import { loadCatalog } from "../../lib/catalog";
 import { useDownload } from "../../contexts/DownloadContext";
@@ -134,7 +131,6 @@ export function Component() {
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [sortBy, setSortBy] = useState("default");
-  const [isFirstVisit] = useState(() => !localStorage.getItem(FIRST_VISIT_KEY));
   const { checkStoredModels, hfToken, setHfToken } = useDownload();
   const { info: gpuInfo } = useWebGPU();
 
@@ -150,12 +146,6 @@ export function Component() {
     }
     init();
   }, [checkStoredModels]);
-
-  useEffect(() => {
-    if (isFirstVisit) {
-      localStorage.setItem(FIRST_VISIT_KEY, "true");
-    }
-  }, [isFirstVisit]);
 
   const allModels = useMemo(() => [...models, ...customModels], [models, customModels]);
 
@@ -343,16 +333,6 @@ export function Component() {
           />
         )}
 
-        {isFirstVisit && (
-          <div className="mb-4 p-3 rounded-xl flex items-center gap-3"
-            style={{ backgroundColor: "var(--color-primary-container)", color: "var(--color-on-primary-container)" }}>
-            <span className="text-lg">💡</span>
-            <p className="text-xs">
-              <strong>Welcome!</strong> Click "Get Started" on any model to download and run AI locally in your browser. We recommend starting with Gemma 3 1B.
-            </p>
-          </div>
-        )}
-
         {loading ? (
           <div className="flex items-center justify-center h-32 text-[var(--color-on-surface-variant)] text-sm">
             Loading model catalog…
@@ -364,12 +344,7 @@ export function Component() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {filteredModels.map((model) => (
-              <ModelCard
-                key={model.id}
-                model={model}
-                isRecommended={model.id === RECOMMENDED_MODEL_ID}
-                defaultExpanded={isFirstVisit && model.id === RECOMMENDED_MODEL_ID}
-              />
+              <ModelCard key={model.id} model={model} />
             ))}
           </div>
         )}
