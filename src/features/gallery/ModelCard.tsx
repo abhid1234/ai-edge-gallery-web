@@ -136,6 +136,12 @@ export function ModelCard({ model }: Props) {
               disabled={isLoading || (status === "downloading" && !autoRun)}
               className="px-3 py-1 rounded-full text-xs font-semibold text-white transition-colors disabled:opacity-50"
               style={{ backgroundColor: "var(--color-tertiary)" }}
+              title={
+                isActive ? "Open the chat interface with this model" :
+                status === "ready" ? "Download, load into memory, and start chatting — all in one click" :
+                status === "downloading" ? "Model is downloading from the server..." :
+                "Download, load into memory, and start chatting — all in one click"
+              }
             >
               {autoRun && status === "downloading" ? "Downloading..." :
                autoRun && status === "ready" ? "Loading..." :
@@ -272,8 +278,10 @@ export function ModelCard({ model }: Props) {
             <button
               onClick={(e) => { e.stopPropagation(); startDownload(model); }}
               className="w-full py-2.5 px-4 bg-[var(--color-primary)] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-colors"
+              title="Save this model to your browser storage so you can use it offline. The model stays on your device."
             >
               Download ({formatSize(model.sizeBytes)})
+
             </button>
           )}
 
@@ -283,6 +291,7 @@ export function ModelCard({ model }: Props) {
                 onClick={(e) => { e.stopPropagation(); handleLoad(); }}
                 disabled={isLoading}
                 className="flex-1 py-2.5 px-4 bg-[var(--color-primary)] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-colors disabled:opacity-50"
+                title="Load the model into your GPU memory so you can chat with it. Uses RAM but enables fast inference."
               >
                 {isLoading ? "Loading…" : "Load Model"}
               </button>
@@ -290,6 +299,7 @@ export function ModelCard({ model }: Props) {
                 onClick={(e) => { e.stopPropagation(); removeModel(model); }}
                 className="py-2.5 px-4 rounded-xl text-sm transition-colors"
                 style={{ border: "1px solid var(--color-outline-variant)", color: "var(--color-on-surface-variant)", backgroundColor: "transparent" }}
+                title="Remove the downloaded model file from your browser storage to free up disk space."
               >
                 Delete
               </button>
@@ -307,6 +317,7 @@ export function ModelCard({ model }: Props) {
               <button
                 onClick={(e) => { e.stopPropagation(); unloadModel(); }}
                 className="py-1.5 px-3 bg-[var(--color-error-container)] text-[var(--color-error)] rounded-lg text-xs font-medium hover:bg-[#F9DEDC] transition-colors"
+                title="Remove the model from GPU memory to free RAM. The downloaded file stays — you can reload it later without re-downloading."
               >
                 Unload (free memory)
               </button>
