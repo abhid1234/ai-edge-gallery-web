@@ -9,21 +9,27 @@ import { checkMemoryForModel } from "../../lib/memory";
 
 interface Props {
   model: ModelInfo;
+  isRecommended?: boolean;
+  defaultExpanded?: boolean;
 }
 
-export function ModelCard({ model }: Props) {
-  const { getModelStatus, downloadProgress, startDownload, removeModel, getModelBlob } =
+export function ModelCard({ model, isRecommended, defaultExpanded }: Props) {
+  const { getModelStatus, downloadProgress, startDownload, cancelDownload, removeModel, getModelBlob } =
     useDownload();
   const { currentModel, isLoading, loadModel, unloadModel, error: modelError } = useModel();
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded ?? false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [autoRun, setAutoRun] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showMemWarning, setShowMemWarning] = useState(false);
 
   const status = getModelStatus(model.id);
   const progress = downloadProgress[model.id];
   const isActive = currentModel?.id === model.id;
   const memCheck = checkMemoryForModel(model.sizeBytes);
+  const isVision = model.category === "vision";
+  const actionLabel = isVision ? "Classify" : "Chat";
 
   useEffect(() => {
     if (autoRun && status === "ready" && !isActive) {
@@ -31,7 +37,7 @@ export function ModelCard({ model }: Props) {
         try {
           const blob = await getModelBlob(model);
           await loadModel(model, blob);
-          navigate(model.category === "vision" ? "/vision" : "/chat");
+          navigate(isVision ? "/vision" : "/chat");
         } catch (e) {
           setLoadError(e instanceof Error ? e.message : "Failed to load");
         } finally {
@@ -39,43 +45,45 @@ export function ModelCard({ model }: Props) {
         }
       })();
     } else if (autoRun && isActive) {
-      navigate(model.category === "vision" ? "/vision" : "/chat");
+      navigate(isVision ? "/vision" : "/chat");
       setAutoRun(false);
     }
   }, [autoRun, status, isActive]);
 
   const handleRun = () => {
+    if (!memCheck.canLoadModel) {
+      setShowMemWarning(true);
+      return;
+    }
+    doRun();
+  };
+
+  const doRun = () => {
     if (status === "not_downloaded") {
       startDownload(model);
       setAutoRun(true);
     } else if (status === "ready" && !isActive) {
       setAutoRun(true);
     } else if (isActive) {
-      navigate(model.category === "vision" ? "/vision" : "/chat");
+      navigate(isVision ? "/vision" : "/chat");
     }
   };
 
-  const handleLoad = async () => {
-    setLoadError(null);
+  const buttonLabel =
+    autoRun && status === "downloading" ? "Downloading..." :
+    autoRun && status === "ready" ? "Loading..." :
+    isLoading && autoRun ? "Loading..." :
+    status === "not_downloaded" ? `Get Started (${formatSize(model.sizeBytes)})` :
+    status === "downloading" ? "Downloading..." :
+    isActive ? `${actionLabel} →` :
+    status === "ready" ? `Start ${actionLabel} →` :
+    "Get Started";
 
-    // Memory check before loading
-    if (!memCheck.canLoadModel) {
-      const proceed = window.confirm(
-        `${memCheck.warning}\n\nLoading this model may freeze your system. Continue anyway?`
-      );
-      if (!proceed) return;
-    } else if (memCheck.warning) {
-      window.confirm(memCheck.warning + "\n\nContinue?");
-    }
-
-    try {
-      const blob = await getModelBlob(model);
-      await loadModel(model, blob);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Failed to load model";
-      setLoadError(msg);
-    }
-  };
+  const buttonStyle = isActive
+    ? { backgroundColor: "var(--color-primary)" }
+    : status === "downloading"
+    ? { backgroundColor: "var(--color-surface-container-high)", color: "var(--color-on-surface-variant)" }
+    : { backgroundColor: "var(--color-tertiary)" };
 
   return (
     <div
@@ -109,6 +117,12 @@ export function ModelCard({ model }: Props) {
                   Downloaded
                 </span>
               )}
+              {isRecommended && status === "not_downloaded" && (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
+                  style={{ backgroundColor: "#FEF7E0", color: "#E37400" }}>
+                  ⭐ Recommended
+                </span>
+              )}
               {(model.fileName.includes("-Web") || model.fileName.includes("web")) && (
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
                   style={{ backgroundColor: "#C2E7FF", color: "#00639B" }}>
@@ -129,28 +143,81 @@ export function ModelCard({ model }: Props) {
             </div>
           </div>
 
-          {/* Run button + Status icon + expand chevron */}
+          {/* Primary button + cancel (when downloading) + overflow menu + chevron */}
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={(e) => { e.stopPropagation(); handleRun(); }}
-              disabled={isLoading || (status === "downloading" && !autoRun)}
+              disabled={isLoading && !autoRun}
               className="px-3 py-1 rounded-full text-xs font-semibold text-white transition-colors disabled:opacity-50"
-              style={{ backgroundColor: "var(--color-tertiary)" }}
+              style={buttonStyle}
             >
-              {autoRun && status === "downloading" ? "Downloading..." :
-               autoRun && status === "ready" ? "Loading..." :
-               isLoading ? "Loading..." :
-               isActive ? "Open Chat →" :
-               "Run →"}
+              {buttonLabel}
             </button>
 
-            {/* Small status dot */}
-            <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{
-              backgroundColor: isActive ? "var(--color-tertiary)" :
-                status === "ready" ? "var(--color-tertiary)" :
-                status === "downloading" ? "var(--color-primary)" :
-                "var(--color-outline-variant)"
-            }} />
+            {/* Cancel download X button */}
+            {status === "downloading" && (
+              <button
+                onClick={(e) => { e.stopPropagation(); cancelDownload(model.id); setAutoRun(false); }}
+                className="w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+                style={{ color: "var(--color-on-surface-variant)", backgroundColor: "var(--color-surface-container-high)" }}
+                title="Cancel download"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+              </button>
+            )}
+
+            {/* Overflow menu */}
+            <div className="relative">
+              <button
+                onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+                style={{ color: "var(--color-on-surface-variant)" }}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                  <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                </svg>
+              </button>
+
+              {menuOpen && (
+                <>
+                  <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+                  <div className="absolute right-0 top-full mt-1 z-20 rounded-lg shadow-lg py-1 min-w-[160px]"
+                    style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-outline-variant)" }}>
+
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setExpanded(true); setMenuOpen(false); }}
+                      className="w-full text-left px-3 py-2 text-xs"
+                      style={{ color: "var(--color-on-surface)" }}
+                    >
+                      Model details
+                    </button>
+
+                    {(status === "ready" || isActive) && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); if (isActive) unloadModel(); removeModel(model); setMenuOpen(false); }}
+                        className="w-full text-left px-3 py-2 text-xs"
+                        style={{ color: "var(--color-error)" }}
+                      >
+                        Delete model
+                      </button>
+                    )}
+
+                    {isActive && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); unloadModel(); setMenuOpen(false); }}
+                        className="w-full text-left px-3 py-2 text-xs"
+                        style={{ color: "var(--color-on-surface-variant)" }}
+                      >
+                        Unload from memory
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
             <svg
               viewBox="0 0 24 24"
               fill="currentColor"
@@ -169,7 +236,32 @@ export function ModelCard({ model }: Props) {
         </div>
       )}
 
-      {/* Expandable section with action buttons */}
+      {/* Inline memory warning */}
+      {showMemWarning && (
+        <div className="px-4 py-3" style={{ backgroundColor: "var(--color-warning-container)" }}>
+          <p className="text-xs mb-2" style={{ color: "var(--color-warning)" }}>
+            This model needs more memory than your device has available. Loading may freeze your system.
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowMemWarning(false); setAutoRun(true); if (status === "not_downloaded") startDownload(model); }}
+              className="px-3 py-1 rounded text-xs font-semibold text-white"
+              style={{ backgroundColor: "var(--color-warning)" }}
+            >
+              Load Anyway
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); setShowMemWarning(false); }}
+              className="px-3 py-1 rounded text-xs"
+              style={{ color: "var(--color-on-surface-variant)" }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Expandable section */}
       {expanded && (
         <div className="px-5 pb-5 border-t" style={{ borderColor: "var(--color-outline-variant)" }}>
           <p className="text-sm mt-3 mb-3 leading-relaxed" style={{ color: "var(--color-on-surface-variant)" }}>
@@ -266,57 +358,6 @@ export function ModelCard({ model }: Props) {
             >
               View on HuggingFace →
             </a>
-          )}
-
-          {status === "not_downloaded" && (
-            <button
-              onClick={(e) => { e.stopPropagation(); startDownload(model); }}
-              className="w-full py-2.5 px-4 bg-[var(--color-primary)] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-colors"
-            >
-              Download ({formatSize(model.sizeBytes)})
-            </button>
-          )}
-
-          {status === "ready" && !isActive && (
-            <div className="flex gap-2">
-              <button
-                onClick={(e) => { e.stopPropagation(); handleLoad(); }}
-                disabled={isLoading}
-                className="flex-1 py-2.5 px-4 bg-[var(--color-primary)] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-colors disabled:opacity-50"
-              >
-                {isLoading ? "Loading…" : "Load Model"}
-              </button>
-              <button
-                onClick={(e) => { e.stopPropagation(); removeModel(model); }}
-                className="py-2.5 px-4 rounded-xl text-sm transition-colors"
-                style={{ border: "1px solid var(--color-outline-variant)", color: "var(--color-on-surface-variant)", backgroundColor: "transparent" }}
-              >
-                Delete
-              </button>
-            </div>
-          )}
-
-          {status === "ready" && isActive && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "var(--color-primary)" }}>
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                </svg>
-                Model is loaded and ready
-              </div>
-              <button
-                onClick={(e) => { e.stopPropagation(); unloadModel(); }}
-                className="py-1.5 px-3 bg-[var(--color-error-container)] text-[var(--color-error)] rounded-lg text-xs font-medium hover:bg-[#F9DEDC] transition-colors"
-              >
-                Unload (free memory)
-              </button>
-            </div>
-          )}
-
-          {!memCheck.canLoadModel && status !== "not_downloaded" && !isActive && (
-            <div className="mt-3 bg-[var(--color-warning-container)] text-[var(--color-warning)] text-xs rounded-lg px-3 py-2">
-              {memCheck.warning}
-            </div>
           )}
 
           {progress?.status === "error" && progress.error && (

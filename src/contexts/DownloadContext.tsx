@@ -3,6 +3,7 @@ import {
   useContext,
   useState,
   useCallback,
+  useRef,
   type ReactNode,
 } from "react";
 import type { ModelInfo, ModelStatus, DownloadProgress } from "../types";
@@ -30,6 +31,7 @@ interface DownloadContextValue {
   hfToken: string | null;
   getModelStatus: (modelId: string) => ModelStatus;
   startDownload: (model: ModelInfo) => Promise<void>;
+  cancelDownload: (modelId: string) => void;
   removeModel: (model: ModelInfo) => Promise<void>;
   getModelBlob: (model: ModelInfo) => Promise<Blob>;
   checkStoredModels: (models: ModelInfo[]) => Promise<void>;
@@ -43,6 +45,7 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
   const [modelStatuses, setModelStatuses] = useState<Record<string, ModelStatus>>({});
   const [downloadProgress, setDownloadProgress] = useState<Record<string, DownloadProgress>>({});
   const [hfToken, setHfTokenState] = useState<string | null>(getStoredToken);
+  const abortControllersRef = useRef<Record<string, AbortController>>({});
 
   const setHfToken = useCallback((token: string) => {
     storeToken(token);
@@ -65,6 +68,9 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const startDownload = useCallback(async (model: ModelInfo) => {
+    const controller = new AbortController();
+    abortControllersRef.current[model.id] = controller;
+
     setModelStatuses((prev) => ({ ...prev, [model.id]: "downloading" }));
     setDownloadProgress((prev) => ({
       ...prev,
@@ -84,6 +90,7 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
       const response = await fetch(model.downloadUrl, {
         headers,
         mode: "cors",
+        signal: controller.signal,
       });
 
       if (response.status === 401 || response.status === 403) {
@@ -103,6 +110,7 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
         }));
       });
 
+      delete abortControllersRef.current[model.id];
       setModelStatuses((prev) => ({ ...prev, [model.id]: "ready" }));
       setDownloadProgress((prev) => ({
         ...prev,
@@ -112,6 +120,17 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
         },
       }));
     } catch (e) {
+      delete abortControllersRef.current[model.id];
+      // If aborted, silently reset to not_downloaded without error UI
+      if (e instanceof DOMException && e.name === "AbortError") {
+        setModelStatuses((prev) => ({ ...prev, [model.id]: "not_downloaded" }));
+        setDownloadProgress((prev) => {
+          const next = { ...prev };
+          delete next[model.id];
+          return next;
+        });
+        return;
+      }
       const message = e instanceof Error ? e.message : "Download failed";
       setModelStatuses((prev) => ({ ...prev, [model.id]: "not_downloaded" }));
       setDownloadProgress((prev) => ({
@@ -123,6 +142,13 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
       }));
     }
   }, [hfToken]);
+
+  const cancelDownload = useCallback((modelId: string) => {
+    const controller = abortControllersRef.current[modelId];
+    if (controller) {
+      controller.abort();
+    }
+  }, []);
 
   const removeModel = useCallback(async (model: ModelInfo) => {
     await deleteFile(model.fileName);
@@ -165,7 +191,7 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
 
   return (
     <DownloadContext.Provider
-      value={{ modelStatuses, downloadProgress, hfToken, getModelStatus, startDownload, removeModel, getModelBlob, checkStoredModels, setHfToken, importLocalModel }}
+      value={{ modelStatuses, downloadProgress, hfToken, getModelStatus, startDownload, cancelDownload, removeModel, getModelBlob, checkStoredModels, setHfToken, importLocalModel }}
     >
       {children}
     </DownloadContext.Provider>
