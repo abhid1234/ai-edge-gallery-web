@@ -53,7 +53,7 @@ export function Layout() {
       <div className="flex flex-col flex-1 min-w-0">
         {/* Slim header */}
         <header
-          className="h-14 flex-shrink-0 flex items-center justify-between px-4 lg:px-6"
+          className="h-16 flex-shrink-0 flex items-center justify-between px-4 lg:px-6"
           style={{
             backgroundColor: "var(--color-surface)",
             borderBottom: "1px solid var(--color-outline-variant)",
@@ -71,9 +71,20 @@ export function Layout() {
               </svg>
             </button>
 
-            {/* Badges only — title is in sidebar */}
+            {/* Title visible on mobile (sidebar hidden) */}
+            <h1
+              className="text-sm font-bold md:hidden"
+              style={{ fontFamily: "var(--font-sans)", color: "var(--color-on-surface)" }}
+            >
+              <span style={{
+                background: "linear-gradient(90deg, var(--color-title-gradient-start), var(--color-title-gradient-end))",
+                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+              }}>AI</span> Edge Gallery
+            </h1>
+
+            {/* Badges */}
             <span
-              className="text-[10px] font-semibold px-2 py-0.5 rounded-full hidden sm:inline"
+              className="text-[11px] font-semibold px-2.5 py-1 rounded-full hidden sm:inline"
               style={{
                 backgroundColor: "var(--color-primary-container)",
                 color: "var(--color-on-primary-container)",
@@ -82,14 +93,14 @@ export function Layout() {
               Web
             </span>
             <span
-              className="text-[10px] px-2 py-0.5 rounded-full items-center gap-1 hidden sm:inline-flex"
+              className="text-[11px] px-2.5 py-1 rounded-full items-center gap-1.5 hidden sm:inline-flex"
               style={{
                 backgroundColor: "var(--color-tertiary-container)",
                 color: "var(--color-tertiary)",
               }}
               title="All inference runs on your device. No data is sent to any server."
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3 h-3">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5">
                 <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
               </svg>
               On-Device
