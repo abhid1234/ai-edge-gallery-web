@@ -11,6 +11,7 @@ const FILTERS = [
   { key: "all", label: "All" },
   { key: "text", label: "Text" },
   { key: "multimodal", label: "Multimodal" },
+  { key: "vision", label: "Vision" },
   { key: "reasoning", label: "Reasoning" },
   { key: "code", label: "Code" },
   { key: "multilingual", label: "Multilingual" },

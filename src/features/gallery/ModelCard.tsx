@@ -31,7 +31,7 @@ export function ModelCard({ model }: Props) {
         try {
           const blob = await getModelBlob(model);
           await loadModel(model, blob);
-          navigate("/chat");
+          navigate(model.category === "vision" ? "/vision" : "/chat");
         } catch (e) {
           setLoadError(e instanceof Error ? e.message : "Failed to load");
         } finally {
@@ -39,7 +39,7 @@ export function ModelCard({ model }: Props) {
         }
       })();
     } else if (autoRun && isActive) {
-      navigate("/chat");
+      navigate(model.category === "vision" ? "/vision" : "/chat");
       setAutoRun(false);
     }
   }, [autoRun, status, isActive]);
@@ -51,7 +51,7 @@ export function ModelCard({ model }: Props) {
     } else if (status === "ready" && !isActive) {
       setAutoRun(true);
     } else if (isActive) {
-      navigate("/chat");
+      navigate(model.category === "vision" ? "/vision" : "/chat");
     }
   };
 

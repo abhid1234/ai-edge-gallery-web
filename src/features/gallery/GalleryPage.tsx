@@ -180,6 +180,9 @@ export function Component() {
         if (activeFilter === "code") {
           return m.tags?.includes("code") ?? false;
         }
+        if (activeFilter === "vision") {
+          return m.category === "vision";
+        }
         if (activeFilter === "multilingual") {
           return m.tags?.includes("multilingual") ?? false;
         }
