@@ -2,11 +2,11 @@
 
 ## Context
 
-Abhi is interviewing with Sachin Kotwani (GPM, On-Device ML at Google) who leads LiteRT, TensorFlow.js, MediaPipe, and the ODML Developer platform. Sachin's flagship launch is the Google AI Edge Gallery — an open-source Android app (500K downloads, 15.5K stars) that lets users download and run Gemma models locally on-device.
+Google's AI Edge Gallery is an open-source Android app (500K downloads, 15.5K stars) that lets users download and run AI models locally on-device. However, the Gallery is Android-only — there's no web equivalent.
 
-**The gap**: The Gallery is Android-only. Sachin's team is actively pushing web AI via LiteRT.js and MediaPipe JS + WebGPU. A browser-based Gallery extends his flagship product to the web using his team's own stack.
+**The gap**: Google's ODML team is actively pushing web AI via LiteRT.js and MediaPipe JS + WebGPU. A browser-based Gallery would bring on-device ML to any device with a modern browser.
 
-**Goal**: Build a web-based AI Edge Gallery that demonstrates technical depth across Sachin's ODML platform — MediaPipe LLM Inference, WebGPU acceleration, Gemma models, and on-device AI principles (zero cloud, full privacy, offline-capable).
+**Goal**: Build a web-based AI Edge Gallery using MediaPipe LLM Inference, WebGPU acceleration, Gemma models, and on-device AI principles (zero cloud, full privacy, offline-capable).
 
 ---
 
@@ -217,14 +217,14 @@ The `LlmInference` interface is mocked in tests. Real MediaPipe inference requir
 
 ---
 
-## Interview Talking Points
+## Key Highlights
 
-1. **"I built the web version of your flagship product"** — The Gallery is Android-only; this extends it to web using MediaPipe JS + WebGPU, which Chintan presented at the Web AI Summit.
-2. **"Same models, same runtime, new platform"** — Gemma 3n `.litertlm` files work on Android AND web. The ODML "everywhere" vision.
-3. **"Developer experience gaps I found"** — Document friction points in the web pipeline (model download UX, WebGPU detection, memory limits).
-4. **"Zero cloud, full privacy"** — No backend, no API keys. Models cached locally via OPFS. Works offline after first download.
-5. **Performance data** — "Gemma 270M at 137 t/s in Chrome. 1B at 60 t/s. Here are the WebGPU vs WASM numbers."
-6. **"On-device function calling in the browser"** (if stretch goal completed) — FunctionGemma running in Chrome, executing web APIs.
+1. **Web version of Google's flagship on-device AI app** — The Gallery is Android-only; this extends it to web using MediaPipe JS + WebGPU.
+2. **Same models, same runtime, new platform** — Gemma 3n `.litertlm` files work on Android AND web. The ODML "everywhere" vision.
+3. **Developer experience analysis** — Documented friction points in the web ML pipeline (model download UX, WebGPU detection, memory limits).
+4. **Zero cloud, full privacy** — No backend, no API keys. Models cached locally via OPFS. Works offline after first download.
+5. **Performance benchmarks** — Real-time token speed, TTFT, and WebGPU vs WASM comparisons.
+6. **On-device function calling in the browser** — FunctionGemma-inspired tool calling running in Chrome, executing web APIs.
 
 ---
 

@@ -51,7 +51,7 @@
 - [ ] **Step 1: Scaffold Vite project**
 
 ```bash
-cd /home/abhidaas/Core/Workspace/ClaudeCode/ODML
+cd ai-edge-gallery-web
 npm create vite@latest . -- --template react-ts
 ```
 

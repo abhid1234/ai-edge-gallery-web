@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router";
 import { ModelCard } from "../../src/features/gallery/ModelCard";
 import type { ModelInfo } from "../../src/types";
 
@@ -36,16 +37,16 @@ const mockModel: ModelInfo = {
 
 describe("ModelCard", () => {
   it("renders model name and info", () => {
-    render(<ModelCard model={mockModel} />);
+    render(<MemoryRouter><ModelCard model={mockModel} /></MemoryRouter>);
     expect(screen.getByText("Test Model")).toBeInTheDocument();
     expect(screen.getByText("1B")).toBeInTheDocument();
     expect(screen.getByText("500 MB")).toBeInTheDocument();
   });
 
   it("has an expandable card header", () => {
-    render(<ModelCard model={mockModel} />);
+    render(<MemoryRouter><ModelCard model={mockModel} /></MemoryRouter>);
     expect(screen.getByText("Test Model")).toBeInTheDocument();
-    // Header is a button for expand/collapse
-    expect(screen.getByRole("button")).toBeInTheDocument();
+    // Header has role=button for expand/collapse; Run button also present
+    expect(screen.getAllByRole("button").length).toBeGreaterThan(0);
   });
 });

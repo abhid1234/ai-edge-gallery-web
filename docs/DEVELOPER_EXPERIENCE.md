@@ -158,5 +158,5 @@ web API. The main blockers are model hosting UX and memory management.
 
 ---
 
-*Built by Abhi Das as a side project exploring the ODML web platform.*
+*Built as a personal project exploring the on-device ML web platform.*
 *Stack: React 19, Vite 6, TypeScript, Tailwind CSS v4, MediaPipe tasks-genai, WebGPU.*
