@@ -5,9 +5,12 @@ export function NetworkCounter() {
   const { isGenerating, currentModel } = useModel();
   const [pulseCount, setPulseCount] = useState(0);
 
-  // Pulse the counter while generating to draw attention
+  // Count seconds while generating
   useEffect(() => {
-    if (!isGenerating) return;
+    if (!isGenerating) {
+      setPulseCount(0);
+      return;
+    }
     const interval = setInterval(() => setPulseCount((c) => c + 1), 1000);
     return () => clearInterval(interval);
   }, [isGenerating]);
