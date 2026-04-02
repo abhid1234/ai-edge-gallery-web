@@ -5,16 +5,19 @@ import { DownloadProvider } from "./contexts/DownloadContext";
 import { ModelProvider } from "./contexts/ModelContext";
 import { NetworkCounter } from "./components/NetworkCounter";
 import { InferenceProgressBar } from "./components/InferenceProgressBar";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <DownloadProvider>
-      <ModelProvider>
-        <InferenceProgressBar />
-        <App />
-        <NetworkCounter />
-      </ModelProvider>
-    </DownloadProvider>
+    <ErrorBoundary>
+      <DownloadProvider>
+        <ModelProvider>
+          <InferenceProgressBar />
+          <App />
+          <NetworkCounter />
+        </ModelProvider>
+      </DownloadProvider>
+    </ErrorBoundary>
   </StrictMode>
 );

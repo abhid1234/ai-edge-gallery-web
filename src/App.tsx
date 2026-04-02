@@ -1,11 +1,35 @@
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { Layout } from "./components/Layout";
 
+function RouteError() {
+  const handleRefresh = () => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((r) => r.unregister()));
+    }
+    caches.keys().then((names) => names.forEach((n) => caches.delete(n)));
+    window.location.reload();
+  };
+
+  return (
+    <div className="flex items-center justify-center h-64">
+      <div className="text-center p-6">
+        <p className="text-4xl mb-3">🔄</p>
+        <p className="text-sm font-semibold mb-1" style={{ color: "var(--color-on-surface)" }}>New version available</p>
+        <p className="text-xs mb-4" style={{ color: "var(--color-on-surface-variant)" }}>Refresh to load the latest version</p>
+        <button onClick={handleRefresh} className="px-4 py-2 rounded-lg text-sm font-semibold text-white" style={{ backgroundColor: "var(--color-primary)" }}>
+          Refresh
+        </button>
+      </div>
+    </div>
+  );
+}
+
 const router = createBrowserRouter(
   [
     {
       path: "/",
       element: <Layout />,
+      errorElement: <RouteError />,
       children: [
         { index: true, lazy: () => import("./features/gallery/GalleryPage") },
         { path: "chat", lazy: () => import("./features/chat/ChatPage") },

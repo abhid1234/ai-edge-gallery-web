@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ai-gallery-v5';
+const CACHE_NAME = 'ai-gallery-v6';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
