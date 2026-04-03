@@ -18,6 +18,7 @@ export interface ModelInfo {
   parameterCount: string;
   description: string;
   maxTokens: number;
+  chatTemplate?: "gemma" | "chatml" | "llama" | "phi" | "zephyr";
   tags?: string[];
   category?: string;
   author?: string;

@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { useModel } from "../../contexts/ModelContext";
+import { formatMultimodalParts } from "../../lib/chatTemplate";
 
 const MAX_IMAGES = 6;
 
@@ -85,12 +86,13 @@ export function Component() {
       const entry = images.find((e) => e.id === id);
       if (!entry) return;
 
+      const { before, after } = formatMultimodalParts(currentModel);
       const parts: (string | { imageSource: string })[] = [
-        "<start_of_turn>user\n",
+        before,
         "Describe this image in one detailed sentence.",
         " ",
         { imageSource: entry.blobUrl },
-        "<end_of_turn>\n<start_of_turn>model\n",
+        after,
       ];
 
       let fullCaption = "";

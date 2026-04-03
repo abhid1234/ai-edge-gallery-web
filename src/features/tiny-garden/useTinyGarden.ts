@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { useModel } from "../../contexts/ModelContext";
+import { formatWithSystem } from "../../lib/chatTemplate";
 import {
   createEmptyGarden,
   parseToolCalls,
@@ -52,12 +53,7 @@ export function useTinyGarden() {
 
       // Build prompt with current garden state
       const systemPrompt = buildSystemPrompt(garden);
-      const fullPrompt =
-        "<start_of_turn>user\n" +
-        systemPrompt +
-        "\n\nUser command: " +
-        command +
-        "<end_of_turn>\n<start_of_turn>model\n";
+      const fullPrompt = formatWithSystem(systemPrompt, `User command: ${command}`, currentModel);
 
       let fullResponse = "";
       try {

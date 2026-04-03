@@ -1,8 +1,33 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useModel } from "../../contexts/ModelContext";
-import type { ChatMessage } from "../../types";
+import type { ChatMessage, ModelInfo } from "../../types";
 
-function formatGemmaPrompt(messages: ChatMessage[], newMessage: string): string {
+function formatPrompt(messages: ChatMessage[], newMessage: string, model: ModelInfo | null): string {
+  const template = model?.chatTemplate || "gemma";
+
+  if (template === "chatml") {
+    // ChatML: Qwen, DeepSeek, SmolLM, Phi-4
+    let prompt = "";
+    for (const msg of messages) {
+      const role = msg.role === "user" ? "user" : "assistant";
+      prompt += `<|im_start|>${role}\n${msg.content}<|im_end|>\n`;
+    }
+    prompt += `<|im_start|>user\n${newMessage}<|im_end|>\n<|im_start|>assistant\n`;
+    return prompt;
+  }
+
+  if (template === "zephyr") {
+    // Zephyr: TinyLlama
+    let prompt = "";
+    for (const msg of messages) {
+      const role = msg.role === "user" ? "user" : "assistant";
+      prompt += `<|${role}|>\n${msg.content}</s>\n`;
+    }
+    prompt += `<|user|>\n${newMessage}</s>\n<|assistant|>\n`;
+    return prompt;
+  }
+
+  // Default: Gemma template
   let prompt = "";
   for (const msg of messages) {
     const role = msg.role === "user" ? "user" : "model";
@@ -20,7 +45,7 @@ export function useChatSession() {
     } catch { return []; }
   });
   const [streamingContent, setStreamingContent] = useState("");
-  const { generate, cancel, isGenerating } = useModel();
+  const { generate, cancel, isGenerating, currentModel } = useModel();
   const doneHandledRef = useRef(false);
 
   useEffect(() => {
@@ -40,7 +65,7 @@ export function useChatSession() {
       setStreamingContent("");
       doneHandledRef.current = false;
 
-      const prompt = formatGemmaPrompt(messages, content);
+      const prompt = formatPrompt(messages, content, currentModel);
 
       let fullResponse = "";
       const genStart = performance.now();

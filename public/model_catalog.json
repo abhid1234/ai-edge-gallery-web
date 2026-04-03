@@ -6,16 +6,27 @@
       "fileName": "Gemma3-1B-IT_multi-prefill-seq_q4_ekv2048.task",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/Gemma3-1B-IT_multi-prefill-seq_q4_ekv2048.task",
       "sizeBytes": 554661246,
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quantization": "q4",
       "parameterCount": "1B",
       "description": "Balanced text generation with 4-bit quantization. Good for multi-turn conversations.",
       "maxTokens": 1024,
-      "tags": ["fast", "chat", "general-purpose"],
+      "tags": [
+        "fast",
+        "chat",
+        "general-purpose"
+      ],
       "category": "text-gen",
       "author": "Google",
       "released": "2025-12-01",
-      "architecture": { "family": "gemma", "contextLength": 2048, "embeddingSize": 2048 }
+      "architecture": {
+        "family": "gemma",
+        "contextLength": 2048,
+        "embeddingSize": 2048
+      },
+      "chatTemplate": "gemma"
     },
     {
       "id": "gemma-3n-e2b",
@@ -23,16 +34,28 @@
       "fileName": "gemma-3n-E2B-it-int4-Web.litertlm",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/gemma-3n-E2B-it-int4-Web.litertlm",
       "sizeBytes": 3038117888,
-      "capabilities": ["text", "image", "audio"],
+      "capabilities": [
+        "text",
+        "image",
+        "audio"
+      ],
       "quantization": "int4",
       "parameterCount": "E2B (~2B active)",
       "description": "Multimodal: text + image + audio. Web-optimized. Requires 8GB+ free RAM.",
       "maxTokens": 4096,
-      "tags": ["multimodal", "audio"],
+      "tags": [
+        "multimodal",
+        "audio"
+      ],
       "category": "multimodal",
       "author": "Google",
       "released": "2025-06-01",
-      "architecture": { "family": "gemma", "contextLength": 4096, "embeddingSize": 2560 }
+      "architecture": {
+        "family": "gemma",
+        "contextLength": 4096,
+        "embeddingSize": 2560
+      },
+      "chatTemplate": "gemma"
     },
     {
       "id": "gemma-3n-e4b",
@@ -40,16 +63,30 @@
       "fileName": "gemma-3n-E4B-it-int4.task",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/gemma-3n-E4B-it-int4.task",
       "sizeBytes": 4405655031,
-      "capabilities": ["text", "image", "audio"],
+      "capabilities": [
+        "text",
+        "image",
+        "audio"
+      ],
       "quantization": "int4",
       "parameterCount": "E4B (~4B active)",
       "description": "Largest multimodal model. Higher quality than E2B. Requires 12GB+ free RAM.",
       "maxTokens": 4096,
-      "tags": ["multimodal", "vision", "audio", "high-quality"],
+      "tags": [
+        "multimodal",
+        "vision",
+        "audio",
+        "high-quality"
+      ],
       "category": "multimodal",
       "author": "Google",
       "released": "2025-06-01",
-      "architecture": { "family": "gemma", "contextLength": 4096, "embeddingSize": 3072 }
+      "architecture": {
+        "family": "gemma",
+        "contextLength": 4096,
+        "embeddingSize": 3072
+      },
+      "chatTemplate": "gemma"
     },
     {
       "id": "qwen-1.5b",
@@ -57,16 +94,26 @@
       "fileName": "Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
       "sizeBytes": 1625493432,
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quantization": "q8",
       "parameterCount": "1.5B",
       "description": "High quality text generation with 8-bit quantization.",
       "maxTokens": 1024,
-      "tags": ["multilingual", "long-context"],
+      "tags": [
+        "multilingual",
+        "long-context"
+      ],
       "category": "text-gen",
       "author": "Alibaba",
       "released": "2025-09-01",
-      "architecture": { "family": "qwen", "contextLength": 4096, "embeddingSize": 1536 }
+      "architecture": {
+        "family": "qwen",
+        "contextLength": 4096,
+        "embeddingSize": 1536
+      },
+      "chatTemplate": "chatml"
     },
     {
       "id": "deepseek-r1",
@@ -74,16 +121,27 @@
       "fileName": "DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.task",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.task",
       "sizeBytes": 1834078546,
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quantization": "q8",
       "parameterCount": "1.5B",
       "description": "Reasoning model with chain-of-thought. Best for complex problem solving.",
       "maxTokens": 4096,
-      "tags": ["reasoning", "chain-of-thought", "math"],
+      "tags": [
+        "reasoning",
+        "chain-of-thought",
+        "math"
+      ],
       "category": "reasoning",
       "author": "DeepSeek",
       "released": "2025-01-01",
-      "architecture": { "family": "deepseek", "contextLength": 4096, "embeddingSize": 1536 }
+      "architecture": {
+        "family": "deepseek",
+        "contextLength": 4096,
+        "embeddingSize": 1536
+      },
+      "chatTemplate": "chatml"
     },
     {
       "id": "smollm-135m",
@@ -91,16 +149,27 @@
       "fileName": "SmolLM-135M-Instruct_multi-prefill-seq_q8_ekv1280.task",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/SmolLM-135M-Instruct_multi-prefill-seq_q8_ekv1280.task",
       "sizeBytes": 166723584,
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quantization": "q8",
       "parameterCount": "135M",
-      "description": "Tiny model — loads instantly. Great for testing and quick experiments.",
+      "description": "Tiny model \u2014 loads instantly. Great for testing and quick experiments.",
       "maxTokens": 1024,
-      "tags": ["tiny", "fast", "lightweight"],
+      "tags": [
+        "tiny",
+        "fast",
+        "lightweight"
+      ],
       "category": "text-gen",
       "author": "HuggingFace",
       "released": "2024-07-01",
-      "architecture": { "family": "llama", "contextLength": 1280, "embeddingSize": 576 }
+      "architecture": {
+        "family": "llama",
+        "contextLength": 1280,
+        "embeddingSize": 576
+      },
+      "chatTemplate": "chatml"
     },
     {
       "id": "qwen-0.5b",
@@ -108,16 +177,27 @@
       "fileName": "Qwen2.5-0.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/Qwen2.5-0.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
       "sizeBytes": 546308096,
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quantization": "q8",
       "parameterCount": "0.5B",
       "description": "Small and fast. Good balance of quality and speed for text tasks.",
       "maxTokens": 1024,
-      "tags": ["small", "multilingual", "fast"],
+      "tags": [
+        "small",
+        "multilingual",
+        "fast"
+      ],
       "category": "text-gen",
       "author": "Alibaba",
       "released": "2025-09-01",
-      "architecture": { "family": "qwen", "contextLength": 1280, "embeddingSize": 896 }
+      "architecture": {
+        "family": "qwen",
+        "contextLength": 1280,
+        "embeddingSize": 896
+      },
+      "chatTemplate": "chatml"
     },
     {
       "id": "tinyllama-1.1b",
@@ -125,16 +205,26 @@
       "fileName": "TinyLlama-1.1B-Chat-v1.0_multi-prefill-seq_q8_ekv1280.task",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/TinyLlama-1.1B-Chat-v1.0_multi-prefill-seq_q8_ekv1280.task",
       "sizeBytes": 1148846080,
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quantization": "q8",
       "parameterCount": "1.1B",
       "description": "Classic small LLM. Trained on 3 trillion tokens. Good general-purpose chat.",
       "maxTokens": 1024,
-      "tags": ["chat", "general-purpose"],
+      "tags": [
+        "chat",
+        "general-purpose"
+      ],
       "category": "text-gen",
       "author": "TinyLlama Project",
       "released": "2024-01-01",
-      "architecture": { "family": "llama", "contextLength": 1280, "embeddingSize": 2048 }
+      "architecture": {
+        "family": "llama",
+        "contextLength": 1280,
+        "embeddingSize": 2048
+      },
+      "chatTemplate": "zephyr"
     },
     {
       "id": "phi-4-mini",
@@ -142,16 +232,28 @@
       "fileName": "Phi-4-mini-instruct_multi-prefill-seq_q8_ekv1280.task",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/Phi-4-mini-instruct_multi-prefill-seq_q8_ekv1280.task",
       "sizeBytes": 3944218624,
-      "capabilities": ["text"],
+      "capabilities": [
+        "text"
+      ],
       "quantization": "q8",
       "parameterCount": "3.8B",
       "description": "Microsoft's best small model. Excellent at code, math, and reasoning.",
       "maxTokens": 1024,
-      "tags": ["code", "reasoning", "math", "microsoft"],
+      "tags": [
+        "code",
+        "reasoning",
+        "math",
+        "microsoft"
+      ],
       "category": "reasoning",
       "author": "Microsoft",
       "released": "2025-02-01",
-      "architecture": { "family": "phi", "contextLength": 1280, "embeddingSize": 3072 }
+      "architecture": {
+        "family": "phi",
+        "contextLength": 1280,
+        "embeddingSize": 3072
+      },
+      "chatTemplate": "chatml"
     },
     {
       "id": "mobilenet-v3",
@@ -159,16 +261,27 @@
       "fileName": "mobilenet_v3_large.tflite",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/mobilenet_v3_large.tflite",
       "sizeBytes": 22024768,
-      "capabilities": ["image"],
+      "capabilities": [
+        "image"
+      ],
       "quantization": "fp32",
       "parameterCount": "5.4M",
       "description": "Fast image classification. 1000 ImageNet categories. Optimized for mobile.",
       "maxTokens": 0,
-      "tags": ["vision", "classification", "fast", "tiny"],
+      "tags": [
+        "vision",
+        "classification",
+        "fast",
+        "tiny"
+      ],
       "category": "vision",
       "author": "Google",
       "released": "2019-11-01",
-      "architecture": { "family": "mobilenet", "contextLength": 0, "embeddingSize": 1280 }
+      "architecture": {
+        "family": "mobilenet",
+        "contextLength": 0,
+        "embeddingSize": 1280
+      }
     },
     {
       "id": "resnet-18",
@@ -176,16 +289,25 @@
       "fileName": "resnet18.tflite",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/resnet18.tflite",
       "sizeBytes": 46182400,
-      "capabilities": ["image"],
+      "capabilities": [
+        "image"
+      ],
       "quantization": "fp32",
       "parameterCount": "11.7M",
       "description": "Classic image classifier. Strong accuracy on ImageNet 1000 categories.",
       "maxTokens": 0,
-      "tags": ["vision", "classification"],
+      "tags": [
+        "vision",
+        "classification"
+      ],
       "category": "vision",
       "author": "Microsoft Research",
       "released": "2015-12-01",
-      "architecture": { "family": "resnet", "contextLength": 0, "embeddingSize": 512 }
+      "architecture": {
+        "family": "resnet",
+        "contextLength": 0,
+        "embeddingSize": 512
+      }
     },
     {
       "id": "efficientnet-b1",
@@ -193,16 +315,26 @@
       "fileName": "efficientnet_b1.tflite",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/efficientnet_b1.tflite",
       "sizeBytes": 30451712,
-      "capabilities": ["image"],
+      "capabilities": [
+        "image"
+      ],
       "quantization": "fp32",
       "parameterCount": "7.8M",
       "description": "Efficient image classifier. Better accuracy-per-FLOP than ResNet.",
       "maxTokens": 0,
-      "tags": ["vision", "classification", "efficient"],
+      "tags": [
+        "vision",
+        "classification",
+        "efficient"
+      ],
       "category": "vision",
       "author": "Google",
       "released": "2019-05-01",
-      "architecture": { "family": "efficientnet", "contextLength": 0, "embeddingSize": 1280 }
+      "architecture": {
+        "family": "efficientnet",
+        "contextLength": 0,
+        "embeddingSize": 1280
+      }
     },
     {
       "id": "mobilenet-v2",
@@ -210,16 +342,27 @@
       "fileName": "mobilenet_v2.tflite",
       "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/mobilenet_v2.tflite",
       "sizeBytes": 13947904,
-      "capabilities": ["image"],
+      "capabilities": [
+        "image"
+      ],
       "quantization": "fp32",
       "parameterCount": "3.4M",
       "description": "Lightweight image classifier. Only 14MB. Fastest inference on mobile.",
       "maxTokens": 0,
-      "tags": ["vision", "classification", "fast", "tiny"],
+      "tags": [
+        "vision",
+        "classification",
+        "fast",
+        "tiny"
+      ],
       "category": "vision",
       "author": "Google",
       "released": "2018-01-01",
-      "architecture": { "family": "mobilenet", "contextLength": 0, "embeddingSize": 1280 }
+      "architecture": {
+        "family": "mobilenet",
+        "contextLength": 0,
+        "embeddingSize": 1280
+      }
     }
   ]
 }

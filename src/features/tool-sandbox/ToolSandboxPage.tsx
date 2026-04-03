@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useModel } from "../../contexts/ModelContext";
+import { formatWithSystem } from "../../lib/chatTemplate";
 
 interface ToolParam {
   name: string;
@@ -410,7 +411,7 @@ export function Component() {
     setInput("");
 
     const systemPrompt = buildSystemPrompt(tools);
-    const fullPrompt = `<start_of_turn>system\n${systemPrompt}<end_of_turn>\n<start_of_turn>user\n${trimmed}<end_of_turn>\n<start_of_turn>model\n`;
+    const fullPrompt = formatWithSystem(systemPrompt, trimmed, currentModel);
 
     let fullResponse = "";
     try {

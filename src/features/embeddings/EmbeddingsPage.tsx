@@ -1,16 +1,16 @@
 import { useState, useCallback, useRef } from "react";
 import { useModel } from "../../contexts/ModelContext";
+import { formatSingleTurn } from "../../lib/chatTemplate";
 
 const EXAMPLE_A = "The cat sat on the mat";
 const EXAMPLE_B = "A feline rested on the rug";
 
-function buildSimilarityPrompt(textA: string, textB: string): string {
+// model param injected at call site via formatSingleTurn
+function buildSimilarityMessage(textA: string, textB: string): string {
   return (
-    `<start_of_turn>user\n` +
     `Rate the semantic similarity between Text A and Text B on a scale of 0 to 100. Output ONLY the number.\n\n` +
     `Text A: ${textA}\n\n` +
-    `Text B: ${textB}\n` +
-    `<end_of_turn>\n<start_of_turn>model\n`
+    `Text B: ${textB}`
   );
 }
 
@@ -53,7 +53,7 @@ export function Component() {
     // Instant client-side Jaccard
     setJaccardScore(jaccardSimilarity(textA, textB));
 
-    const prompt = buildSimilarityPrompt(textA.trim(), textB.trim());
+    const prompt = formatSingleTurn(buildSimilarityMessage(textA.trim(), textB.trim()), currentModel);
     let fullResponse = "";
 
     try {

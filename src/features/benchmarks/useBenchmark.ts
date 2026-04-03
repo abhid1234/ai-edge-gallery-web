@@ -1,10 +1,14 @@
 import { useState, useCallback } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import { useWebGPU } from "../../hooks/useWebGPU";
-import type { BenchmarkResult } from "../../types";
+import { formatSingleTurn } from "../../lib/chatTemplate";
+import type { BenchmarkResult, ModelInfo } from "../../types";
 
-const BENCHMARK_PROMPT =
-  "<start_of_turn>user\nExplain what on-device machine learning means in 3 sentences.<end_of_turn>\n<start_of_turn>model\n";
+const BENCHMARK_MESSAGE = "Explain what on-device machine learning means in 3 sentences.";
+
+function getBenchmarkPrompt(model: ModelInfo | null): string {
+  return formatSingleTurn(BENCHMARK_MESSAGE, model);
+}
 
 const STORAGE_KEY = "benchmark_history";
 
@@ -44,7 +48,7 @@ export function useBenchmark() {
     let tokenCount = 0;
     let firstToken = true;
 
-    await generate(BENCHMARK_PROMPT, (partial, done) => {
+    await generate(getBenchmarkPrompt(currentModel), (partial, done) => {
       if (firstToken && partial.length > 0) {
         ttft = Math.round(performance.now() - startTime);
         firstToken = false;

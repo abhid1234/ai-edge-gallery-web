@@ -27,8 +27,9 @@ export async function initModel(
         modelAssetPath: blobUrl,
       },
       maxTokens: modelInfo.maxTokens,
-      topK: 40,
-      temperature: 0.8,
+      topK: 20,
+      topP: 0.95,
+      temperature: 0.7,
       randomSeed: 101,
     };
 

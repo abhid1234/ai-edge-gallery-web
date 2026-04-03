@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useModel } from "../../contexts/ModelContext";
+import { formatSingleTurn } from "../../lib/chatTemplate";
 
 interface CompareResult {
   modelName: string;
@@ -26,7 +27,7 @@ export function Component() {
     let firstToken = true;
     let fullResponse = "";
 
-    const gemmaPrompt = `<start_of_turn>user\n${prompt.trim()}<end_of_turn>\n<start_of_turn>model\n`;
+    const gemmaPrompt = formatSingleTurn(prompt.trim(), currentModel);
 
     await generate(gemmaPrompt, (partial, done) => {
       if (firstToken && partial.length > 0) {

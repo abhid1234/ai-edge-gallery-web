@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { useModel } from "../../contexts/ModelContext";
+import { formatWithSystem } from "../../lib/chatTemplate";
 import { buildSystemPrompt, parseToolCall, toolsByName } from "./tools";
 
 export interface ActionRecord {
@@ -25,8 +26,7 @@ export function useWebActions() {
       doneHandledRef.current = false;
 
       const systemPrompt = buildSystemPrompt();
-      // Format as a single-turn Gemma prompt with system context prepended to the user turn
-      const prompt = `<start_of_turn>user\n${systemPrompt}\n\nUser request: ${request}<end_of_turn>\n<start_of_turn>model\n`;
+      const prompt = formatWithSystem(systemPrompt, `User request: ${request}`, currentModel);
 
       let fullResponse = "";
 
@@ -81,7 +81,7 @@ export function useWebActions() {
         await finalize(fullResponse || "Error: generation failed");
       }
     },
-    [generate]
+    [generate, currentModel]
   );
 
   const clearHistory = useCallback(() => {

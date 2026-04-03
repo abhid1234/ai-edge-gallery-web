@@ -1,16 +1,16 @@
 import { useState, useCallback, useRef } from "react";
 import { useModel } from "../../contexts/ModelContext";
+import { formatSingleTurn } from "../../lib/chatTemplate";
 
 const EXAMPLE_PREFIX = "function fibonacci(n) {\n  ";
 const EXAMPLE_SUFFIX = "\n}\n\nconsole.log(fibonacci(10));";
 
-function buildFillInMiddlePrompt(prefix: string, suffix: string): string {
+// Returns the user message body; template wrapper applied at call site via formatSingleTurn
+function buildFillInMiddleMessage(prefix: string, suffix: string): string {
   return (
-    `<start_of_turn>user\n` +
     `Complete the code between PREFIX and SUFFIX. Output ONLY the missing code, nothing else.\n\n` +
     `PREFIX:\n\`\`\`${prefix}\`\`\`\n\n` +
-    `SUFFIX:\n\`\`\`${suffix}\`\`\`\n` +
-    `<end_of_turn>\n<start_of_turn>model\n`
+    `SUFFIX:\n\`\`\`${suffix}\`\`\``
   );
 }
 
@@ -31,7 +31,7 @@ export function Component() {
     setError(null);
     doneHandledRef.current = false;
 
-    const prompt = buildFillInMiddlePrompt(prefix, suffix);
+    const prompt = formatSingleTurn(buildFillInMiddleMessage(prefix, suffix), currentModel);
     let fullResponse = "";
 
     try {

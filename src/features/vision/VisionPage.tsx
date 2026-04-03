@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { useModel } from "../../contexts/ModelContext";
+import { formatMultimodalParts } from "../../lib/chatTemplate";
 
 interface ClassResult {
   label: string;
@@ -140,12 +141,13 @@ export function Component() {
     setParseError(null);
     setRawResponse("");
 
+    const { before, after } = formatMultimodalParts(currentModel);
     const parts: (string | { imageSource: string })[] = [
-      "<start_of_turn>user\n",
+      before,
       CLASSIFY_PROMPT,
       "\n",
       { imageSource: imageUrl },
-      "<end_of_turn>\n<start_of_turn>model\n",
+      after,
     ];
 
     const t0 = performance.now();
