@@ -27,30 +27,30 @@ export async function initModel(
 
   const genaiFileset = await getFileset();
 
-  // Create a blob URL so MediaPipe can fetch the model itself
-  const blobUrl = URL.createObjectURL(modelBlob);
+  // Stream the model to MediaPipe via ReadableStreamDefaultReader
+  // This avoids loading the entire model into JS heap as an ArrayBuffer.
+  // MediaPipe's createFromOptions accepts ReadableStreamDefaultReader
+  // as modelAssetBuffer, reading chunks on demand (similar to mmap).
+  const stream = modelBlob.stream();
+  const reader = stream.getReader() as ReadableStreamDefaultReader<Uint8Array>;
 
-  try {
-    const options: Record<string, unknown> = {
-      baseOptions: {
-        modelAssetPath: blobUrl,
-      },
-      maxTokens: modelInfo.maxTokens,
-      topK: 64,
-      topP: 0.95,
-      temperature: 1.0,
-      randomSeed: Math.floor(Math.random() * 1000000),
-    };
+  const options: Record<string, unknown> = {
+    baseOptions: {
+      modelAssetBuffer: reader,
+    },
+    maxTokens: modelInfo.maxTokens,
+    topK: 64,
+    topP: 0.95,
+    temperature: 1.0,
+    randomSeed: Math.floor(Math.random() * 1000000),
+  };
 
-    if (modelInfo.capabilities.includes("image")) {
-      (options as Record<string, unknown>).maxNumImages = 5;
-    }
-
-    instance = await LlmInference.createFromOptions(genaiFileset, options);
-    currentModelId = modelInfo.id;
-  } finally {
-    URL.revokeObjectURL(blobUrl);
+  if (modelInfo.capabilities.includes("image")) {
+    (options as Record<string, unknown>).maxNumImages = 5;
   }
+
+  instance = await LlmInference.createFromOptions(genaiFileset, options);
+  currentModelId = modelInfo.id;
 }
 
 export async function generateText(
