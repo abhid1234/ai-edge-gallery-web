@@ -69,3 +69,17 @@ export async function listFiles(): Promise<string[]> {
   }
   return names;
 }
+
+export async function getTotalStorageUsage(): Promise<number> {
+  const root = await getRoot();
+  let totalBytes = 0;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  for await (const [name] of (root as any).entries()) {
+    try {
+      const handle = await root.getFileHandle(name);
+      const file = await handle.getFile();
+      totalBytes += file.size;
+    } catch { /* skip directories or inaccessible entries */ }
+  }
+  return totalBytes;
+}

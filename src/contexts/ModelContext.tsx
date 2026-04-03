@@ -52,11 +52,11 @@ export function ModelProvider({ children }: { children: ReactNode }) {
     let hiddenTimer: ReturnType<typeof setTimeout> | null = null;
     const handleVisibility = () => {
       if (document.hidden) {
-        // If tab hidden for 5 minutes, auto-unload to prevent memory pressure
+        // If tab hidden for 2 minutes, auto-unload to prevent memory pressure
         hiddenTimer = setTimeout(() => {
           dispose();
           setCurrentModel(null);
-        }, 5 * 60 * 1000);
+        }, 2 * 60 * 1000);
       } else if (hiddenTimer) {
         clearTimeout(hiddenTimer);
         hiddenTimer = null;

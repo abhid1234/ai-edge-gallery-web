@@ -38,6 +38,8 @@ function formatPrompt(messages: ChatMessage[], newMessage: string, model: ModelI
   return prompt;
 }
 
+const MAX_MESSAGES = 50;
+
 export function useChatSession() {
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     try {
@@ -62,7 +64,10 @@ export function useChatSession() {
         timestamp: Date.now(),
       };
 
-      setMessages((prev) => [...prev, userMessage]);
+      setMessages((prev) => {
+        const updated = [...prev, userMessage];
+        return updated.length > MAX_MESSAGES ? updated.slice(-MAX_MESSAGES) : updated;
+      });
       setStreamingContent("");
       doneHandledRef.current = false;
 
@@ -124,7 +129,10 @@ export function useChatSession() {
               content: fullResponse.trim(),
               timestamp: Date.now(),
             };
-            setMessages((prev) => [...prev, modelMessage]);
+            setMessages((prev) => {
+              const updated = [...prev, modelMessage];
+              return updated.length > MAX_MESSAGES ? updated.slice(-MAX_MESSAGES) : updated;
+            });
             setStreamingContent("");
           }
         });

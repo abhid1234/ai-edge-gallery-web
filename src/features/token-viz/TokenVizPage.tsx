@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback } from "react";
 import { useModel } from "../../contexts/ModelContext";
 
+const MAX_TOKENS = 500;
+
 interface TokenData {
   text: string;
   timeMs: number;
@@ -129,7 +131,10 @@ export function Component() {
         prevLengthRef.current = partial.length;
 
         if (newText.length > 0) {
-          setTokens((prev) => [...prev, { text: newText, timeMs: elapsed }]);
+          setTokens((prev) => {
+            const updated = [...prev, { text: newText, timeMs: elapsed }];
+            return updated.length > MAX_TOKENS ? updated.slice(-MAX_TOKENS) : updated;
+          });
         }
 
         if (done) {

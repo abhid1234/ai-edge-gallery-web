@@ -6,6 +6,7 @@ import { useWebGPU } from "../../hooks/useWebGPU";
 import { ModelCard } from "./ModelCard";
 import { ModelFilters } from "./ModelFilters";
 import { ModelImport } from "./ModelImport";
+import { getTotalStorageUsage } from "../../lib/storage";
 import type { ModelInfo } from "../../types";
 
 // Task card color rotation: red → green → blue → yellow (uses CSS variables for dark mode)
@@ -122,6 +123,14 @@ const FEATURE_CARDS = [
   },
 ] as const;
 
+function formatSize(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
+
 export function Component() {
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [customModels, setCustomModels] = useState<ModelInfo[]>([]);
@@ -131,7 +140,8 @@ export function Component() {
   const [search, setSearch] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
   const [sortBy, setSortBy] = useState("default");
-  const { checkStoredModels, hfToken, setHfToken } = useDownload();
+  const [storageUsed, setStorageUsed] = useState(0);
+  const { checkStoredModels, hfToken, setHfToken, modelStatuses } = useDownload();
   const { info: gpuInfo } = useWebGPU();
 
   useEffect(() => {
@@ -146,6 +156,11 @@ export function Component() {
     }
     init();
   }, [checkStoredModels]);
+
+  // Refresh storage usage whenever download status changes
+  useEffect(() => {
+    getTotalStorageUsage().then(setStorageUsed).catch(() => {/* OPFS unavailable */});
+  }, [models, modelStatuses]);
 
   const allModels = useMemo(() => [...models, ...customModels], [models, customModels]);
 
@@ -279,9 +294,16 @@ export function Component() {
       {/* Models section */}
       <div className="px-6 pt-8 pb-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-[var(--color-on-surface)]">
-            Available Models
-          </h2>
+          <div className="flex items-baseline gap-3">
+            <h2 className="text-lg font-bold text-[var(--color-on-surface)]">
+              Available Models
+            </h2>
+            {storageUsed > 0 && (
+              <span className="text-xs" style={{ color: "var(--color-on-surface-variant)" }}>
+                {formatSize(storageUsed)} stored on device
+              </span>
+            )}
+          </div>
           <button
             onClick={() => setShowTokenInput((v) => !v)}
             className={`text-xs px-3 py-1.5 rounded-full transition-colors ${

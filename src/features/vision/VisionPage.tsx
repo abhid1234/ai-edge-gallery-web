@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import { formatMultimodalParts } from "../../lib/chatTemplate";
 
@@ -92,12 +92,31 @@ export function Component() {
   const [webcamError, setWebcamError] = useState<string | null>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageUrlRef = useRef<string | null>(null);
+
+  // Keep ref in sync so cleanup always has the latest URL
+  useEffect(() => {
+    imageUrlRef.current = imageUrl;
+  }, [imageUrl]);
+
+  // Revoke blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (imageUrlRef.current && imageUrlRef.current.startsWith("blob:")) {
+        URL.revokeObjectURL(imageUrlRef.current);
+      }
+    };
+  }, []);
 
   const isMultimodal = currentModel?.capabilities.includes("image") ?? false;
   const canClassify = !!imageUrl && !!currentModel && isMultimodal && !isGenerating;
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) return;
+    // Revoke previous blob URL before creating a new one
+    if (imageUrlRef.current && imageUrlRef.current.startsWith("blob:")) {
+      URL.revokeObjectURL(imageUrlRef.current);
+    }
     const url = URL.createObjectURL(file);
     setImageUrl(url);
     setResults([]);
@@ -170,6 +189,9 @@ export function Component() {
   };
 
   const handleClearImage = () => {
+    if (imageUrlRef.current && imageUrlRef.current.startsWith("blob:")) {
+      URL.revokeObjectURL(imageUrlRef.current);
+    }
     setImageUrl(null);
     setResults([]);
     setInferenceMs(null);

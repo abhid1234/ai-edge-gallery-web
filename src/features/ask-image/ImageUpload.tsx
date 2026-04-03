@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, type DragEvent } from "react";
+import { useState, useCallback, useRef, useEffect, type DragEvent } from "react";
 
 interface Props {
   onImageSelected: (imageUrl: string) => void;
@@ -8,10 +8,25 @@ export function ImageUpload({ onImageSelected }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const previewRef = useRef<string | null>(null);
+
+  // Keep ref in sync so the unmount cleanup always has the latest URL
+  useEffect(() => {
+    previewRef.current = preview;
+  }, [preview]);
+
+  // Revoke blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewRef.current) URL.revokeObjectURL(previewRef.current);
+    };
+  }, []);
 
   const handleFile = useCallback(
     (file: File) => {
       if (!file.type.startsWith("image/")) return;
+      // Revoke previous blob URL before creating a new one
+      if (previewRef.current) URL.revokeObjectURL(previewRef.current);
       const url = URL.createObjectURL(file);
       setPreview(url);
       onImageSelected(url);
@@ -38,7 +53,7 @@ export function ImageUpload({ onImageSelected }: Props) {
         <div className="relative">
           <img src={preview} alt="Uploaded" className="max-h-64 rounded-lg object-contain mx-auto" />
           <button
-            onClick={() => { setPreview(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+            onClick={() => { if (previewRef.current) URL.revokeObjectURL(previewRef.current); setPreview(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
             className="absolute top-2 right-2 bg-[var(--color-surface)]/80 rounded-full px-2 py-0.5 text-xs text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface)]"
           >
             Clear

@@ -18,12 +18,19 @@ export function AudioRecorder({ onAudioReady }: Props) {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const audioUrlRef = useRef<string | null>(null);
+
+  // Keep ref in sync so cleanup always has the latest URL
+  useEffect(() => {
+    audioUrlRef.current = audioUrl;
+  }, [audioUrl]);
 
   // Clean up on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (streamRef.current) streamRef.current.getTracks().forEach((t) => t.stop());
+      if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
     };
   }, []);
 
@@ -50,6 +57,8 @@ export function AudioRecorder({ onAudioReady }: Props) {
 
   const startRecording = useCallback(async () => {
     setError(null);
+    // Revoke any existing blob URL before starting a new recording
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
     setAudioUrl(null);
     chunksRef.current = [];
 
@@ -100,6 +109,8 @@ export function AudioRecorder({ onAudioReady }: Props) {
         setError("Unsupported file type. Please upload a WAV, MP3, WebM, or OGG file.");
         return;
       }
+      // Revoke previous blob URL before creating a new one
+      if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
       const url = URL.createObjectURL(file);
       setAudioUrl(url);
       onAudioReady(url);
@@ -109,6 +120,7 @@ export function AudioRecorder({ onAudioReady }: Props) {
   );
 
   const clearAudio = () => {
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
     setAudioUrl(null);
     setElapsed(0);
     if (fileInputRef.current) fileInputRef.current.value = "";
