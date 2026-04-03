@@ -3,6 +3,7 @@ import {
   useContext,
   useState,
   useCallback,
+  useEffect,
   type ReactNode,
 } from "react";
 import type { ModelInfo } from "../types";
@@ -39,11 +40,43 @@ export function ModelProvider({ children }: { children: ReactNode }) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Cleanup on unmount — dispose MediaPipe instance to free WASM/GPU memory
+  useEffect(() => {
+    return () => {
+      dispose();
+    };
+  }, []);
+
+  // Cleanup on page visibility change — free memory when tab is hidden for >5 min
+  useEffect(() => {
+    let hiddenTimer: ReturnType<typeof setTimeout> | null = null;
+    const handleVisibility = () => {
+      if (document.hidden) {
+        // If tab hidden for 5 minutes, auto-unload to prevent memory pressure
+        hiddenTimer = setTimeout(() => {
+          dispose();
+          setCurrentModel(null);
+        }, 5 * 60 * 1000);
+      } else if (hiddenTimer) {
+        clearTimeout(hiddenTimer);
+        hiddenTimer = null;
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      if (hiddenTimer) clearTimeout(hiddenTimer);
+    };
+  }, []);
+
   const loadModel = useCallback(async (model: ModelInfo, blob: Blob) => {
     setIsLoading(true);
     setError(null);
     try {
       await initModel(blob, model);
+      // Blob is no longer needed — MediaPipe has loaded the model via blob URL.
+      // Setting blob to null here doesn't help (it's a parameter), but the caller
+      // should not hold a reference to the blob after this returns.
       setCurrentModel(model);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to load model";

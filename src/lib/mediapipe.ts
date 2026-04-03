@@ -6,8 +6,18 @@ const WASM_CDN =
 
 let instance: LlmInference | null = null;
 let currentModelId: string | null = null;
+// Cache the WASM fileset so it's only loaded once (prevents ~50-100MB leak per reload)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let cachedFileset: any = null;
 
 export type StreamCallback = (partialResult: string, done: boolean) => void;
+
+async function getFileset() {
+  if (!cachedFileset) {
+    cachedFileset = await FilesetResolver.forGenAiTasks(WASM_CDN);
+  }
+  return cachedFileset;
+}
 
 export async function initModel(
   modelBlob: Blob,
@@ -15,10 +25,9 @@ export async function initModel(
 ): Promise<void> {
   await dispose();
 
-  const genaiFileset = await FilesetResolver.forGenAiTasks(WASM_CDN);
+  const genaiFileset = await getFileset();
 
   // Create a blob URL so MediaPipe can fetch the model itself
-  // This avoids us having to load the entire file into a single ArrayBuffer
   const blobUrl = URL.createObjectURL(modelBlob);
 
   try {
