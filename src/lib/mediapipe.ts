@@ -27,16 +27,15 @@ export async function initModel(
 
   const genaiFileset = await getFileset();
 
-  // Stream the model to MediaPipe via ReadableStreamDefaultReader
-  // This avoids loading the entire model into JS heap as an ArrayBuffer.
-  // MediaPipe's createFromOptions accepts ReadableStreamDefaultReader
-  // as modelAssetBuffer, reading chunks on demand (similar to mmap).
-  const stream = modelBlob.stream();
-  const reader = stream.getReader() as ReadableStreamDefaultReader<Uint8Array>;
+  // Pass blob URL to MediaPipe — it handles fetching internally.
+  // The blob is backed by OPFS (disk), so only the pages MediaPipe reads
+  // are loaded into memory via the browser's cache.
+  const blobUrl = URL.createObjectURL(modelBlob);
 
+  try {
   const options: Record<string, unknown> = {
     baseOptions: {
-      modelAssetBuffer: reader,
+      modelAssetPath: blobUrl,
     },
     maxTokens: modelInfo.maxTokens,
     topK: 64,
@@ -51,6 +50,9 @@ export async function initModel(
 
   instance = await LlmInference.createFromOptions(genaiFileset, options);
   currentModelId = modelInfo.id;
+  } finally {
+    URL.revokeObjectURL(blobUrl);
+  }
 }
 
 export async function generateText(
