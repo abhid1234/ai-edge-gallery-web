@@ -27,10 +27,10 @@ export async function initModel(
         modelAssetPath: blobUrl,
       },
       maxTokens: modelInfo.maxTokens,
-      topK: 20,
+      topK: 64,
       topP: 0.95,
-      temperature: 0.7,
-      randomSeed: 101,
+      temperature: 1.0,
+      randomSeed: Math.floor(Math.random() * 1000000),
     };
 
     if (modelInfo.capabilities.includes("image")) {

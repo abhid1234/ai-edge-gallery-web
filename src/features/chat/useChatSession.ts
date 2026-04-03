@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import type { ChatMessage, ModelInfo } from "../../types";
+import { detectRepetition } from "../../lib/repetitionDetector";
 
 function formatPrompt(messages: ChatMessage[], newMessage: string, model: ModelInfo | null): string {
   const template = model?.chatTemplate || "gemma";
@@ -72,11 +73,31 @@ export function useChatSession() {
       let firstTokenTime = -1;
       let tokenCount = 0;
       try {
+        let repetitionCancelled = false;
         await generate(prompt, (partial, done) => {
           const now = performance.now();
           if (firstTokenTime < 0) firstTokenTime = now;
           fullResponse += partial;
           tokenCount = Math.round(fullResponse.length / 4);
+
+          // Detect repetition loops and auto-cancel
+          if (!done && !repetitionCancelled && fullResponse.length > 100 && detectRepetition(fullResponse)) {
+            repetitionCancelled = true;
+            cancel();
+            // Trim to content before the repetition started
+            const words = fullResponse.trim().split(/\s+/);
+            const seen = new Set<string>();
+            let cutoff = words.length;
+            for (let i = Math.max(0, words.length - 30); i < words.length - 2; i++) {
+              const trigram = words.slice(i, i + 3).join(" ");
+              if (seen.has(trigram)) { cutoff = i; break; }
+              seen.add(trigram);
+            }
+            fullResponse = words.slice(0, cutoff).join(" ") + "\n\n⚠️ _Response was cut short — the model started repeating itself._";
+            setStreamingContent(fullResponse);
+            return;
+          }
+
           setStreamingContent(fullResponse);
 
           if (done && !doneHandledRef.current) {
