@@ -18,6 +18,7 @@ export function MemoryMonitor() {
   const [peakHeapMB, setPeakHeapMB] = useState(0);
   const [loadTimeMB, setLoadTimeMB] = useState<{ before: number; after: number } | null>(null);
   const preLoadHeap = useRef<number>(0);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   // Track heap before model load starts
   useEffect(() => {
@@ -58,6 +59,22 @@ export function MemoryMonitor() {
     return () => clearInterval(interval);
   }, []);
 
+  // Close panel when clicking outside
+  useEffect(() => {
+    if (!expanded) return;
+    const handleClick = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        setExpanded(false);
+      }
+    };
+    // Delay listener so the opening click doesn't immediately close it
+    const timer = setTimeout(() => document.addEventListener("mousedown", handleClick), 0);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, [expanded]);
+
   const handleReset = useCallback(() => {
     setSamples([]);
     setPeakHeapMB(0);
@@ -83,44 +100,19 @@ export function MemoryMonitor() {
   const sparkline = samples.length > 1 ? renderSparkline(samples) : null;
 
   return (
-    <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 select-none" style={{ maxWidth: expanded ? "340px" : "auto" }}>
-      {/* Collapsed pill */}
-      <button
-        onClick={() => setExpanded((v) => !v)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-all"
-        style={{
-          backgroundColor: "var(--color-surface-container-high)",
-          color: "var(--color-on-surface-variant)",
-          border: `1px solid ${color}40`,
-        }}
-      >
-        <span
-          className={`w-2 h-2 rounded-full flex-shrink-0 ${schedulerState === "GENERATING" || schedulerState === "LOADING" ? "animate-pulse" : ""}`}
-          style={{ backgroundColor: color }}
-        />
-        <span>
-          {Math.round(heapMB)}MB heap
-          {currentModel ? ` \u00b7 ~${estimatedGpuMB}MB GPU` : ""}
-          {" \u00b7 "}
-          ~{snapshot.estimatedFreeGB.toFixed(1)}GB free
-        </span>
-        <svg
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className={`w-3 h-3 transition-transform ${expanded ? "rotate-180" : ""}`}
-        >
-          <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" />
-        </svg>
-      </button>
-
-      {/* Expanded panel */}
+    <div
+      ref={panelRef}
+      className="fixed bottom-3 z-50 select-none flex flex-col items-center"
+      style={{ left: "50%", transform: "translateX(-50%)" }}
+    >
+      {/* Expanded panel — opens ABOVE the pill */}
       {expanded && (
         <div
-          className="mt-2 rounded-xl p-4 text-xs space-y-3"
+          className="mb-2 rounded-xl p-4 text-xs space-y-3 w-[320px]"
           style={{
             backgroundColor: "var(--color-surface)",
             border: "1px solid var(--color-outline-variant)",
-            boxShadow: "0 4px 24px rgba(0,0,0,0.12)",
+            boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
           }}
         >
           <div className="flex items-center justify-between">
@@ -136,24 +128,35 @@ export function MemoryMonitor() {
             </button>
           </div>
 
+          {/* Plain-language explanation */}
+          <div className="text-[11px] leading-relaxed rounded-lg p-2.5" style={{ backgroundColor: "var(--color-surface-container)", color: "var(--color-on-surface-variant)" }}>
+            This shows how much of your computer's memory the AI model is using.
+            <span style={{ color: "#34A853" }}> Green</span> = plenty of room.
+            <span style={{ color: "#F9AB00" }}> Yellow</span> = getting tight.
+            <span style={{ color: "#EA4335" }}> Red</span> = may slow down your browser.
+          </div>
+
           {/* Memory bars */}
           <div className="space-y-2">
             <ResourceBar
-              label="JS Heap"
+              label="App memory"
+              tooltip="Memory used by the web app's code and data"
               valueMB={Math.round(heapMB)}
               maxMB={Math.round(snapshot.deviceMemoryGB * 1024)}
               color="#4285F4"
             />
             {currentModel && (
               <ResourceBar
-                label="Est. GPU"
+                label="GPU (estimated)"
+                tooltip="Memory the AI model uses on your graphics chip"
                 valueMB={estimatedGpuMB}
                 maxMB={Math.round(snapshot.deviceMemoryGB * 1024)}
                 color="#34A853"
               />
             )}
             <ResourceBar
-              label="Combined"
+              label="Total used"
+              tooltip="App + GPU memory combined"
               valueMB={Math.round(heapMB) + estimatedGpuMB}
               maxMB={Math.round(snapshot.deviceMemoryGB * 1024)}
               color={color}
@@ -164,7 +167,7 @@ export function MemoryMonitor() {
           {sparkline && (
             <div>
               <div className="text-[10px] font-medium mb-1" style={{ color: "var(--color-on-surface-variant)" }}>
-                Heap over time (2min window)
+                Memory over the last 2 minutes
               </div>
               {sparkline}
             </div>
@@ -172,12 +175,12 @@ export function MemoryMonitor() {
 
           {/* Stats grid */}
           <div className="grid grid-cols-2 gap-2">
-            <StatBox label="Peak Heap" value={`${Math.round(peakHeapMB)}MB`} />
-            <StatBox label="Device RAM" value={`${snapshot.deviceMemoryGB}GB`} />
+            <StatBox label="Highest so far" tooltip="The most memory used during this session" value={`${Math.round(peakHeapMB)}MB`} />
+            <StatBox label="Your device" tooltip="Total RAM your computer reports" value={`${snapshot.deviceMemoryGB}GB`} />
             {currentModel && (
               <>
-                <StatBox label="Model Size" value={`${Math.round(currentModel.sizeBytes / (1024 * 1024))}MB`} />
-                <StatBox label="Est. Peak" value={`${estimatePeakMemoryGB(currentModel.sizeBytes).toFixed(1)}GB`} />
+                <StatBox label="Model size" tooltip="Size of the AI model file on disk" value={`${Math.round(currentModel.sizeBytes / (1024 * 1024))}MB`} />
+                <StatBox label="Needs at peak" tooltip="Maximum memory the model will use while running" value={`${estimatePeakMemoryGB(currentModel.sizeBytes).toFixed(1)}GB`} />
               </>
             )}
           </div>
@@ -189,13 +192,13 @@ export function MemoryMonitor() {
               style={{ backgroundColor: "var(--color-surface-container)" }}
             >
               <div className="text-[10px] font-semibold mb-1" style={{ color: "var(--color-on-surface)" }}>
-                Last Model Load Impact
+                Memory impact when model loaded
               </div>
               <div className="flex items-center gap-2 text-[11px]" style={{ color: "var(--color-on-surface-variant)" }}>
-                <span>{loadTimeMB.before}MB</span>
+                <span>Before: {loadTimeMB.before}MB</span>
                 <span style={{ color: "var(--color-outline)" }}>&rarr;</span>
                 <span style={{ color: loadTimeMB.after > loadTimeMB.before * 2 ? "#EA4335" : "#34A853" }}>
-                  {loadTimeMB.after}MB
+                  After: {loadTimeMB.after}MB
                 </span>
                 <span style={{ color: "var(--color-outline)" }}>
                   (+{loadTimeMB.after - loadTimeMB.before}MB)
@@ -203,27 +206,50 @@ export function MemoryMonitor() {
               </div>
               <div className="text-[10px] mt-1" style={{ color: "var(--color-outline)" }}>
                 {loadTimeMB.after - loadTimeMB.before < 500
-                  ? "Streaming is working — low heap impact"
-                  : "High heap delta — model may have been buffered"}
+                  ? "Good — model loaded efficiently with low memory overhead"
+                  : "High memory jump — the model needed a lot of RAM to load"}
               </div>
             </div>
           )}
-
-          {/* How to verify */}
-          <div className="text-[10px] leading-relaxed" style={{ color: "var(--color-outline)" }}>
-            Open Chrome Task Manager (Shift+Esc) to see total process memory including GPU.
-            The "Memory footprint" column shows real RSS.
-          </div>
         </div>
       )}
+
+      {/* Pill button — always centered */}
+      <button
+        onClick={() => setExpanded((v) => !v)}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-all"
+        style={{
+          backgroundColor: "var(--color-surface-container-high)",
+          color: "var(--color-on-surface-variant)",
+          border: `1px solid ${color}40`,
+        }}
+      >
+        <span
+          className={`w-2 h-2 rounded-full flex-shrink-0 ${schedulerState === "GENERATING" || schedulerState === "LOADING" ? "animate-pulse" : ""}`}
+          style={{ backgroundColor: color }}
+        />
+        <span>
+          {Math.round(heapMB)}MB used
+          {currentModel ? ` \u00b7 ~${estimatedGpuMB}MB GPU` : ""}
+          {" \u00b7 "}
+          ~{snapshot.estimatedFreeGB.toFixed(1)}GB free
+        </span>
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className={`w-3 h-3 transition-transform ${expanded ? "rotate-180" : ""}`}
+        >
+          <path d={expanded ? "M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" : "M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"} />
+        </svg>
+      </button>
     </div>
   );
 }
 
-function ResourceBar({ label, valueMB, maxMB, color }: { label: string; valueMB: number; maxMB: number; color: string }) {
+function ResourceBar({ label, tooltip, valueMB, maxMB, color }: { label: string; tooltip: string; valueMB: number; maxMB: number; color: string }) {
   const pct = maxMB > 0 ? Math.min((valueMB / maxMB) * 100, 100) : 0;
   return (
-    <div>
+    <div title={tooltip}>
       <div className="flex justify-between mb-0.5">
         <span style={{ color: "var(--color-on-surface-variant)" }}>{label}</span>
         <span className="tabular-nums" style={{ color: "var(--color-on-surface)" }}>
@@ -240,9 +266,9 @@ function ResourceBar({ label, valueMB, maxMB, color }: { label: string; valueMB:
   );
 }
 
-function StatBox({ label, value }: { label: string; value: string }) {
+function StatBox({ label, tooltip, value }: { label: string; tooltip: string; value: string }) {
   return (
-    <div className="rounded-lg p-2" style={{ backgroundColor: "var(--color-surface-container)" }}>
+    <div className="rounded-lg p-2" style={{ backgroundColor: "var(--color-surface-container)" }} title={tooltip}>
       <div className="text-[10px]" style={{ color: "var(--color-on-surface-variant)" }}>{label}</div>
       <div className="text-sm font-semibold tabular-nums" style={{ color: "var(--color-on-surface)" }}>{value}</div>
     </div>
