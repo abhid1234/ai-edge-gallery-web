@@ -9,7 +9,8 @@ const WASM_CDN =
   "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.26/wasm";
 
 let instance: LlmInference | null = null;
-let gpuDevice: GPUDevice | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let gpuDevice: any = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let cachedFileset: any = null;
 
@@ -20,7 +21,8 @@ async function getFileset() {
   return cachedFileset;
 }
 
-async function getGpuDevice(): Promise<GPUDevice> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function getGpuDevice(): Promise<any> {
   if (!gpuDevice || gpuDevice.lost) {
     gpuDevice = await LlmInference.createWebGpuDevice();
   }
@@ -91,9 +93,11 @@ self.onmessage = async (e: MessageEvent<WorkerMessage>) => {
         await dispose();
         const genaiFileset = await getFileset();
         const device = await getGpuDevice();
-        const adapterInfo = await navigator.gpu
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const adapterInfo = await (navigator as any).gpu
           ?.requestAdapter()
-          .then((a) => a?.info);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .then((a: any) => a?.info);
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const options: Record<string, unknown> = {

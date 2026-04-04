@@ -118,7 +118,7 @@ export async function generateMultimodal(
   return sendMessage<string>({ type: "generateMultimodal", parts }, onStream);
 }
 
-export function countTokens(prompt: string): number | undefined {
+export function countTokens(_prompt: string): number | undefined {
   // countTokens is sync in the original API but async via worker.
   // For backward compat, return undefined (callers already handle this).
   // Use countTokensAsync for the real value.
