@@ -8,21 +8,25 @@ import {
 } from "react";
 import type { ModelInfo } from "../types";
 import {
-  initModel,
-  dispose,
-  generateText,
-  generateMultimodal,
-  cancelGeneration,
-  type StreamCallback,
-  type MultimodalPart,
-} from "../lib/mediapipe";
+  load,
+  unload,
+  generate,
+  generateWithImage,
+  cancel,
+  subscribe,
+  getState,
+  getCurrentModel,
+  type SchedulerState,
+} from "../lib/modelScheduler";
+import type { StreamCallback, MultimodalPart } from "../lib/mediapipe";
 
 interface ModelContextValue {
   currentModel: ModelInfo | null;
+  schedulerState: SchedulerState;
   isLoading: boolean;
   isGenerating: boolean;
   error: string | null;
-  loadModel: (model: ModelInfo, blob: Blob) => Promise<void>;
+  loadModel: (model: ModelInfo, file: File) => Promise<void>;
   unloadModel: () => Promise<void>;
   generate: (prompt: string, onStream: StreamCallback) => Promise<string>;
   generateWithImage: (
@@ -35,27 +39,35 @@ interface ModelContextValue {
 const ModelContext = createContext<ModelContextValue | null>(null);
 
 export function ModelProvider({ children }: { children: ReactNode }) {
-  const [currentModel, setCurrentModel] = useState<ModelInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [currentModel, setCurrentModel] = useState<ModelInfo | null>(getCurrentModel());
+  const [schedulerState, setSchedulerState] = useState<SchedulerState>(getState());
   const [error, setError] = useState<string | null>(null);
 
-  // Cleanup on unmount — dispose MediaPipe instance to free WASM/GPU memory
+  const isLoading = schedulerState === "LOADING";
+  const isGenerating = schedulerState === "GENERATING";
+
+  // Subscribe to scheduler state changes
+  useEffect(() => {
+    return subscribe((newState) => {
+      setSchedulerState(newState);
+      setCurrentModel(getCurrentModel());
+    });
+  }, []);
+
+  // Cleanup on unmount — dispose model to free WASM/GPU memory
   useEffect(() => {
     return () => {
-      dispose();
+      unload();
     };
   }, []);
 
-  // Cleanup on page visibility change — free memory when tab is hidden for >5 min
+  // Auto-unload when tab hidden for >2 minutes
   useEffect(() => {
     let hiddenTimer: ReturnType<typeof setTimeout> | null = null;
     const handleVisibility = () => {
       if (document.hidden) {
-        // If tab hidden for 2 minutes, auto-unload to prevent memory pressure
         hiddenTimer = setTimeout(() => {
-          dispose();
-          setCurrentModel(null);
+          unload();
         }, 2 * 60 * 1000);
       } else if (hiddenTimer) {
         clearTimeout(hiddenTimer);
@@ -69,74 +81,56 @@ export function ModelProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const loadModel = useCallback(async (model: ModelInfo, blob: Blob) => {
-    setIsLoading(true);
+  const loadModel = useCallback(async (model: ModelInfo, file: File) => {
     setError(null);
     try {
-      await initModel(blob, model);
-      // Blob is no longer needed — MediaPipe has loaded the model via blob URL.
-      // Setting blob to null here doesn't help (it's a parameter), but the caller
-      // should not hold a reference to the blob after this returns.
-      setCurrentModel(model);
+      await load(model, file);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to load model";
       setError(message);
       throw e;
-    } finally {
-      setIsLoading(false);
     }
   }, []);
 
   const unloadModel = useCallback(async () => {
-    await dispose();
-    setCurrentModel(null);
+    await unload();
     setError(null);
   }, []);
 
-  const generate = useCallback(
+  const doGenerate = useCallback(
     async (prompt: string, onStream: StreamCallback): Promise<string> => {
-      setIsGenerating(true);
-      try {
-        return await generateText(prompt, onStream);
-      } finally {
-        setIsGenerating(false);
-      }
+      return generate(prompt, onStream);
     },
     []
   );
 
-  const generateWithImage = useCallback(
+  const doGenerateWithImage = useCallback(
     async (
       parts: MultimodalPart[],
       onStream: StreamCallback
     ): Promise<string> => {
-      setIsGenerating(true);
-      try {
-        return await generateMultimodal(parts, onStream);
-      } finally {
-        setIsGenerating(false);
-      }
+      return generateWithImage(parts, onStream);
     },
     []
   );
 
-  const cancel = useCallback(() => {
-    cancelGeneration();
-    setIsGenerating(false);
+  const doCancel = useCallback(() => {
+    cancel();
   }, []);
 
   return (
     <ModelContext.Provider
       value={{
         currentModel,
+        schedulerState,
         isLoading,
         isGenerating,
         error,
         loadModel,
         unloadModel,
-        generate,
-        generateWithImage,
-        cancel,
+        generate: doGenerate,
+        generateWithImage: doGenerateWithImage,
+        cancel: doCancel,
       }}
     >
       {children}

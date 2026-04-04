@@ -1,98 +1,152 @@
-import { FilesetResolver, LlmInference } from "@mediapipe/tasks-genai";
+/**
+ * Main-thread proxy for MediaPipe LLM Inference running in a Web Worker.
+ * All heavy work (model loading, inference) happens off the main thread.
+ * The UI stays responsive even during multi-GB model loads.
+ */
 import type { ModelInfo } from "../types";
+import { requestMemoryRecovery } from "./memory";
 
-const WASM_CDN =
-  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.26/wasm";
-
-let instance: LlmInference | null = null;
+let worker: Worker | null = null;
 let currentModelId: string | null = null;
-// Cache the WASM fileset so it's only loaded once (prevents ~50-100MB leak per reload)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let cachedFileset: any = null;
+let msgId = 0;
 
 export type StreamCallback = (partialResult: string, done: boolean) => void;
+export type MultimodalPart = string | { imageSource: string } | { audioSource: string };
 
-async function getFileset() {
-  if (!cachedFileset) {
-    cachedFileset = await FilesetResolver.forGenAiTasks(WASM_CDN);
+// Pending request callbacks keyed by message id
+const pending = new Map<
+  number,
+  {
+    resolve: (value: unknown) => void;
+    reject: (reason: unknown) => void;
+    onStream?: StreamCallback;
   }
-  return cachedFileset;
+>();
+
+function getWorker(): Worker {
+  if (!worker) {
+    worker = new Worker(
+      new URL("./mediapipe.worker.ts", import.meta.url),
+      { type: "module" }
+    );
+    worker.onmessage = (e) => {
+      const msg = e.data;
+      const entry = pending.get(msg.id);
+
+      switch (msg.type) {
+        case "stream":
+          entry?.onStream?.(msg.partial, msg.done);
+          break;
+        case "initDone":
+          entry?.resolve(undefined);
+          pending.delete(msg.id);
+          break;
+        case "generateDone":
+          entry?.resolve(msg.result);
+          pending.delete(msg.id);
+          break;
+        case "countTokensResult":
+          entry?.resolve(msg.count);
+          pending.delete(msg.id);
+          break;
+        case "disposeDone":
+          entry?.resolve(undefined);
+          pending.delete(msg.id);
+          break;
+        case "error":
+          entry?.reject(new Error(msg.error));
+          pending.delete(msg.id);
+          break;
+      }
+    };
+    worker.onerror = (e) => {
+      console.error("MediaPipe worker error:", e);
+      // Reject all pending requests
+      for (const [id, entry] of pending) {
+        entry.reject(new Error("Worker crashed"));
+        pending.delete(id);
+      }
+    };
+  }
+  return worker;
+}
+
+function sendMessage<T>(
+  msg: Record<string, unknown>,
+  onStream?: StreamCallback
+): Promise<T> {
+  const id = ++msgId;
+  const w = getWorker();
+  return new Promise<T>((resolve, reject) => {
+    pending.set(id, {
+      resolve: resolve as (value: unknown) => void,
+      reject,
+      onStream,
+    });
+    w.postMessage({ ...msg, id });
+  });
 }
 
 export async function initModel(
-  modelBlob: Blob,
+  modelFile: File,
   modelInfo: ModelInfo
 ): Promise<void> {
   await dispose();
-
-  const genaiFileset = await getFileset();
-
-  // Pass blob URL to MediaPipe — it handles fetching internally.
-  // The blob is backed by OPFS (disk), so only the pages MediaPipe reads
-  // are loaded into memory via the browser's cache.
-  const blobUrl = URL.createObjectURL(modelBlob);
-
-  try {
-  const options: Record<string, unknown> = {
-    baseOptions: {
-      modelAssetPath: blobUrl,
-    },
+  await sendMessage({
+    type: "init",
+    modelFile,
     maxTokens: modelInfo.maxTokens,
-    topK: 64,
-    topP: 0.95,
-    temperature: 1.0,
-    randomSeed: Math.floor(Math.random() * 1000000),
-  };
-
-  if (modelInfo.capabilities.includes("image")) {
-    (options as Record<string, unknown>).maxNumImages = 5;
-  }
-
-  instance = await LlmInference.createFromOptions(genaiFileset, options);
+    capabilities: modelInfo.capabilities,
+  });
   currentModelId = modelInfo.id;
-  } finally {
-    URL.revokeObjectURL(blobUrl);
-  }
+  requestMemoryRecovery();
 }
 
 export async function generateText(
   prompt: string,
   onStream: StreamCallback
 ): Promise<string> {
-  if (!instance) throw new Error("No model loaded");
-  return instance.generateResponse(prompt, onStream);
+  if (!currentModelId) throw new Error("No model loaded");
+  return sendMessage<string>({ type: "generate", prompt }, onStream);
 }
-
-export type MultimodalPart = string | { imageSource: string } | { audioSource: string };
 
 export async function generateMultimodal(
   parts: MultimodalPart[],
   onStream: StreamCallback
 ): Promise<string> {
-  if (!instance) throw new Error("No model loaded");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return instance.generateResponse(parts as any, onStream);
+  if (!currentModelId) throw new Error("No model loaded");
+  return sendMessage<string>({ type: "generateMultimodal", parts }, onStream);
 }
 
 export function countTokens(prompt: string): number | undefined {
-  if (!instance) return undefined;
-  return instance.sizeInTokens(prompt);
+  // countTokens is sync in the original API but async via worker.
+  // For backward compat, return undefined (callers already handle this).
+  // Use countTokensAsync for the real value.
+  return undefined;
+}
+
+export async function countTokensAsync(prompt: string): Promise<number | undefined> {
+  if (!currentModelId) return undefined;
+  return sendMessage<number | undefined>({ type: "countTokens", prompt });
 }
 
 export function cancelGeneration(): void {
-  instance?.cancelProcessing();
+  if (worker) {
+    worker.postMessage({ type: "cancel" });
+  }
 }
 
 export function isIdle(): boolean {
-  return instance?.isIdle ?? true;
+  // With worker, we track idle state on main thread via pending map
+  return !Array.from(pending.values()).some((p) => p.onStream !== undefined);
 }
 
 export async function dispose(): Promise<void> {
-  if (instance) {
-    instance.close();
-    instance = null;
-    currentModelId = null;
+  if (worker && currentModelId) {
+    await sendMessage({ type: "dispose" });
   }
+  currentModelId = null;
+  requestMemoryRecovery();
 }
 
 export function getCurrentModelId(): string | null {

@@ -39,6 +39,12 @@ export async function readFileAsBlob(fileName: string): Promise<Blob> {
   return fileHandle.getFile();
 }
 
+export async function readFileAsFile(fileName: string): Promise<File> {
+  const root = await getRoot();
+  const fileHandle = await root.getFileHandle(fileName);
+  return fileHandle.getFile();
+}
+
 export async function getFileInfo(
   fileName: string
 ): Promise<{ exists: boolean; size: number }> {

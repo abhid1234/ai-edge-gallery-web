@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function ModelCard({ model }: Props) {
-  const { getModelStatus, downloadProgress, startDownload, removeModel, getModelBlob } =
+  const { getModelStatus, downloadProgress, startDownload, removeModel, getModelFile } =
     useDownload();
   const { currentModel, isLoading, loadModel, unloadModel, error: modelError } = useModel();
   const navigate = useNavigate();
@@ -29,8 +29,8 @@ export function ModelCard({ model }: Props) {
     if (autoRun && status === "ready" && !isActive) {
       (async () => {
         try {
-          const blob = await getModelBlob(model);
-          await loadModel(model, blob);
+          const file = await getModelFile(model);
+          await loadModel(model, file);
           navigate(model.category === "vision" ? "/vision" : "/chat");
         } catch (e) {
           setLoadError(e instanceof Error ? e.message : "Failed to load");
@@ -58,19 +58,15 @@ export function ModelCard({ model }: Props) {
   const handleLoad = async () => {
     setLoadError(null);
 
-    // Memory check before loading
-    if (!memCheck.canLoadModel) {
-      const proceed = window.confirm(
-        `${memCheck.warning}\n\nLoading this model may freeze your system. Continue anyway?`
-      );
-      if (!proceed) return;
-    } else if (memCheck.warning) {
+    // Hard block when memory is insufficient
+    if (!memCheck.canLoadModel) return;
+    if (memCheck.warning) {
       window.confirm(memCheck.warning + "\n\nContinue?");
     }
 
     try {
-      const blob = await getModelBlob(model);
-      await loadModel(model, blob);
+      const file = await getModelFile(model);
+      await loadModel(model, file);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to load model";
       setLoadError(msg);
@@ -126,6 +122,15 @@ export function ModelCard({ model }: Props) {
               <span className="text-[11px] px-2 py-0.5 rounded" style={{ color: "var(--color-on-surface-variant)", backgroundColor: "var(--color-surface-container-high)" }}>
                 {model.quantization}
               </span>
+              {!memCheck.canLoadModel ? (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#FECDD3", color: "#B91C1C" }}>
+                  Too large
+                </span>
+              ) : memCheck.warning ? (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#FEF3C7", color: "#92400E" }}>
+                  Tight fit
+                </span>
+              ) : null}
             </div>
           </div>
 
@@ -133,7 +138,7 @@ export function ModelCard({ model }: Props) {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={(e) => { e.stopPropagation(); handleRun(); }}
-              disabled={isLoading || (status === "downloading" && !autoRun)}
+              disabled={isLoading || (status === "downloading" && !autoRun) || (!memCheck.canLoadModel && !isActive && status !== "not_downloaded")}
               className="px-3 py-1 rounded-full text-xs font-semibold text-white transition-colors disabled:opacity-50"
               style={{ backgroundColor: "var(--color-tertiary)" }}
               title={
@@ -289,11 +294,11 @@ export function ModelCard({ model }: Props) {
             <div className="flex gap-2">
               <button
                 onClick={(e) => { e.stopPropagation(); handleLoad(); }}
-                disabled={isLoading}
+                disabled={isLoading || !memCheck.canLoadModel}
                 className="flex-1 py-2.5 px-4 bg-[var(--color-primary)] text-white rounded-xl text-sm font-semibold hover:opacity-90 transition-colors disabled:opacity-50"
-                title="Load the model into your GPU memory so you can chat with it. Uses RAM but enables fast inference."
+                title={!memCheck.canLoadModel ? "Not enough memory to load this model" : "Load the model into your GPU memory so you can chat with it. Uses RAM but enables fast inference."}
               >
-                {isLoading ? "Loading…" : "Load Model"}
+                {!memCheck.canLoadModel ? "Too Large for Device" : isLoading ? "Loading…" : "Load Model"}
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); removeModel(model); }}

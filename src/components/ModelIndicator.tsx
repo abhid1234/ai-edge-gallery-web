@@ -1,31 +1,42 @@
 import { useModel } from "../contexts/ModelContext";
 
+const STATE_COLORS: Record<string, string> = {
+  UNLOADED: "#9AA0A6",   // gray
+  LOADING: "#F9AB00",    // yellow
+  READY: "#34A853",      // green
+  GENERATING: "#4285F4", // blue
+  UNLOADING: "#F9AB00",  // yellow
+};
+
+const STATE_LABELS: Record<string, string> = {
+  UNLOADED: "No model loaded",
+  LOADING: "Loading model\u2026",
+  READY: "Ready",
+  GENERATING: "Generating\u2026",
+  UNLOADING: "Unloading\u2026",
+};
+
 export function ModelIndicator() {
-  const { currentModel, isLoading, isGenerating, unloadModel } = useModel();
+  const { currentModel, schedulerState, unloadModel } = useModel();
 
-  // Determine status dot color
-  let dotColor = "#9AA0A6"; // gray — no model
-  if (isLoading) dotColor = "#F9AB00"; // yellow — loading
-  else if (currentModel && !isGenerating) dotColor = "#34A853"; // green — loaded
-  else if (isGenerating) dotColor = "#F9AB00"; // yellow — generating
+  const dotColor = STATE_COLORS[schedulerState] ?? "#9AA0A6";
+  const animating = schedulerState === "LOADING" || schedulerState === "GENERATING" || schedulerState === "UNLOADING";
 
-  const label = isLoading
-    ? "Loading model…"
-    : currentModel
-    ? `${currentModel.name}${currentModel.quantization ? ` · ${currentModel.quantization}` : ""}`
-    : "No model loaded";
+  const label = currentModel
+    ? `${currentModel.name}${currentModel.quantization ? ` \u00b7 ${currentModel.quantization}` : ""} \u00b7 ${STATE_LABELS[schedulerState] ?? schedulerState}`
+    : STATE_LABELS[schedulerState] ?? "No model loaded";
 
   return (
     <div
       className="flex items-center gap-2 px-4 py-2 rounded-full cursor-default select-none"
       style={{
         backgroundColor: "var(--color-surface-container-high)",
-        maxWidth: "260px",
+        maxWidth: "300px",
       }}
     >
       {/* Status dot */}
       <span
-        className={`w-2 h-2 rounded-full flex-shrink-0 ${isLoading || isGenerating ? "animate-pulse" : ""}`}
+        className={`w-2 h-2 rounded-full flex-shrink-0 ${animating ? "animate-pulse" : ""}`}
         style={{ backgroundColor: dotColor }}
       />
 
@@ -37,8 +48,8 @@ export function ModelIndicator() {
         {label}
       </span>
 
-      {/* Unload button — only shown when a model is loaded and idle */}
-      {currentModel && !isLoading && !isGenerating && (
+      {/* Unload button — only shown when model is loaded and idle */}
+      {currentModel && schedulerState === "READY" && (
         <button
           onClick={unloadModel}
           title="Unload model (free memory)"
