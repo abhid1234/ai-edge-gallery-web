@@ -40,13 +40,66 @@ export function estimatePeakMemoryGB(modelSizeBytes: number): number {
   return modelGB * 1.1 + 1.5; // WASM copy + GPU overhead + headroom
 }
 
+const DEVICE_MEMORY_OVERRIDE_KEY = "device_memory_gb_override";
+
+/**
+ * Get the effective device memory in GB.
+ *
+ * navigator.deviceMemory is capped at 8GB for privacy (a 32GB machine still
+ * reports 8). Users can override via localStorage or the Resource Monitor.
+ * When performance.memory is available, we also infer a floor from the JS
+ * heap size limit — Chrome typically sets this to ~4GB on high-RAM machines,
+ * which tells us the device has at least 8-16GB.
+ */
+export function getDeviceMemoryGB(): number {
+  // 1. Explicit user override
+  try {
+    const override = localStorage.getItem(DEVICE_MEMORY_OVERRIDE_KEY);
+    if (override) {
+      const val = parseFloat(override);
+      if (val > 0 && val <= 256) return val;
+    }
+  } catch { /* ignore */ }
+
+  // 2. navigator.deviceMemory (capped at 8GB by browsers)
+  const reported = (navigator as { deviceMemory?: number }).deviceMemory ?? 8;
+
+  // 3. Infer a better floor from JS heap limit.
+  //    Chrome allocates ~4GB heap limit on 16GB+ machines, ~2GB on 8GB machines.
+  //    If heap limit > 3GB, the device almost certainly has 16GB+ RAM.
+  const perf = (performance as { memory?: { jsHeapSizeLimit: number } }).memory;
+  if (perf) {
+    const heapLimitGB = perf.jsHeapSizeLimit / (1024 * 1024 * 1024);
+    if (heapLimitGB > 3.5) return Math.max(reported, 16);
+    if (heapLimitGB > 2) return Math.max(reported, 8);
+  }
+
+  return reported;
+}
+
+export function setDeviceMemoryOverride(gb: number | null): void {
+  if (gb === null) {
+    localStorage.removeItem(DEVICE_MEMORY_OVERRIDE_KEY);
+  } else {
+    localStorage.setItem(DEVICE_MEMORY_OVERRIDE_KEY, String(gb));
+  }
+}
+
+export function getDeviceMemoryOverride(): number | null {
+  try {
+    const val = localStorage.getItem(DEVICE_MEMORY_OVERRIDE_KEY);
+    return val ? parseFloat(val) : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Get the best available memory snapshot.
  * Tries performance.memory (Chrome), falls back to deviceMemory heuristic.
  */
 export function getMemorySnapshot(): { deviceMemoryGB: number; estimatedFreeGB: number; heapUsedGB: number } {
-  const deviceMemoryGB =
-    (navigator as { deviceMemory?: number }).deviceMemory ?? 8;
+  const deviceMemoryGB = getDeviceMemoryGB();
 
   const perf = (performance as { memory?: { jsHeapSizeLimit: number; usedJSHeapSize: number } }).memory;
   let estimatedFreeGB = deviceMemoryGB * 0.6;
@@ -110,8 +163,7 @@ export function checkMemoryForModel(modelSizeBytes: number): MemoryInfo {
  * Get device memory tier for filtering models in the catalog.
  */
 export function getDeviceMemoryTier(): "low" | "medium" | "high" {
-  const deviceMemoryGB =
-    (navigator as { deviceMemory?: number }).deviceMemory ?? 8;
+  const deviceMemoryGB = getDeviceMemoryGB();
   if (deviceMemoryGB <= 4) return "low"; // Can load 270M-1B models
   if (deviceMemoryGB <= 8) return "medium"; // Can load up to 1.5B models
   return "high"; // Can load E2B/E4B models

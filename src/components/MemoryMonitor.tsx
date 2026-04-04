@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useModel } from "../contexts/ModelContext";
-import { getMemorySnapshot, estimatePeakMemoryGB } from "../lib/memory";
+import { getMemorySnapshot, estimatePeakMemoryGB, getDeviceMemoryOverride, setDeviceMemoryOverride } from "../lib/memory";
 
 interface MemorySample {
   ts: number;
@@ -185,6 +185,9 @@ export function MemoryMonitor() {
             )}
           </div>
 
+          {/* RAM override */}
+          <RamOverride deviceMemoryGB={snapshot.deviceMemoryGB} />
+
           {/* Load impact — the before/after comparison */}
           {loadTimeMB && (
             <div
@@ -242,6 +245,46 @@ export function MemoryMonitor() {
           <path d={expanded ? "M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" : "M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"} />
         </svg>
       </button>
+    </div>
+  );
+}
+
+function RamOverride({ deviceMemoryGB }: { deviceMemoryGB: number }) {
+  const override = getDeviceMemoryOverride();
+  const options = [8, 16, 32, 64];
+
+  return (
+    <div className="rounded-lg p-2.5" style={{ backgroundColor: "var(--color-surface-container)" }}>
+      <div className="text-[10px] font-medium mb-1.5" style={{ color: "var(--color-on-surface-variant)" }}>
+        Your browser reports {(navigator as { deviceMemory?: number }).deviceMemory ?? "unknown"}GB (capped at 8GB for privacy).
+        {override ? ` You set it to ${override}GB.` : ""} How much RAM does your device actually have?
+      </div>
+      <div className="flex gap-1.5 flex-wrap">
+        {options.map((gb) => {
+          const isActive = override ? override === gb : deviceMemoryGB === gb;
+          return (
+            <button
+              key={gb}
+              onClick={() => {
+                if (override === gb) {
+                  setDeviceMemoryOverride(null);
+                } else {
+                  setDeviceMemoryOverride(gb);
+                }
+                window.location.reload();
+              }}
+              className="px-2 py-0.5 rounded text-[10px] font-semibold transition-colors"
+              style={{
+                backgroundColor: isActive ? "var(--color-primary)" : "var(--color-surface-container-high)",
+                color: isActive ? "white" : "var(--color-on-surface-variant)",
+                border: isActive ? "none" : "1px solid var(--color-outline-variant)",
+              }}
+            >
+              {gb}GB
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
