@@ -1,151 +1,166 @@
 /**
- * Main-thread proxy for MediaPipe LLM Inference running in a Web Worker.
- * All heavy work (model loading, inference) happens off the main thread.
- * The UI stays responsive even during multi-GB model loads.
+ * MediaPipe LLM Inference wrapper.
+ *
+ * Runs on the main thread (MediaPipe's WASM loader uses importScripts,
+ * which is incompatible with ES module Web Workers).
+ *
+ * Memory optimizations:
+ * - Streams model from OPFS via ReadableStreamDefaultReader (no blob URL)
+ * - Manages WebGPU device lifecycle (explicit destroy on dispose)
+ * - GC hints after load and dispose
  */
+import { FilesetResolver, LlmInference } from "@mediapipe/tasks-genai";
 import type { ModelInfo } from "../types";
 import { requestMemoryRecovery } from "./memory";
 
-let worker: Worker | null = null;
+const WASM_CDN =
+  "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.26/wasm";
+
+let instance: LlmInference | null = null;
 let currentModelId: string | null = null;
-let msgId = 0;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let gpuDevice: any = null;
+// Cache the WASM fileset so it's only loaded once (prevents ~50-100MB leak per reload)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let cachedFileset: any = null;
 
 export type StreamCallback = (partialResult: string, done: boolean) => void;
 export type MultimodalPart = string | { imageSource: string } | { audioSource: string };
 
-// Pending request callbacks keyed by message id
-const pending = new Map<
-  number,
-  {
-    resolve: (value: unknown) => void;
-    reject: (reason: unknown) => void;
-    onStream?: StreamCallback;
+async function getFileset() {
+  if (!cachedFileset) {
+    cachedFileset = await FilesetResolver.forGenAiTasks(WASM_CDN);
   }
->();
-
-function getWorker(): Worker {
-  if (!worker) {
-    worker = new Worker(
-      new URL("./mediapipe.worker.ts", import.meta.url),
-      { type: "module" }
-    );
-    worker.onmessage = (e) => {
-      const msg = e.data;
-      const entry = pending.get(msg.id);
-
-      switch (msg.type) {
-        case "stream":
-          entry?.onStream?.(msg.partial, msg.done);
-          break;
-        case "initDone":
-          entry?.resolve(undefined);
-          pending.delete(msg.id);
-          break;
-        case "generateDone":
-          entry?.resolve(msg.result);
-          pending.delete(msg.id);
-          break;
-        case "countTokensResult":
-          entry?.resolve(msg.count);
-          pending.delete(msg.id);
-          break;
-        case "disposeDone":
-          entry?.resolve(undefined);
-          pending.delete(msg.id);
-          break;
-        case "error":
-          entry?.reject(new Error(msg.error));
-          pending.delete(msg.id);
-          break;
-      }
-    };
-    worker.onerror = (e) => {
-      console.error("MediaPipe worker error:", e);
-      // Reject all pending requests
-      for (const [id, entry] of pending) {
-        entry.reject(new Error("Worker crashed"));
-        pending.delete(id);
-      }
-    };
-  }
-  return worker;
+  return cachedFileset;
 }
 
-function sendMessage<T>(
-  msg: Record<string, unknown>,
-  onStream?: StreamCallback
-): Promise<T> {
-  const id = ++msgId;
-  const w = getWorker();
-  return new Promise<T>((resolve, reject) => {
-    pending.set(id, {
-      resolve: resolve as (value: unknown) => void,
-      reject,
-      onStream,
-    });
-    w.postMessage({ ...msg, id });
-  });
+/**
+ * Get or create a WebGPU device with performance-prioritized config.
+ * Destroyed explicitly in dispose() to free GPU memory immediately.
+ */
+async function getGpuDevice() {
+  if (!gpuDevice || gpuDevice.lost) {
+    gpuDevice = await LlmInference.createWebGpuDevice();
+  }
+  return gpuDevice;
 }
 
+/**
+ * Load a model by streaming from an OPFS File object.
+ * Uses ReadableStreamDefaultReader instead of blob URL to avoid
+ * materializing the entire model in JS heap (~3.8GB savings for large models).
+ *
+ * Falls back to blob URL if streaming throws (MediaPipe version compat).
+ */
 export async function initModel(
   modelFile: File,
   modelInfo: ModelInfo
 ): Promise<void> {
   await dispose();
-  await sendMessage({
-    type: "init",
-    modelFile,
+
+  const genaiFileset = await getFileset();
+  const device = await getGpuDevice();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const adapterInfo = await (navigator as any).gpu
+    ?.requestAdapter()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .then((a: any) => a?.info);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const options: Record<string, unknown> = {
+    baseOptions: {
+      modelAssetBuffer: modelFile.stream().getReader(),
+      gpuOptions: {
+        device,
+        ...(adapterInfo ? { adapterInfo } : {}),
+      },
+    },
     maxTokens: modelInfo.maxTokens,
-    capabilities: modelInfo.capabilities,
-  });
-  currentModelId = modelInfo.id;
-  requestMemoryRecovery();
+    topK: 64,
+    topP: 0.95,
+    temperature: 1.0,
+    randomSeed: Math.floor(Math.random() * 1000000),
+  };
+
+  if (modelInfo.capabilities.includes("image")) {
+    (options as Record<string, unknown>).maxNumImages = 5;
+  }
+
+  try {
+    instance = await LlmInference.createFromOptions(genaiFileset, options);
+    currentModelId = modelInfo.id;
+    requestMemoryRecovery();
+  } catch (streamError) {
+    // Fallback: if streaming fails (older MediaPipe), try blob URL approach
+    console.warn(
+      "Stream-based model loading failed, falling back to blob URL:",
+      streamError
+    );
+    const blobUrl = URL.createObjectURL(modelFile);
+    try {
+      const fallbackOptions = {
+        ...options,
+        baseOptions: {
+          modelAssetPath: blobUrl,
+          gpuOptions: {
+            device,
+            ...(adapterInfo ? { adapterInfo } : {}),
+          },
+        },
+      };
+      instance = await LlmInference.createFromOptions(
+        genaiFileset,
+        fallbackOptions
+      );
+      currentModelId = modelInfo.id;
+      requestMemoryRecovery();
+    } finally {
+      URL.revokeObjectURL(blobUrl);
+    }
+  }
 }
 
 export async function generateText(
   prompt: string,
   onStream: StreamCallback
 ): Promise<string> {
-  if (!currentModelId) throw new Error("No model loaded");
-  return sendMessage<string>({ type: "generate", prompt }, onStream);
+  if (!instance) throw new Error("No model loaded");
+  return instance.generateResponse(prompt, onStream);
 }
 
 export async function generateMultimodal(
   parts: MultimodalPart[],
   onStream: StreamCallback
 ): Promise<string> {
-  if (!currentModelId) throw new Error("No model loaded");
-  return sendMessage<string>({ type: "generateMultimodal", parts }, onStream);
+  if (!instance) throw new Error("No model loaded");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return instance.generateResponse(parts as any, onStream);
 }
 
-export function countTokens(_prompt: string): number | undefined {
-  // countTokens is sync in the original API but async via worker.
-  // For backward compat, return undefined (callers already handle this).
-  // Use countTokensAsync for the real value.
-  return undefined;
-}
-
-export async function countTokensAsync(prompt: string): Promise<number | undefined> {
-  if (!currentModelId) return undefined;
-  return sendMessage<number | undefined>({ type: "countTokens", prompt });
+export function countTokens(prompt: string): number | undefined {
+  if (!instance) return undefined;
+  return instance.sizeInTokens(prompt);
 }
 
 export function cancelGeneration(): void {
-  if (worker) {
-    worker.postMessage({ type: "cancel" });
-  }
+  instance?.cancelProcessing();
 }
 
 export function isIdle(): boolean {
-  // With worker, we track idle state on main thread via pending map
-  return !Array.from(pending.values()).some((p) => p.onStream !== undefined);
+  return instance?.isIdle ?? true;
 }
 
 export async function dispose(): Promise<void> {
-  if (worker && currentModelId) {
-    await sendMessage({ type: "dispose" });
+  if (instance) {
+    instance.close();
+    instance = null;
+    currentModelId = null;
   }
-  currentModelId = null;
+  // Destroy GPU device to immediately free GPU memory buffers
+  if (gpuDevice) {
+    gpuDevice.destroy();
+    gpuDevice = null;
+  }
   requestMemoryRecovery();
 }
 
