@@ -208,34 +208,6 @@
       "chatTemplate": "chatml"
     },
     {
-      "id": "qwen-0.5b",
-      "name": "Qwen 2.5 0.5B",
-      "fileName": "Qwen2.5-0.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/Qwen2.5-0.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
-      "sizeBytes": 546308096,
-      "capabilities": [
-        "text"
-      ],
-      "quantization": "q8",
-      "parameterCount": "0.5B",
-      "description": "Small and fast. Good balance of quality and speed for text tasks.",
-      "maxTokens": 1024,
-      "tags": [
-        "small",
-        "multilingual",
-        "fast"
-      ],
-      "category": "text-gen",
-      "author": "Alibaba",
-      "released": "2025-09-01",
-      "architecture": {
-        "family": "qwen",
-        "contextLength": 1280,
-        "embeddingSize": 896
-      },
-      "chatTemplate": "chatml"
-    },
-    {
       "id": "tinyllama-1.1b",
       "name": "TinyLlama 1.1B",
       "fileName": "TinyLlama-1.1B-Chat-v1.0_multi-prefill-seq_q8_ekv1280.task",
