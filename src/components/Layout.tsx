@@ -3,6 +3,7 @@ import { Outlet } from "react-router";
 import { ModelIndicator } from "./ModelIndicator";
 import { WebGPUWarning } from "./WebGPUWarning";
 import { OfflineToggle } from "./OfflineToggle";
+import { HeaderMemoryPill } from "./HeaderMemoryPill";
 import { Sidebar } from "./Sidebar";
 import { CommandBar } from "./CommandBar";
 import { useWebGPU } from "../hooks/useWebGPU";
@@ -134,6 +135,7 @@ export function Layout() {
               </kbd>
             </button>
             <OfflineToggle />
+            <HeaderMemoryPill />
             <ModelIndicator />
           </div>
         </header>

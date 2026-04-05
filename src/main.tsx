@@ -5,7 +5,6 @@ import { DownloadProvider } from "./contexts/DownloadContext";
 import { ModelProvider } from "./contexts/ModelContext";
 import { NetworkCounter } from "./components/NetworkCounter";
 import { InferenceProgressBar } from "./components/InferenceProgressBar";
-import { MemoryMonitor } from "./components/MemoryMonitor";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import "./index.css";
 
@@ -17,7 +16,6 @@ createRoot(document.getElementById("root")!).render(
           <InferenceProgressBar />
           <App />
           <NetworkCounter />
-          <MemoryMonitor />
         </ModelProvider>
       </DownloadProvider>
     </ErrorBoundary>
