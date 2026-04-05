@@ -232,9 +232,15 @@ function RamOverride({ deviceMemoryGB }: { deviceMemoryGB: number }) {
   const options = [8, 16, 32, 64];
   return (
     <div className="rounded-lg p-2.5" style={{ backgroundColor: "var(--color-surface-container)" }}>
-      <div className="text-[10px] font-medium mb-1.5" style={{ color: "var(--color-on-surface-variant)" }}>
-        Your browser reports {(navigator as { deviceMemory?: number }).deviceMemory ?? "unknown"}GB (capped at 8GB for privacy).
-        {override ? ` You set it to ${override}GB.` : ""} How much RAM does your device actually have?
+      <div className="text-[11px] font-semibold mb-1" style={{ color: "var(--color-on-surface)" }}>
+        Select your device's RAM
+      </div>
+      <div className="text-[10px] mb-2 leading-relaxed" style={{ color: "var(--color-on-surface-variant)" }}>
+        Browsers limit RAM detection to 8GB for privacy, so we can't auto-detect your actual RAM.
+        {override
+          ? <> You've selected <strong style={{ color: "var(--color-primary)" }}>{override}GB</strong>.</>
+          : <> Select your device's actual RAM below so we can allow larger models to load.</>
+        }
       </div>
       <div className="flex gap-1.5 flex-wrap">
         {options.map((gb) => {
