@@ -134,7 +134,7 @@ export function Layout() {
                 ⌘K
               </kbd>
             </button>
-            <OfflineToggle />
+            <span className="hidden sm:block"><OfflineToggle /></span>
             <HeaderMemoryPill />
             <ModelIndicator />
           </div>
