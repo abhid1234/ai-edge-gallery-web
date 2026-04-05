@@ -52,42 +52,12 @@ const FEATURE_CARDS = [
     ),
   },
   {
-    title: "Benchmarks",
-    subtitle: "Performance & speed",
-    path: "/benchmarks",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6">
-        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Prompt Lab",
-    subtitle: "Experiment with prompts",
-    path: "/prompt-lab",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6">
-        <path d="M19.8 18.4L14 10.67V6.5l1.35-1.69c.26-.33.03-.81-.39-.81H9.04c-.42 0-.65.48-.39.81L10 6.5v4.17L4.2 18.4c-.49.66-.02 1.6.8 1.6h14c.82 0 1.29-.94.8-1.6z" />
-      </svg>
-    ),
-  },
-  {
     title: "Ask Audio",
-    subtitle: "Transcribe & understand audio",
+    subtitle: "Transcribe & understand",
     path: "/ask-audio",
     icon: (
       <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6">
         <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z" />
-      </svg>
-    ),
-  },
-  {
-    title: "Web Actions",
-    subtitle: "On-device function calling",
-    path: "/web-actions",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6">
-        <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z" />
       </svg>
     ),
   },
@@ -98,16 +68,6 @@ const FEATURE_CARDS = [
     icon: (
       <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Vision Classifier",
-    subtitle: "Zero-shot image classification",
-    path: "/vision",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6">
-        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
       </svg>
     ),
   },
@@ -255,8 +215,8 @@ export function Component() {
       </div>
 
       {/* Feature task cards */}
-      <div className="px-6 pb-2">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="px-4 sm:px-6 pb-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {FEATURE_CARDS.map((card, i) => {
             const color = TASK_COLORS[i % TASK_COLORS.length];
             return (
@@ -282,8 +242,8 @@ export function Component() {
       </div>
 
       {/* Models section */}
-      <div className="px-6 pt-8 pb-8">
-        <div className="flex items-center justify-between mb-4">
+      <div className="px-4 sm:px-6 pt-8 pb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="flex items-baseline gap-3">
             <h2 className="text-lg font-bold text-[var(--color-on-surface)]">
               Available Models

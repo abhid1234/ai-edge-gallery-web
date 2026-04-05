@@ -54,7 +54,7 @@ export function Layout() {
       <div className="flex flex-col flex-1 min-w-0">
         {/* Slim header */}
         <header
-          className="h-20 flex-shrink-0 flex items-center justify-between px-4 lg:px-6"
+          className="h-14 sm:h-20 flex-shrink-0 flex items-center justify-between px-3 sm:px-4 lg:px-6"
           style={{
             backgroundColor: "var(--color-surface)",
             borderBottom: "1px solid var(--color-outline-variant)",
