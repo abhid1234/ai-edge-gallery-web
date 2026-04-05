@@ -122,15 +122,11 @@ export function ModelCard({ model }: Props) {
               <span className="text-[11px] px-2 py-0.5 rounded" style={{ color: "var(--color-on-surface-variant)", backgroundColor: "var(--color-surface-container-high)" }}>
                 {model.quantization}
               </span>
-              {!memCheck.canLoadModel ? (
+              {!memCheck.canLoadModel && (
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#FECDD3", color: "#B91C1C" }}>
                   Too large
                 </span>
-              ) : memCheck.warning ? (
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#FEF3C7", color: "#92400E" }}>
-                  Tight fit
-                </span>
-              ) : null}
+              )}
             </div>
           </div>
 
@@ -183,7 +179,14 @@ export function ModelCard({ model }: Props) {
       {/* Expandable section with action buttons */}
       {expanded && (
         <div className="px-5 pb-5 border-t" style={{ borderColor: "var(--color-outline-variant)" }}>
-          <p className="text-sm mt-3 mb-3 leading-relaxed" style={{ color: "var(--color-on-surface-variant)" }}>
+          <p
+            className="text-sm mt-3 mb-3 leading-relaxed"
+            style={
+              model.tags?.includes("high-memory")
+                ? { color: "#B45309", backgroundColor: "#FEF3C7", padding: "8px 12px", borderRadius: "8px", borderLeft: "3px solid #F59E0B" }
+                : { color: "var(--color-on-surface-variant)" }
+            }
+          >
             {model.description}
           </p>
 
