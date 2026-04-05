@@ -1,5 +1,6 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import type { ChatMessage } from "../../types";
+import { renderMarkdown } from "../../lib/renderMarkdown";
 
 const EXAMPLE_PROMPTS = [
   "Explain on-device ML in simple terms",
@@ -145,7 +146,12 @@ export function MessageList({ messages, streamingContent, isGenerating, onSendPr
               {parsed?.thinking && (
                 <ThinkingBlock thinking={parsed.thinking} />
               )}
-              <pre className="whitespace-pre-wrap font-sans">{parsed ? parsed.content : msg.content}</pre>
+              {msg.role === "model" ? (
+                /* Model output rendered as markdown. renderMarkdown escapes all HTML entities before formatting. */
+                <div className="whitespace-pre-wrap font-sans" dangerouslySetInnerHTML={{ __html: renderMarkdown(parsed ? parsed.content : msg.content) }} />
+              ) : (
+                <pre className="whitespace-pre-wrap font-sans">{msg.content}</pre>
+              )}
               {msg.role === "model" && (
                 <button
                   onClick={() => navigator.clipboard.writeText(msg.content)}
@@ -176,7 +182,8 @@ export function MessageList({ messages, streamingContent, isGenerating, onSendPr
                   <ThinkingBlock thinking={parsed.thinking} isIncomplete={parsed.isIncomplete} />
                 )}
                 {parsed.content && (
-                  <pre className="whitespace-pre-wrap font-sans">{parsed.content}</pre>
+                  /* Streaming model output — renderMarkdown escapes HTML */
+                  <div className="whitespace-pre-wrap font-sans" dangerouslySetInnerHTML={{ __html: renderMarkdown(parsed.content) }} />
                 )}
                 {!parsed.isIncomplete && (
                   <span className="inline-block w-1.5 h-4 animate-pulse ml-0.5 rounded-sm" style={{ backgroundColor: "var(--color-primary)" }} />
