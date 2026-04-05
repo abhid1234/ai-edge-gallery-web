@@ -1,102 +1,6 @@
 {
   "models": [
     {
-      "id": "gemma-4-e2b",
-      "name": "Gemma 4 E2B",
-      "fileName": "gemma-4-E2B-it-web.task",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/gemma-4-E2B-it-web.task",
-      "sizeBytes": 2003697664,
-      "capabilities": ["text", "image"],
-      "quantization": "int4",
-      "parameterCount": "E2B (~2B active)",
-      "description": "Gemma 4 multimodal. Smaller and faster than Gemma 3n E2B. Text + image understanding.",
-      "maxTokens": 256,
-      "chatTemplate": "gemma",
-      "tags": ["multimodal", "new", "gemma4"],
-      "category": "multimodal",
-      "author": "Google",
-      "released": "2026-04-02",
-      "architecture": { "family": "gemma", "contextLength": 1024, "embeddingSize": 2560 }
-    },
-    {
-      "id": "gemma-4-e4b",
-      "name": "Gemma 4 E4B",
-      "fileName": "gemma-4-E4B-it-web.task",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/gemma-4-E4B-it-web.task",
-      "sizeBytes": 2964324352,
-      "capabilities": ["text", "image"],
-      "quantization": "int4",
-      "parameterCount": "E4B (~4B active)",
-      "description": "Gemma 4 largest multimodal. Highest quality text + image. Web-optimized.",
-      "maxTokens": 256,
-      "chatTemplate": "gemma",
-      "tags": ["multimodal", "new", "gemma4", "high-quality"],
-      "category": "multimodal",
-      "author": "Google",
-      "released": "2026-04-02",
-      "architecture": { "family": "gemma", "contextLength": 1024, "embeddingSize": 3072 }
-    },
-    {
-      "id": "gemma-3n-e2b",
-      "name": "Gemma 3n E2B",
-      "fileName": "gemma-3n-E2B-it-int4-Web.litertlm",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/gemma-3n-E2B-it-int4-Web.litertlm",
-      "sizeBytes": 3038117888,
-      "capabilities": [
-        "text",
-        "image",
-        "audio"
-      ],
-      "quantization": "int4",
-      "parameterCount": "E2B (~2B active)",
-      "description": "Multimodal: text + image + audio. Web-optimized. Requires 8GB+ free RAM.",
-      "maxTokens": 4096,
-      "tags": [
-        "multimodal",
-        "audio"
-      ],
-      "category": "multimodal",
-      "author": "Google",
-      "released": "2025-06-01",
-      "architecture": {
-        "family": "gemma",
-        "contextLength": 4096,
-        "embeddingSize": 2560
-      },
-      "chatTemplate": "gemma"
-    },
-    {
-      "id": "gemma-3n-e4b",
-      "name": "Gemma 3n E4B",
-      "fileName": "gemma-3n-E4B-it-int4.task",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/gemma-3n-E4B-it-int4.task",
-      "sizeBytes": 4405655031,
-      "capabilities": [
-        "text",
-        "image",
-        "audio"
-      ],
-      "quantization": "int4",
-      "parameterCount": "E4B (~4B active)",
-      "description": "Largest multimodal model. Higher quality than E2B. Requires 12GB+ free RAM.",
-      "maxTokens": 4096,
-      "tags": [
-        "multimodal",
-        "vision",
-        "audio",
-        "high-quality"
-      ],
-      "category": "multimodal",
-      "author": "Google",
-      "released": "2025-06-01",
-      "architecture": {
-        "family": "gemma",
-        "contextLength": 4096,
-        "embeddingSize": 3072
-      },
-      "chatTemplate": "gemma"
-    },
-    {
       "id": "qwen-1.5b",
       "name": "Qwen 2.5 1.5B",
       "fileName": "Qwen2.5-1.5B-Instruct_multi-prefill-seq_q8_ekv1280.task",
@@ -107,9 +11,10 @@
       ],
       "quantization": "q8",
       "parameterCount": "1.5B",
-      "description": "High quality text generation with 8-bit quantization.",
+      "description": "High quality text generation with 8-bit quantization. Works on most devices.",
       "maxTokens": 1024,
       "tags": [
+        "recommended",
         "multilingual",
         "long-context"
       ],
@@ -124,88 +29,83 @@
       "chatTemplate": "chatml"
     },
     {
-      "id": "smollm-135m",
-      "name": "SmolLM 135M",
-      "fileName": "SmolLM-135M-Instruct_multi-prefill-seq_q8_ekv1280.task",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/SmolLM-135M-Instruct_multi-prefill-seq_q8_ekv1280.task",
-      "sizeBytes": 166723584,
+      "id": "gemma-3n-e2b",
+      "name": "Gemma 3n E2B",
+      "fileName": "gemma-3n-E2B-it-int4-Web.litertlm",
+      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/gemma-3n-E2B-it-int4-Web.litertlm",
+      "sizeBytes": 3038117888,
       "capabilities": [
-        "text"
+        "text",
+        "image",
+        "audio"
       ],
-      "quantization": "q8",
-      "parameterCount": "135M",
-      "description": "Tiny model \u2014 loads instantly. Great for testing and quick experiments.",
-      "maxTokens": 1024,
+      "quantization": "int4",
+      "parameterCount": "E2B (~2B active)",
+      "description": "Multimodal: text + image + audio. Web-optimized. Works on most devices.",
+      "maxTokens": 4096,
       "tags": [
-        "tiny",
-        "fast",
-        "lightweight"
+        "recommended",
+        "multimodal",
+        "audio"
       ],
-      "category": "text-gen",
-      "author": "HuggingFace",
-      "released": "2024-07-01",
+      "category": "multimodal",
+      "author": "Google",
+      "released": "2025-06-01",
       "architecture": {
-        "family": "llama",
-        "contextLength": 1280,
-        "embeddingSize": 576
+        "family": "gemma",
+        "contextLength": 4096,
+        "embeddingSize": 2560
       },
-      "chatTemplate": "chatml"
+      "chatTemplate": "gemma"
     },
     {
-      "id": "tinyllama-1.1b",
-      "name": "TinyLlama 1.1B",
-      "fileName": "TinyLlama-1.1B-Chat-v1.0_multi-prefill-seq_q8_ekv1280.task",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/TinyLlama-1.1B-Chat-v1.0_multi-prefill-seq_q8_ekv1280.task",
-      "sizeBytes": 1148846080,
-      "capabilities": [
-        "text"
-      ],
-      "quantization": "q8",
-      "parameterCount": "1.1B",
-      "description": "Classic small LLM. Trained on 3 trillion tokens. Good general-purpose chat.",
-      "maxTokens": 1024,
-      "tags": [
-        "chat",
-        "general-purpose"
-      ],
-      "category": "text-gen",
-      "author": "TinyLlama Project",
-      "released": "2024-01-01",
-      "architecture": {
-        "family": "llama",
-        "contextLength": 1280,
-        "embeddingSize": 2048
-      },
-      "chatTemplate": "zephyr"
+      "id": "gemma-4-e2b",
+      "name": "Gemma 4 E2B",
+      "fileName": "gemma-4-E2B-it-web.task",
+      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/gemma-4-E2B-it-web.task",
+      "sizeBytes": 2003697664,
+      "capabilities": ["text", "image"],
+      "quantization": "int4",
+      "parameterCount": "E2B (~2B active)",
+      "description": "Gemma 4 multimodal. Text + image. Requires a device with 8GB+ free memory — may not load on all browsers due to WebAssembly memory limits.",
+      "maxTokens": 128,
+      "chatTemplate": "gemma",
+      "tags": ["multimodal", "gemma4", "high-memory"],
+      "category": "multimodal",
+      "author": "Google",
+      "released": "2026-04-02",
+      "architecture": { "family": "gemma", "contextLength": 1024, "embeddingSize": 2560 }
     },
     {
-      "id": "phi-4-mini",
-      "name": "Phi-4 Mini",
-      "fileName": "Phi-4-mini-instruct_multi-prefill-seq_q8_ekv1280.task",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/Phi-4-mini-instruct_multi-prefill-seq_q8_ekv1280.task",
-      "sizeBytes": 3944218624,
+      "id": "gemma-3n-e4b",
+      "name": "Gemma 3n E4B",
+      "fileName": "gemma-3n-E4B-it-int4.task",
+      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/gemma-3n-E4B-it-int4.task",
+      "sizeBytes": 4405655031,
       "capabilities": [
-        "text"
+        "text",
+        "image",
+        "audio"
       ],
-      "quantization": "q8",
-      "parameterCount": "3.8B",
-      "description": "Microsoft's best small model. Excellent at code, math, and reasoning.",
-      "maxTokens": 1024,
+      "quantization": "int4",
+      "parameterCount": "E4B (~4B active)",
+      "description": "Largest multimodal model. Highest quality. Requires a device with 12GB+ free memory — may not load on all browsers due to WebAssembly memory limits.",
+      "maxTokens": 4096,
       "tags": [
-        "code",
-        "reasoning",
-        "math",
-        "microsoft"
+        "multimodal",
+        "audio",
+        "high-quality",
+        "high-memory"
       ],
-      "category": "reasoning",
-      "author": "Microsoft",
-      "released": "2025-02-01",
+      "category": "multimodal",
+      "author": "Google",
+      "released": "2025-06-01",
       "architecture": {
-        "family": "phi",
-        "contextLength": 1280,
+        "family": "gemma",
+        "contextLength": 4096,
         "embeddingSize": 3072
       },
-      "chatTemplate": "chatml"
+      "chatTemplate": "gemma"
     },
     {
       "id": "mobilenet-v3",
