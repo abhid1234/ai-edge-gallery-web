@@ -52,10 +52,10 @@ export function Component() {
             {/* Vertical line + dot */}
             <div className="flex flex-col items-center">
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center text-lg shadow-sm ${
+                className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl shadow-md ${
                   isGenerating && i >= 2 ? "animate-pulse" : ""
                 }`}
-                style={{ backgroundColor: step.color + "18", border: `2px solid ${step.color}` }}
+                style={{ backgroundColor: step.color + "20", border: `2.5px solid ${step.color}` }}
               >
                 {step.icon}
               </div>
