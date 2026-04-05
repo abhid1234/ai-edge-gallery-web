@@ -52,6 +52,7 @@ const router = createBrowserRouter(
         { path: "hybrid", lazy: () => import("./features/hybrid/HybridPage") },
         { path: "vision-rag", lazy: () => import("./features/vision-rag/VisionRagPage") },
         { path: "vision", lazy: () => import("./features/vision/VisionPage") },
+        { path: "model-test", lazy: () => import("./features/model-test/ModelTestPage") },
       ],
     },
   ],
