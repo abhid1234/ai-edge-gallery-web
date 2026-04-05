@@ -38,13 +38,13 @@
       "quantization": "int4",
       "parameterCount": "E2B (~2B active)",
       "description": "Gemma 4 multimodal. Smaller and faster than Gemma 3n E2B. Text + image understanding.",
-      "maxTokens": 4096,
+      "maxTokens": 1024,
       "chatTemplate": "gemma",
       "tags": ["multimodal", "new", "gemma4"],
       "category": "multimodal",
       "author": "Google",
       "released": "2026-04-02",
-      "architecture": { "family": "gemma", "contextLength": 4096, "embeddingSize": 2560 }
+      "architecture": { "family": "gemma", "contextLength": 1024, "embeddingSize": 2560 }
     },
     {
       "id": "gemma-4-e4b",
@@ -56,13 +56,13 @@
       "quantization": "int4",
       "parameterCount": "E4B (~4B active)",
       "description": "Gemma 4 largest multimodal. Highest quality text + image. Web-optimized.",
-      "maxTokens": 4096,
+      "maxTokens": 1024,
       "chatTemplate": "gemma",
       "tags": ["multimodal", "new", "gemma4", "high-quality"],
       "category": "multimodal",
       "author": "Google",
       "released": "2026-04-02",
-      "architecture": { "family": "gemma", "contextLength": 4096, "embeddingSize": 3072 }
+      "architecture": { "family": "gemma", "contextLength": 1024, "embeddingSize": 3072 }
     },
     {
       "id": "gemma-3n-e2b",
