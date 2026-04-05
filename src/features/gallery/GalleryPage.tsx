@@ -215,7 +215,7 @@ export function Component() {
       </div>
 
       {/* Mobile warning */}
-      {/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && (
+      {/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.location.search.includes("screenshot") && (
         <div className="mx-4 sm:mx-6 mb-4 rounded-xl p-4" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}>
           <div className="flex items-start gap-3">
             <span className="text-xl flex-shrink-0">📱</span>

@@ -140,8 +140,8 @@ export function Layout() {
           </div>
         </header>
 
-        {/* WebGPU Warning */}
-        {!info.supported && (
+        {/* WebGPU Warning — hidden in screenshot mode (?screenshot) */}
+        {!info.supported && !window.location.search.includes("screenshot") && (
           <div className="px-6 pt-4">
             <WebGPUWarning />
           </div>
