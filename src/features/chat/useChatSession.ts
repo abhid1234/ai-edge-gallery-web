@@ -79,7 +79,6 @@ export function useChatSession() {
       let tokenCount = 0;
       try {
         let repetitionCancelled = false;
-        let cleanedResponse = ""; // Holds the trimmed version after repetition detected
         await generate(prompt, (partial, done) => {
           // Once cancelled, ignore ALL further tokens from MediaPipe's buffer
           if (repetitionCancelled) return;
@@ -93,27 +92,7 @@ export function useChatSession() {
           if (!done && fullResponse.length > 50 && detectRepetition(fullResponse)) {
             repetitionCancelled = true;
             cancel();
-            // Trim: walk backward to find where repetition started
-            const words = fullResponse.trim().split(/\s+/);
-            let cutoff = words.length;
-            for (let i = words.length - 1; i >= 2; i--) {
-              if (words[i] === words[i - 1] && words[i] === words[i - 2]) {
-                cutoff = i - 2;
-              } else if (cutoff < words.length) {
-                break;
-              }
-            }
-            if (cutoff === words.length) {
-              const seen = new Set<string>();
-              for (let i = Math.max(0, words.length - 50); i < words.length - 2; i++) {
-                const tg = words[i] + " " + words[i + 1] + " " + words[i + 2];
-                if (seen.has(tg)) { cutoff = i; break; }
-                seen.add(tg);
-              }
-            }
-            cleanedResponse = words.slice(0, cutoff).join(" ");
-            fullResponse = cleanedResponse;
-            setStreamingContent(cleanedResponse);
+            setStreamingContent(fullResponse);
             return;
           }
 
