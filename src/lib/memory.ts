@@ -102,12 +102,18 @@ export function getMemorySnapshot(): { deviceMemoryGB: number; estimatedFreeGB: 
   const deviceMemoryGB = getDeviceMemoryGB();
 
   const perf = (performance as { memory?: { jsHeapSizeLimit: number; usedJSHeapSize: number } }).memory;
-  let estimatedFreeGB = deviceMemoryGB * 0.6;
   let heapUsedGB = 0;
+  // When user has set a RAM override, trust it — use 60% of override as free estimate.
+  // performance.memory only reports JS heap (~4GB cap) which is useless for
+  // checking whether a 3GB model fits in 32GB of actual RAM.
+  let estimatedFreeGB = deviceMemoryGB * 0.6;
   if (perf) {
-    const heapLimitGB = perf.jsHeapSizeLimit / (1024 * 1024 * 1024);
     heapUsedGB = perf.usedJSHeapSize / (1024 * 1024 * 1024);
-    estimatedFreeGB = Math.max(heapLimitGB - heapUsedGB, 0);
+    if (!getDeviceMemoryOverride()) {
+      // No override — use heap limit as the best estimate
+      const heapLimitGB = perf.jsHeapSizeLimit / (1024 * 1024 * 1024);
+      estimatedFreeGB = Math.max(heapLimitGB - heapUsedGB, 0);
+    }
   }
 
   return { deviceMemoryGB, estimatedFreeGB, heapUsedGB };
