@@ -18,7 +18,7 @@ But the reality? Browsers weren't designed for ML workloads, so there are real e
 
 I wanted to understand these constraints firsthand — not from documentation, but from shipping something real.
 
-[IMAGE: Screenshot of the AI Edge Gallery showing the model gallery with Qwen 2.5 1.5B and Gemma 3n E2B models]
+![AI Edge Gallery — model gallery](https://www.ondeviceml.space/images/gallery-full.png)
 
 ---
 
@@ -32,7 +32,7 @@ The entire stack is:
 
 No backend. No database. No auth. The model downloads from R2 to OPFS once, then inference runs entirely in-browser via WebGPU.
 
-[IMAGE: How It Works page showing the 5-step pipeline: CDN → Browser Storage → WebGPU Runtime → On-Device Inference → Response]
+![How It Works — on-device ML pipeline](https://www.ondeviceml.space/images/how-it-works.png)
 
 ---
 
@@ -42,7 +42,7 @@ The first time I loaded Qwen 2.5 1.5B, asked it to write a fizzbuzz in Python, a
 
 This isn't a toy demo. The model understands context, generates structured code, and maintains multi-turn conversations. All running on a Chromebook's integrated Intel GPU.
 
-[IMAGE: Chat interface showing a fizzbuzz response with the "0 bytes sent to server" counter visible]
+![Chat interface — on-device inference](https://www.ondeviceml.space/images/chat.png)
 
 ---
 
@@ -69,7 +69,7 @@ Browsers cap `navigator.deviceMemory` at 8GB for privacy. My 32GB Chromebook rep
 
 **My workaround:** Infer true RAM from Chrome's JS heap limit. If `performance.memory.jsHeapSizeLimit` > 3.5GB, the device almost certainly has 16GB+. Combined with a manual override in the UI, users can set their actual RAM and unlock models that would otherwise be blocked.
 
-[IMAGE: Resource Monitor panel showing memory bars, sparkline, and RAM override buttons]
+![Resource Monitor — memory tracking](https://www.ondeviceml.space/images/quant-explorer.png)
 
 ---
 
@@ -83,7 +83,7 @@ Some model-hardware combinations produce unexpected output, which is why compati
 
 **What I learned:** You can't assume GPU compatibility. I built a Model Compatibility Test page that auto-downloads each model, loads it, generates one test response, then unloads and deletes — giving a pass/fail for every model on the user's specific hardware.
 
-[IMAGE: Model Compatibility Test results showing pass/fail for each model]
+![Model Compatibility Test — automated pass/fail](https://www.ondeviceml.space/images/model-test.png)
 
 ---
 
