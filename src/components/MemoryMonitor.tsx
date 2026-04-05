@@ -102,8 +102,7 @@ export function MemoryMonitor() {
   return (
     <div
       ref={panelRef}
-      className="fixed bottom-3 z-50 select-none flex flex-col items-center"
-      style={{ left: "50%", transform: "translateX(-50%)" }}
+      className="fixed bottom-12 right-4 z-50 select-none flex flex-col items-end"
     >
       {/* Expanded panel — opens ABOVE the pill */}
       {expanded && (
