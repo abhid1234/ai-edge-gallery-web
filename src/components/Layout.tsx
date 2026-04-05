@@ -60,28 +60,28 @@ export function Layout() {
             borderBottom: "1px solid var(--color-outline-variant)",
           }}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Mobile hamburger */}
             <button
-              className="md:hidden p-2 rounded-lg"
+              className="md:hidden p-1.5 rounded-lg"
               onClick={() => setMobileSidebarOpen(true)}
               style={{ color: "var(--color-on-surface)" }}
             >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                 <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
               </svg>
             </button>
 
-            {/* Title visible on mobile only (sidebar has it on desktop) */}
-            <h1
-              className="text-base font-bold md:hidden"
-              style={{ fontFamily: "var(--font-sans)", color: "var(--color-on-surface)" }}
-            >
-              <span style={{
-                background: "linear-gradient(90deg, var(--color-title-gradient-start), var(--color-title-gradient-end))",
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-              }}>AI</span> Edge Gallery
-            </h1>
+            {/* Compact logo on mobile */}
+            <div className="md:hidden flex items-center gap-1.5">
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-extrabold text-white flex-shrink-0"
+                style={{ background: "linear-gradient(135deg, var(--color-title-gradient-start), var(--color-title-gradient-end))" }}
+              >
+                AI
+              </div>
+              <span className="text-xs font-bold" style={{ color: "var(--color-on-surface)" }}>Edge Gallery</span>
+            </div>
 
             {/* Badges */}
             <span

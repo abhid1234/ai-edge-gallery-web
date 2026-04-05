@@ -28,7 +28,7 @@ export function ModelIndicator() {
 
   return (
     <div
-      className="flex items-center gap-2 px-4 py-2 rounded-full cursor-default select-none"
+      className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full cursor-default select-none"
       style={{
         backgroundColor: "var(--color-surface-container-high)",
         maxWidth: "300px",
@@ -40,12 +40,18 @@ export function ModelIndicator() {
         style={{ backgroundColor: dotColor }}
       />
 
-      {/* Label */}
+      {/* Label — truncated on mobile */}
       <span
-        className="text-sm font-semibold truncate"
+        className="text-xs sm:text-sm font-semibold truncate hidden sm:inline"
         style={{ color: "var(--color-on-surface)", fontFamily: "var(--font-sans)" }}
       >
         {label}
+      </span>
+      <span
+        className="text-[10px] font-semibold truncate sm:hidden max-w-[80px]"
+        style={{ color: "var(--color-on-surface)", fontFamily: "var(--font-sans)" }}
+      >
+        {currentModel ? currentModel.name : "No model"}
       </span>
 
       {/* Unload button — only shown when model is loaded and idle */}
