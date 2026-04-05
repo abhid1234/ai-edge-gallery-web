@@ -296,13 +296,13 @@ export function Component() {
           </div>
           <button
             onClick={() => setShowTokenInput((v) => !v)}
-            className={`text-xs px-3 py-1.5 rounded-full transition-colors ${
+            className={`text-sm font-semibold px-4 py-2 rounded-xl transition-colors shadow-sm ${
               hfToken
                 ? "bg-[var(--color-tertiary-container)] text-[var(--color-tertiary)]"
-                : "bg-[var(--color-warning-container)] text-[var(--color-warning)]"
+                : "bg-[var(--color-primary)] text-white hover:opacity-90"
             }`}
           >
-            {hfToken ? "HF Token Set" : "Add HF Token"}
+            {hfToken ? "HuggingFace Token Set" : "Add HuggingFace Token"}
           </button>
         </div>
 
