@@ -1,16 +1,16 @@
 import { useState, useCallback, useRef } from "react";
 import { loadCatalog, formatSize } from "../../lib/catalog";
-import { getFileInfo } from "../../lib/storage";
-import { readFileAsBlob } from "../../lib/storage";
+import { getFileInfo, writeFileFromStream, readFileAsBlob, deleteFile } from "../../lib/storage";
 import { initModel, dispose, generateText } from "../../lib/mediapipe";
 import type { ModelInfo } from "../../types";
 
-type TestStatus = "pending" | "skipped" | "loading" | "generating" | "pass" | "fail";
+type TestStatus = "pending" | "downloading" | "loading" | "generating" | "cleaning" | "pass" | "fail";
 
 interface TestResult {
   model: ModelInfo;
   status: TestStatus;
   error?: string;
+  downloadPct?: number;
   loadTimeMs?: number;
   generateTimeMs?: number;
   firstTokens?: string;
@@ -19,7 +19,6 @@ interface TestResult {
 export function Component() {
   const [results, setResults] = useState<TestResult[]>([]);
   const [running, setRunning] = useState(false);
-  const currentIdxRef = useRef(-1);
   const abortRef = useRef(false);
 
   const updateResult = useCallback((id: string, update: Partial<TestResult>) => {
@@ -33,24 +32,48 @@ export function Component() {
     setRunning(true);
 
     const catalog = await loadCatalog();
-    const models = catalog.models;
+    // Only test LLM models (skip vision classifiers — they use a different API)
+    const models = catalog.models.filter((m) => m.capabilities.includes("text"));
 
-    // Initialize all as pending
     setResults(models.map((m) => ({ model: m, status: "pending" })));
 
     for (let i = 0; i < models.length; i++) {
       if (abortRef.current) break;
-      currentIdxRef.current = i;
       const model = models[i];
+      let wasAlreadyDownloaded = false;
 
-      // Check if downloaded
+      // Step 1: Check if already downloaded, if not download it
       const info = await getFileInfo(model.fileName);
-      if (!info.exists) {
-        updateResult(model.id, { status: "skipped", error: "Not downloaded" });
-        continue;
+      if (info.exists) {
+        wasAlreadyDownloaded = true;
+      } else {
+        // Download
+        updateResult(model.id, { status: "downloading", downloadPct: 0 });
+        try {
+          const response = await fetch(model.downloadUrl, { mode: "cors" });
+          if (!response.ok || !response.body) {
+            updateResult(model.id, {
+              status: "fail",
+              error: `Download failed: ${response.status}`,
+            });
+            continue;
+          }
+          await writeFileFromStream(model.fileName, response.body, (bytes) => {
+            const pct = model.sizeBytes > 0 ? Math.round((bytes / model.sizeBytes) * 100) : 0;
+            updateResult(model.id, { downloadPct: pct });
+          });
+        } catch (e) {
+          updateResult(model.id, {
+            status: "fail",
+            error: `Download: ${e instanceof Error ? e.message : String(e)}`,
+          });
+          continue;
+        }
       }
 
-      // Load model
+      if (abortRef.current) break;
+
+      // Step 2: Load model
       updateResult(model.id, { status: "loading" });
       const loadStart = performance.now();
       try {
@@ -66,11 +89,19 @@ export function Component() {
           loadTimeMs,
         });
         await dispose();
+        // Delete if we downloaded it for testing
+        if (!wasAlreadyDownloaded) {
+          try { await deleteFile(model.fileName); } catch { /* ignore */ }
+        }
         continue;
       }
 
-      // Generate a short test response
-      if (abortRef.current) break;
+      if (abortRef.current) {
+        await dispose();
+        break;
+      }
+
+      // Step 3: Generate a short test response
       const genStart = performance.now();
       try {
         let firstTokens = "";
@@ -88,14 +119,18 @@ export function Component() {
         });
       }
 
-      // Dispose before next model
+      // Step 4: Dispose model immediately
       await dispose();
 
-      // Brief pause to let memory settle
-      await new Promise((r) => setTimeout(r, 1000));
+      // Step 5: Delete model file if we downloaded it just for testing
+      if (!wasAlreadyDownloaded) {
+        try { await deleteFile(model.fileName); } catch { /* ignore */ }
+      }
+
+      // Step 6: Pause to let memory settle
+      await new Promise((r) => setTimeout(r, 2000));
     }
 
-    currentIdxRef.current = -1;
     setRunning(false);
   }, [updateResult]);
 
@@ -105,7 +140,7 @@ export function Component() {
 
   const passed = results.filter((r) => r.status === "pass").length;
   const failed = results.filter((r) => r.status === "fail").length;
-  const skipped = results.filter((r) => r.status === "skipped").length;
+  const pending = results.filter((r) => r.status === "pending").length;
   const total = results.length;
 
   return (
@@ -116,7 +151,8 @@ export function Component() {
             Model Compatibility Test
           </h2>
           <p className="text-sm mt-1" style={{ color: "var(--color-on-surface-variant)" }}>
-            Loads each downloaded model, generates a test response, then unloads. Tests run sequentially.
+            Downloads, loads, generates one response, then unloads and deletes each model.
+            Tests run one at a time to avoid freezing.
           </p>
         </div>
         <div className="flex gap-2">
@@ -145,7 +181,7 @@ export function Component() {
         <div className="flex gap-4 text-sm font-semibold">
           <span style={{ color: "#34A853" }}>{passed} passed</span>
           <span style={{ color: "#EA4335" }}>{failed} failed</span>
-          <span style={{ color: "var(--color-outline)" }}>{skipped} skipped</span>
+          <span style={{ color: "var(--color-outline)" }}>{pending} remaining</span>
           <span style={{ color: "var(--color-on-surface-variant)" }}>{total} total</span>
         </div>
       )}
@@ -161,7 +197,7 @@ export function Component() {
               border: `1px solid ${
                 r.status === "pass" ? "#34A85340" :
                 r.status === "fail" ? "#EA433540" :
-                r.status === "loading" || r.status === "generating" ? "#F9AB0040" :
+                r.status !== "pending" ? "#F9AB0040" :
                 "var(--color-outline-variant)"
               }`,
             }}
@@ -170,9 +206,8 @@ export function Component() {
             <div className="w-6 text-center flex-shrink-0">
               {r.status === "pass" && <span style={{ color: "#34A853" }}>&#10003;</span>}
               {r.status === "fail" && <span style={{ color: "#EA4335" }}>&#10007;</span>}
-              {r.status === "skipped" && <span style={{ color: "var(--color-outline)" }}>&#8212;</span>}
               {r.status === "pending" && <span style={{ color: "var(--color-outline)" }}>&#9679;</span>}
-              {(r.status === "loading" || r.status === "generating") && (
+              {r.status !== "pass" && r.status !== "fail" && r.status !== "pending" && (
                 <span className="animate-pulse" style={{ color: "#F9AB00" }}>&#9679;</span>
               )}
             </div>
@@ -186,11 +221,19 @@ export function Component() {
                 <span className="text-[11px] px-1.5 py-0.5 rounded" style={{ backgroundColor: "var(--color-surface-container-high)", color: "var(--color-on-surface-variant)" }}>
                   {formatSize(r.model.sizeBytes)}
                 </span>
+                {r.status === "downloading" && (
+                  <span className="text-[11px] font-medium" style={{ color: "#F9AB00" }}>
+                    Downloading{r.downloadPct != null ? ` ${r.downloadPct}%` : "..."}
+                  </span>
+                )}
                 {r.status === "loading" && (
-                  <span className="text-[11px] font-medium" style={{ color: "#F9AB00" }}>Loading...</span>
+                  <span className="text-[11px] font-medium" style={{ color: "#F9AB00" }}>Loading into memory...</span>
                 )}
                 {r.status === "generating" && (
-                  <span className="text-[11px] font-medium" style={{ color: "#F9AB00" }}>Generating...</span>
+                  <span className="text-[11px] font-medium" style={{ color: "#F9AB00" }}>Generating response...</span>
+                )}
+                {r.status === "cleaning" && (
+                  <span className="text-[11px] font-medium" style={{ color: "#F9AB00" }}>Cleaning up...</span>
                 )}
               </div>
               {r.error && (
@@ -200,7 +243,7 @@ export function Component() {
               )}
               {r.firstTokens && (
                 <div className="text-[11px] mt-1 truncate" style={{ color: "var(--color-on-surface-variant)" }} title={r.firstTokens}>
-                  "{r.firstTokens}"
+                  &ldquo;{r.firstTokens}&rdquo;
                 </div>
               )}
             </div>
@@ -216,7 +259,8 @@ export function Component() {
 
       {results.length === 0 && (
         <div className="text-center py-12 text-sm" style={{ color: "var(--color-outline)" }}>
-          Click "Run All Tests" to test every downloaded model
+          Click &ldquo;Run All Tests&rdquo; to download and test every model sequentially.
+          Models downloaded just for testing will be deleted after.
         </div>
       )}
     </div>
