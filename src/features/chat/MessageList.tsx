@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import type { ChatMessage } from "../../types";
 import { renderMarkdown } from "../../lib/renderMarkdown";
 
