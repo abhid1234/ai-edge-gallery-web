@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import type { ModelInfo } from "../types";
+import { detectRepetition } from "../lib/repetitionDetector";
 import {
   initModel,
   dispose,
@@ -98,8 +99,18 @@ export function ModelProvider({ children }: { children: ReactNode }) {
   const doGenerate = useCallback(
     async (prompt: string, onStream: StreamCallback): Promise<string> => {
       setIsGenerating(true);
+      let cancelled = false;
       try {
-        return await generateText(prompt, onStream);
+        return await generateText(prompt, (partial, done) => {
+          if (cancelled) return;
+          if (!done && partial.length > 50 && detectRepetition(partial)) {
+            cancelled = true;
+            cancelGeneration();
+            onStream(partial, true);
+            return;
+          }
+          onStream(partial, done);
+        });
       } finally {
         setIsGenerating(false);
       }
@@ -113,8 +124,18 @@ export function ModelProvider({ children }: { children: ReactNode }) {
       onStream: StreamCallback
     ): Promise<string> => {
       setIsGenerating(true);
+      let cancelled = false;
       try {
-        return await generateMultimodal(parts, onStream);
+        return await generateMultimodal(parts, (partial, done) => {
+          if (cancelled) return;
+          if (!done && partial.length > 50 && detectRepetition(partial)) {
+            cancelled = true;
+            cancelGeneration();
+            onStream(partial, true);
+            return;
+          }
+          onStream(partial, done);
+        });
       } finally {
         setIsGenerating(false);
       }
