@@ -350,7 +350,9 @@ export function ModelCard({ model }: Props) {
 
           {loadError && (
             <div className="mt-3 bg-[var(--color-error-container)] text-[var(--color-error)] text-xs rounded-lg px-3 py-2">
-              Load error: {loadError}
+              {loadError.includes("Unable to open zip archive")
+                ? "Model file is corrupted. Delete and re-download it."
+                : `Load error: ${loadError.split("\n")[0].slice(0, 100)}`}
             </div>
           )}
 
