@@ -137,7 +137,7 @@ The app is live and the code is open source:
 - **Live demo:** [www.ondeviceml.space](https://www.ondeviceml.space)
 - **Source code:** [github.com/abhid1234/ai-edge-gallery-web](https://github.com/abhid1234/ai-edge-gallery-web)
 
-Load Qwen 2.5 1.5B, ask it anything, and watch the network counter stay at zero. That part never gets old.
+Load Gemma 3n E2B, ask it anything, and watch the network counter stay at zero. That part never gets old.
 
 If you're building something similar or have ideas for improvements, I'd love to hear about it. Issues and PRs welcome.
 
