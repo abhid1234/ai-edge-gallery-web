@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import { AudioRecorder } from "./AudioRecorder";
 import { useAudioInference } from "./useAudioInference";
+import { renderMarkdown } from "../../lib/renderMarkdown";
 
 export function Component() {
   const { currentModel } = useModel();
@@ -75,7 +76,7 @@ export function Component() {
 
         {response && (
           <div className="bg-[var(--color-surface-container)] rounded-lg p-4 text-sm text-[var(--color-on-surface)] leading-relaxed">
-            <pre className="whitespace-pre-wrap font-sans">{response}</pre>
+            <div className="whitespace-pre-wrap font-sans" dangerouslySetInnerHTML={{ __html: renderMarkdown(response) }} />
           </div>
         )}
       </div>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import { ImageUpload } from "./ImageUpload";
 import { useMultimodal } from "./useMultimodal";
+import { renderMarkdown } from "../../lib/renderMarkdown";
 
 export function Component() {
   const { currentModel } = useModel();
@@ -49,7 +50,8 @@ export function Component() {
 
         {response && (
           <div className="bg-[var(--color-surface-container)] rounded-lg p-4 text-sm text-[var(--color-on-surface)] leading-relaxed">
-            <pre className="whitespace-pre-wrap font-sans">{response}</pre>
+            {/* On-device model output — renderMarkdown escapes all HTML entities */}
+            <div className="whitespace-pre-wrap font-sans" dangerouslySetInnerHTML={{ __html: renderMarkdown(response) }} />
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useModel } from "../../contexts/ModelContext";
 import { formatSingleTurn } from "../../lib/chatTemplate";
+import { renderMarkdown } from "../../lib/renderMarkdown";
 
 interface CompareResult {
   modelName: string;
@@ -97,7 +98,8 @@ export function Component() {
       {isRunning && streamingResponse && (
         <div className="rounded-xl p-4 mb-4" style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-outline-variant)" }}>
           <p className="text-xs font-semibold mb-2" style={{ color: "var(--color-primary)" }}>{currentModel?.name} (streaming...)</p>
-          <pre className="text-sm whitespace-pre-wrap font-sans" style={{ color: "var(--color-on-surface)" }}>{streamingResponse}</pre>
+          {/* Model output — renderMarkdown escapes HTML */}
+          <div className="text-sm whitespace-pre-wrap font-sans" style={{ color: "var(--color-on-surface)" }} dangerouslySetInnerHTML={{ __html: renderMarkdown(streamingResponse) }} />
           <span className="inline-block w-1.5 h-4 animate-pulse ml-0.5 rounded-sm" style={{ backgroundColor: "var(--color-primary)" }} />
         </div>
       )}
@@ -129,7 +131,7 @@ export function Component() {
                     <span>Speed: <strong>{r.tokensPerSec} tok/s</strong></span>
                   </div>
                 </div>
-                <pre className="text-sm whitespace-pre-wrap font-sans leading-relaxed" style={{ color: "var(--color-on-surface)" }}>{r.response}</pre>
+                <div className="text-sm whitespace-pre-wrap font-sans leading-relaxed" style={{ color: "var(--color-on-surface)" }} dangerouslySetInnerHTML={{ __html: renderMarkdown(r.response) }} />
               </div>
             ))}
           </div>
