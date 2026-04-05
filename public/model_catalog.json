@@ -124,34 +124,6 @@
       "chatTemplate": "chatml"
     },
     {
-      "id": "deepseek-r1",
-      "name": "DeepSeek R1 1.5B",
-      "fileName": "DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.litertlm",
-      "downloadUrl": "https://pub-c58f10d335194d4d817c4c47bb5b9d85.r2.dev/models/DeepSeek-R1-Distill-Qwen-1.5B_multi-prefill-seq_q8_ekv4096.litertlm",
-      "sizeBytes": 1834078546,
-      "capabilities": [
-        "text"
-      ],
-      "quantization": "q8",
-      "parameterCount": "1.5B",
-      "description": "Reasoning model with chain-of-thought. Best for complex problem solving.",
-      "maxTokens": 4096,
-      "tags": [
-        "reasoning",
-        "chain-of-thought",
-        "math"
-      ],
-      "category": "reasoning",
-      "author": "DeepSeek",
-      "released": "2025-01-01",
-      "architecture": {
-        "family": "deepseek",
-        "contextLength": 4096,
-        "embeddingSize": 1536
-      },
-      "chatTemplate": "chatml"
-    },
-    {
       "id": "smollm-135m",
       "name": "SmolLM 135M",
       "fileName": "SmolLM-135M-Instruct_multi-prefill-seq_q8_ekv1280.task",
