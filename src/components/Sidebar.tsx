@@ -13,8 +13,9 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
-const NAV_GROUPS: { items: NavItem[] }[] = [
+const NAV_GROUPS: { title?: string; items: NavItem[] }[] = [
   {
+    title: "Main",
     items: [
       {
         to: "/",
@@ -47,6 +48,7 @@ const NAV_GROUPS: { items: NavItem[] }[] = [
     ],
   },
   {
+    title: "Multimodal",
     items: [
       {
         to: "/ask-image",
@@ -78,6 +80,7 @@ const NAV_GROUPS: { items: NavItem[] }[] = [
     ],
   },
   {
+    title: "Tools",
     items: [
       {
         to: "/benchmarks",
@@ -118,6 +121,7 @@ const NAV_GROUPS: { items: NavItem[] }[] = [
     ],
   },
   {
+    title: "Analytics",
     items: [
       {
         to: "/token-viz",
@@ -140,6 +144,7 @@ const NAV_GROUPS: { items: NavItem[] }[] = [
     ],
   },
   {
+    title: "Experiments",
     items: [
       {
         to: "/web-actions",
@@ -162,6 +167,7 @@ const NAV_GROUPS: { items: NavItem[] }[] = [
     ],
   },
   {
+    title: "Advanced",
     items: [
       {
         to: "/quant-explorer",
@@ -193,6 +199,7 @@ const NAV_GROUPS: { items: NavItem[] }[] = [
     ],
   },
   {
+    title: "Developer",
     items: [
       {
         to: "/modelfile",
@@ -262,9 +269,17 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <div key={gi}>
             {gi > 0 && (
               <div
-                className="mx-2 my-1.5 border-t"
+                className="mx-2 mt-3 mb-1 border-t"
                 style={{ borderColor: "var(--color-outline-variant)" }}
               />
+            )}
+            {group.title && !collapsed && (
+              <div
+                className="px-3 pt-1 pb-0.5 text-[10px] font-semibold uppercase tracking-wider"
+                style={{ color: "var(--color-outline)" }}
+              >
+                {group.title}
+              </div>
             )}
             {group.items.map((item) => (
               <NavLink
