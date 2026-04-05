@@ -488,7 +488,7 @@
   <p><strong>What actually works:</strong> Plain blob URL loading. Read the model from OPFS as a Blob, create a blob URL, pass it to MediaPipe, revoke immediately after. Simple, boring, reliable.</p>
 
   <div class="callout">
-    <strong>The irony:</strong> Google's own research blog shows they can run 7B+ models in the browser using layer-by-layer streaming. But that only works with the old <code>.bin</code> format — not the <code>.task</code> files that all new models use. The streaming path and the modern model format are on different tracks.
+    <strong>Worth noting:</strong> Layer-by-layer streaming can support 7B+ models in the browser, but it currently only works with the older <code>.bin</code> format. The newer <code>.task</code> format uses a different loading path. As the tooling matures, these will likely converge.
   </div>
 
   <hr>

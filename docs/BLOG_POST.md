@@ -59,7 +59,7 @@ This means a 2GB model + KV cache + WASM runtime can exceed 4GB and crash with "
 
 **What actually works:** Plain blob URL loading. Read the model from OPFS as a Blob, create a blob URL, pass it to MediaPipe, revoke immediately after. Simple, boring, reliable.
 
-**The irony:** Google's own research blog shows they can run 7B+ models in the browser using layer-by-layer streaming. But that only works with the old `.bin` format — not the `.task` files that all new models use. The streaming path and the modern model format are on different tracks.
+**Worth noting:** Layer-by-layer streaming can support 7B+ models in the browser, but it currently only works with the older `.bin` format. The newer `.task` format uses a different loading path. As the tooling matures, these will likely converge.
 
 ---
 
