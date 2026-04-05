@@ -95,6 +95,11 @@ export function ModelCard({ model }: Props) {
           <div className="flex-1 min-w-0 mr-3">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-semibold text-sm" style={{ color: "var(--color-on-surface)" }}>{model.name}</span>
+              {model.tags?.includes("recommended") && (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#D1FAE5", color: "#065F46" }}>
+                  Recommended
+                </span>
+              )}
               {isActive && (
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "var(--color-primary-container)", color: "var(--color-on-primary-container)" }}>
                   Active
@@ -103,6 +108,11 @@ export function ModelCard({ model }: Props) {
               {status === "ready" && !isActive && (
                 <span className="text-[10px] font-semibold bg-[var(--color-tertiary-container)] text-[var(--color-tertiary)] px-2 py-0.5 rounded-full">
                   Downloaded
+                </span>
+              )}
+              {model.tags?.includes("high-memory") && (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: "#FEF3C7", color: "#92400E" }}>
+                  Needs more memory
                 </span>
               )}
             </div>
