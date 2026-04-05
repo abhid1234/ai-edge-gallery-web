@@ -301,6 +301,13 @@
 
   <p>I wanted to understand these constraints firsthand — not from documentation, but from shipping something real.</p>
 
+  <div class="figure">
+    <div class="figure-inner">
+      <img src="/images/gallery-full.png" alt="AI Edge Gallery — model gallery showing available LLMs with Recommended and Needs More Memory badges" style="width:100%;border-radius:12px;border:1px solid #e0e0e0;">
+    </div>
+    <div class="figure-caption">The AI Edge Gallery — browse, download, and run models entirely in your browser. Green "Recommended" badges mark models that work on most hardware.</div>
+  </div>
+
   <hr>
 
   <!-- Section: Architecture -->
@@ -379,6 +386,13 @@
     <div class="figure-caption">Fig 1. The 5-step pipeline: model files flow from CDN to browser storage, then inference runs entirely on the device's GPU.</div>
   </div>
 
+  <div class="figure">
+    <div class="figure-inner">
+      <img src="/images/how-it-works.png" alt="How It Works page showing the animated on-device ML pipeline" style="width:100%;border-radius:12px;border:1px solid #e0e0e0;">
+    </div>
+    <div class="figure-caption">The "How It Works" page — an interactive pipeline that animates during live inference, showing data flowing through each stage.</div>
+  </div>
+
   <hr>
 
   <!-- Section: Wow Moment -->
@@ -387,6 +401,13 @@
   <p>The first time I loaded Qwen 2.5 1.5B, asked it to write a fizzbuzz in Python, and watched it stream tokens at 2-4 tok/s with <strong>zero bytes sent to any server</strong> — that was the moment it clicked. The network counter in the corner stayed at 0 the entire time.</p>
 
   <p>This isn't a toy demo. The model understands context, generates structured code, and maintains multi-turn conversations. All running on a Chromebook's integrated Intel GPU.</p>
+
+  <div class="figure">
+    <div class="figure-inner">
+      <img src="/images/chat.png" alt="Chat interface with on-device model showing example prompts" style="width:100%;border-radius:12px;border:1px solid #e0e0e0;">
+    </div>
+    <div class="figure-caption">The chat interface — multi-turn conversations with streaming, markdown rendering, and structured output modes (JSON/Schema). The "0 bytes sent" counter in the bottom-right confirms everything stays on-device.</div>
+  </div>
 
   <hr>
 
@@ -621,7 +642,14 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:#888;text-align:center;margin-top:-0.8rem;margin-bottom:2rem;">Fig 4. GPU compatibility varies wildly between integrated and discrete GPUs. The same model binary can pass on one GPU and require different GPU capabilities on another.</p>
+  <p style="font-size:0.8rem;color:#888;text-align:center;margin-top:-0.8rem;margin-bottom:2rem;">Fig 4. GPU compatibility varies between integrated and discrete GPUs. The same model binary can pass on one GPU and require different GPU capabilities on another.</p>
+
+  <div class="figure">
+    <div class="figure-inner">
+      <img src="/images/model-test.png" alt="Model Compatibility Test page showing automated pass/fail results" style="width:100%;border-radius:12px;border:1px solid #e0e0e0;">
+    </div>
+    <div class="figure-caption">The Model Compatibility Test — automatically downloads, loads, and tests each model on your specific hardware, then reports pass/fail with timing data.</div>
+  </div>
 
   <hr>
 
@@ -794,6 +822,17 @@
   </div>
 
   <p>The models that work — Qwen 2.5 1.5B and Gemma 3n E2B — deliver genuinely useful on-device inference. As WebGPU matures and WASM Memory64 becomes standard, more models will become browser-compatible.</p>
+
+  <div class="figure" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div>
+      <img src="/images/quant-explorer.png" alt="Quantization Explorer showing tradeoffs between model precision and size" style="width:100%;border-radius:12px;border:1px solid #e0e0e0;">
+      <div class="figure-caption" style="margin-top:8px;">Quantization Explorer — interactive tradeoff visualization between model precision, size, and quality.</div>
+    </div>
+    <div>
+      <img src="/images/ask-image.png" alt="Ask Image page for multimodal image Q&A" style="width:100%;border-radius:12px;border:1px solid #e0e0e0;">
+      <div class="figure-caption" style="margin-top:8px;">Ask Image — drag-drop a photo and ask questions about it, powered entirely by the on-device multimodal model.</div>
+    </div>
+  </div>
 
   <hr>
 
