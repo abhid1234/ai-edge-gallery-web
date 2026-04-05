@@ -233,31 +233,31 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       }}
     >
       {/* Logo */}
-      <div className="h-14 flex items-center px-4 flex-shrink-0">
+      <div className="h-20 flex items-center px-4 flex-shrink-0">
         {collapsed ? (
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-extrabold text-white flex-shrink-0 shadow-md"
             style={{ background: "linear-gradient(135deg, var(--color-title-gradient-start), var(--color-title-gradient-end))" }}
           >
             AI
           </div>
         ) : (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-extrabold text-white flex-shrink-0"
+              className="w-11 h-11 rounded-xl flex items-center justify-center text-sm font-extrabold text-white flex-shrink-0 shadow-md"
               style={{ background: "linear-gradient(135deg, var(--color-title-gradient-start), var(--color-title-gradient-end))" }}
             >
               AI
             </div>
             <div className="leading-tight">
-              <p className="text-[11px] font-bold" style={{ color: "var(--color-on-surface)" }}>
+              <p className="text-sm font-bold" style={{ color: "var(--color-on-surface)" }}>
                 <span style={{
                   background: "linear-gradient(90deg, var(--color-title-gradient-start), var(--color-title-gradient-end))",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                 }}>Google AI</span>
                 {" "}Edge Gallery
               </p>
-              <p className="text-[9px]" style={{ color: "var(--color-on-surface-variant)" }}>On-Device ML Platform</p>
+              <p className="text-[10px]" style={{ color: "var(--color-on-surface-variant)" }}>On-Device ML Platform</p>
             </div>
           </div>
         )}
