@@ -23,7 +23,7 @@ interface ModelContextValue {
   isLoading: boolean;
   isGenerating: boolean;
   error: string | null;
-  loadModel: (model: ModelInfo, file: File) => Promise<void>;
+  loadModel: (model: ModelInfo, blob: Blob) => Promise<void>;
   unloadModel: () => Promise<void>;
   generate: (prompt: string, onStream: StreamCallback) => Promise<string>;
   generateWithImage: (
@@ -74,11 +74,11 @@ export function ModelProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const loadModel = useCallback(async (model: ModelInfo, file: File) => {
+  const loadModel = useCallback(async (model: ModelInfo, blob: Blob) => {
     setIsLoading(true);
     setError(null);
     try {
-      await initModel(file, model);
+      await initModel(blob, model);
       setCurrentModel(model);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to load model";

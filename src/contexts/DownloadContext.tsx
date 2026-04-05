@@ -11,7 +11,7 @@ import {
   deleteFile,
   writeFileFromStream,
   requestPersistence,
-  readFileAsFile,
+  readFileAsBlob,
 } from "../lib/storage";
 
 const HF_TOKEN_KEY = "hf_token";
@@ -31,7 +31,7 @@ interface DownloadContextValue {
   getModelStatus: (modelId: string) => ModelStatus;
   startDownload: (model: ModelInfo) => Promise<void>;
   removeModel: (model: ModelInfo) => Promise<void>;
-  getModelFile: (model: ModelInfo) => Promise<File>;
+  getModelBlob: (model: ModelInfo) => Promise<Blob>;
   checkStoredModels: (models: ModelInfo[]) => Promise<void>;
   setHfToken: (token: string) => void;
   importLocalModel: (file: File, onProgress?: (bytes: number) => void) => Promise<ModelInfo>;
@@ -129,8 +129,8 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
     setModelStatuses((prev) => ({ ...prev, [model.id]: "not_downloaded" }));
   }, []);
 
-  const getModelFile = useCallback(async (model: ModelInfo): Promise<File> => {
-    return readFileAsFile(model.fileName);
+  const getModelBlob = useCallback(async (model: ModelInfo): Promise<Blob> => {
+    return readFileAsBlob(model.fileName);
   }, []);
 
   const importLocalModel = useCallback(
@@ -165,7 +165,7 @@ export function DownloadProvider({ children }: { children: ReactNode }) {
 
   return (
     <DownloadContext.Provider
-      value={{ modelStatuses, downloadProgress, hfToken, getModelStatus, startDownload, removeModel, getModelFile, checkStoredModels, setHfToken, importLocalModel }}
+      value={{ modelStatuses, downloadProgress, hfToken, getModelStatus, startDownload, removeModel, getModelBlob, checkStoredModels, setHfToken, importLocalModel }}
     >
       {children}
     </DownloadContext.Provider>

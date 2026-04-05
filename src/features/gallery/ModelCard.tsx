@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function ModelCard({ model }: Props) {
-  const { getModelStatus, downloadProgress, startDownload, removeModel, getModelFile } =
+  const { getModelStatus, downloadProgress, startDownload, removeModel, getModelBlob } =
     useDownload();
   const { currentModel, isLoading, loadModel, unloadModel, error: modelError } = useModel();
   const navigate = useNavigate();
@@ -29,8 +29,8 @@ export function ModelCard({ model }: Props) {
     if (autoRun && status === "ready" && !isActive) {
       (async () => {
         try {
-          const file = await getModelFile(model);
-          await loadModel(model, file);
+          const blob = await getModelBlob(model);
+          await loadModel(model, blob);
           navigate(model.category === "vision" ? "/vision" : "/chat");
         } catch (e) {
           setLoadError(e instanceof Error ? e.message : "Failed to load");
@@ -65,8 +65,8 @@ export function ModelCard({ model }: Props) {
     }
 
     try {
-      const file = await getModelFile(model);
-      await loadModel(model, file);
+      const blob = await getModelBlob(model);
+      await loadModel(model, blob);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Failed to load model";
       setLoadError(msg);

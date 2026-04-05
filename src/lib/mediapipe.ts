@@ -1,14 +1,5 @@
-/**
- * MediaPipe LLM Inference wrapper.
- *
- * Memory optimizations:
- * - WASM fileset cached (loaded once per session)
- * - Blob URL revoked immediately after MediaPipe init
- * - GC hints after load and dispose
- */
 import { FilesetResolver, LlmInference } from "@mediapipe/tasks-genai";
 import type { ModelInfo } from "../types";
-import { requestMemoryRecovery } from "./memory";
 
 const WASM_CDN =
   "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-genai@0.10.26/wasm";
@@ -20,7 +11,6 @@ let currentModelId: string | null = null;
 let cachedFileset: any = null;
 
 export type StreamCallback = (partialResult: string, done: boolean) => void;
-export type MultimodalPart = string | { imageSource: string } | { audioSource: string };
 
 async function getFileset() {
   if (!cachedFileset) {
@@ -30,7 +20,7 @@ async function getFileset() {
 }
 
 export async function initModel(
-  modelFile: File,
+  modelBlob: Blob,
   modelInfo: ModelInfo
 ): Promise<void> {
   await dispose();
@@ -38,29 +28,28 @@ export async function initModel(
   const genaiFileset = await getFileset();
 
   // Pass blob URL to MediaPipe — it handles fetching internally.
-  // The File is backed by OPFS (disk), so the blob URL avoids a full copy.
-  const blobUrl = URL.createObjectURL(modelFile);
+  // The blob is backed by OPFS (disk), so only the pages MediaPipe reads
+  // are loaded into memory via the browser's cache.
+  const blobUrl = URL.createObjectURL(modelBlob);
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const options: Record<string, unknown> = {
-      baseOptions: {
-        modelAssetPath: blobUrl,
-      },
-      maxTokens: modelInfo.maxTokens,
-      topK: 64,
-      topP: 0.95,
-      temperature: 1.0,
-      randomSeed: Math.floor(Math.random() * 1000000),
-    };
+  const options: Record<string, unknown> = {
+    baseOptions: {
+      modelAssetPath: blobUrl,
+    },
+    maxTokens: modelInfo.maxTokens,
+    topK: 64,
+    topP: 0.95,
+    temperature: 1.0,
+    randomSeed: Math.floor(Math.random() * 1000000),
+  };
 
-    if (modelInfo.capabilities.includes("image")) {
-      (options as Record<string, unknown>).maxNumImages = 5;
-    }
+  if (modelInfo.capabilities.includes("image")) {
+    (options as Record<string, unknown>).maxNumImages = 5;
+  }
 
-    instance = await LlmInference.createFromOptions(genaiFileset, options);
-    currentModelId = modelInfo.id;
-    requestMemoryRecovery();
+  instance = await LlmInference.createFromOptions(genaiFileset, options);
+  currentModelId = modelInfo.id;
   } finally {
     URL.revokeObjectURL(blobUrl);
   }
@@ -73,6 +62,8 @@ export async function generateText(
   if (!instance) throw new Error("No model loaded");
   return instance.generateResponse(prompt, onStream);
 }
+
+export type MultimodalPart = string | { imageSource: string } | { audioSource: string };
 
 export async function generateMultimodal(
   parts: MultimodalPart[],
@@ -102,7 +93,6 @@ export async function dispose(): Promise<void> {
     instance = null;
     currentModelId = null;
   }
-  requestMemoryRecovery();
 }
 
 export function getCurrentModelId(): string | null {
