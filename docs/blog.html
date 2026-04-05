@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>I Ran AI Models Entirely in the Browser — Here's What Actually Works</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; font-size: 18px; }
+
+  body {
+    font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fafaf8;
+    color: #2d2d2d;
+    line-height: 1.72;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* --- Sticky Header --- */
+  .sticky-header {
+    position: fixed; top: -60px; left: 0; right: 0; z-index: 100;
+    background: rgba(26,26,46,0.97);
+    backdrop-filter: blur(8px);
+    height: 56px;
+    display: flex; align-items: center; justify-content: center;
+    transition: top 0.3s ease;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+  }
+  .sticky-header.visible { top: 0; }
+  .sticky-header h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    color: #fff; font-size: 0.85rem; font-weight: 700;
+    letter-spacing: 0.02em; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+    max-width: 90vw;
+  }
+
+  /* --- Hero --- */
+  .hero {
+    padding: 6rem 1.5rem 3rem;
+    max-width: 800px; margin: 0 auto;
+    border-bottom: 1px solid #e8e6e1;
+  }
+  .hero-label {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: #4285F4; margin-bottom: 1.2rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    color: #1a1a2e; font-size: 2.8rem; font-weight: 900;
+    line-height: 1.15; margin-bottom: 1.2rem;
+  }
+  .hero .subtitle {
+    font-size: 1.1rem; color: #666; line-height: 1.6;
+    max-width: 640px; font-weight: 300;
+  }
+  .hero .meta {
+    margin-top: 1.8rem; font-size: 0.78rem; color: #999;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+  }
+  .hero .meta .dot { width: 3px; height: 3px; border-radius: 50%; background: #ccc; }
+
+  /* --- TOC --- */
+  .toc-wrapper {
+    max-width: 720px; margin: 2.5rem auto; padding: 0 1.5rem;
+  }
+  .toc {
+    background: #f4f3ef; border-radius: 12px; padding: 1.8rem 2rem;
+    border-left: 4px solid #4285F4;
+  }
+  .toc h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1rem; color: #1a1a2e; margin-bottom: 0.8rem;
+    font-weight: 700;
+  }
+  .toc ol { list-style: none; counter-reset: toc; }
+  .toc li { counter-increment: toc; margin-bottom: 0.35rem; }
+  .toc li::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    color: #4285F4; margin-right: 0.6rem; font-weight: 500;
+  }
+  .toc a {
+    color: #444; text-decoration: none; font-size: 0.88rem;
+    transition: color 0.2s;
+  }
+  .toc a:hover { color: #4285F4; }
+
+  /* --- Article --- */
+  article {
+    max-width: 720px; margin: 0 auto; padding: 0 1.5rem 4rem;
+  }
+  article h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    color: #1a1a2e; font-size: 1.7rem; font-weight: 700;
+    margin: 3.5rem 0 1rem; line-height: 1.25;
+    padding-top: 1rem;
+  }
+  article h2 .lesson-num {
+    display: block; font-size: 0.65rem; font-weight: 600;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: #4285F4; margin-bottom: 0.3rem;
+    font-family: 'Source Sans 3', sans-serif;
+  }
+  article p { margin-bottom: 1.2rem; }
+  article strong { color: #1a1a2e; font-weight: 600; }
+  article a { color: #4285F4; text-decoration: underline; text-underline-offset: 2px; }
+  article a:hover { color: #1a1a2e; }
+
+  article ul, article ol {
+    margin: 0.8rem 0 1.4rem 1.5rem;
+  }
+  article li { margin-bottom: 0.4rem; }
+
+  article .lead {
+    font-size: 1.15rem; line-height: 1.7; color: #444;
+    margin-bottom: 1.6rem;
+  }
+
+  /* --- Horizontal Rule --- */
+  article hr {
+    border: none; height: 1px; background: #e8e6e1;
+    margin: 3rem 0;
+  }
+
+  /* --- Code Blocks --- */
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.82rem;
+    background: #f0efe9; padding: 0.15em 0.4em; border-radius: 4px;
+    color: #c7254e;
+  }
+  pre {
+    background: #1e1e2e; color: #cdd6f4; border-radius: 10px;
+    padding: 1.4rem 1.6rem; margin: 1.2rem 0 1.6rem;
+    overflow-x: auto; font-size: 0.78rem; line-height: 1.65;
+    border: 1px solid #313244;
+  }
+  pre code {
+    background: none; padding: 0; color: inherit; font-size: inherit;
+  }
+  .code-kw { color: #cba6f7; }
+  .code-str { color: #a6e3a1; }
+  .code-cm { color: #6c7086; font-style: italic; }
+  .code-fn { color: #89b4fa; }
+  .code-num { color: #fab387; }
+
+  /* --- Figure / Diagram Containers --- */
+  .figure {
+    margin: 2rem 0; border-radius: 12px; overflow: hidden;
+    background: #fff; border: 1px solid #e8e6e1;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .figure-inner { padding: 1.5rem; }
+  .figure svg { width: 100%; height: auto; display: block; }
+  .figure-caption {
+    padding: 0.8rem 1.5rem; background: #f9f8f5;
+    border-top: 1px solid #e8e6e1;
+    font-size: 0.75rem; color: #888; text-align: center;
+    font-style: italic;
+  }
+
+  /* --- Tables --- */
+  .table-wrapper {
+    margin: 1.5rem 0 2rem; overflow-x: auto; border-radius: 12px;
+    border: 1px solid #e8e6e1; background: #fff;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  thead { background: #1a1a2e; }
+  thead th {
+    padding: 0.85rem 1.2rem; text-align: left;
+    color: #fff; font-weight: 600; font-size: 0.78rem;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  tbody tr { border-bottom: 1px solid #f0efe9; transition: background 0.15s; }
+  tbody tr:hover { background: #fafaf5; }
+  tbody td { padding: 0.75rem 1.2rem; }
+  .badge {
+    display: inline-block; padding: 0.15em 0.65em; border-radius: 100px;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em;
+  }
+  .badge-pass { background: #d4edda; color: #155724; }
+  .badge-fail { background: #f8d7da; color: #721c24; }
+  .badge-warn { background: #fff3cd; color: #856404; }
+
+  /* --- Callout --- */
+  .callout {
+    background: #eef4ff; border-left: 4px solid #4285F4;
+    padding: 1.2rem 1.5rem; border-radius: 0 10px 10px 0;
+    margin: 1.5rem 0; font-size: 0.92rem;
+  }
+  .callout strong { color: #1a1a2e; }
+
+  /* --- Author Card --- */
+  .author-card {
+    max-width: 720px; margin: 0 auto 4rem; padding: 0 1.5rem;
+  }
+  .author-card-inner {
+    background: #fff; border: 1px solid #e8e6e1; border-radius: 14px;
+    padding: 2rem; display: flex; gap: 1.5rem; align-items: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .author-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, #4285F4, #1a1a2e);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700; flex-shrink: 0;
+  }
+  .author-info h3 {
+    font-family: 'Playfair Display', serif; color: #1a1a2e;
+    font-size: 1.05rem; margin-bottom: 0.2rem;
+  }
+  .author-info p { font-size: 0.82rem; color: #666; margin-bottom: 0.5rem; }
+  .author-links { display: flex; gap: 0.8rem; }
+  .author-links a {
+    font-size: 0.75rem; color: #4285F4; text-decoration: none;
+    font-weight: 600;
+  }
+  .author-links a:hover { text-decoration: underline; }
+
+  /* --- Footer --- */
+  footer {
+    text-align: center; padding: 2rem 1rem; border-top: 1px solid #e8e6e1;
+    font-size: 0.72rem; color: #aaa;
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 640px) {
+    html { font-size: 16px; }
+    .hero h1 { font-size: 1.9rem; }
+    .hero { padding: 4rem 1rem 2rem; }
+    article { padding: 0 1rem 3rem; }
+    article h2 { font-size: 1.35rem; }
+    .author-card-inner { flex-direction: column; text-align: center; }
+    .author-links { justify-content: center; }
+    .toc { padding: 1.2rem 1.4rem; }
+    .figure-inner { padding: 1rem; }
+    table { font-size: 0.78rem; }
+    thead th, tbody td { padding: 0.6rem 0.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Sticky Header -->
+<div class="sticky-header" id="stickyHeader">
+  <h1>I Ran AI Models Entirely in the Browser — Here's What Actually Works</h1>
+</div>
+
+<!-- Hero -->
+<header class="hero" id="top">
+  <div class="hero-label">Technical Deep Dive</div>
+  <h1>I Ran AI Models Entirely in the Browser — Here's What Actually Works (and What Doesn't)</h1>
+  <p class="subtitle">A personal experiment with on-device ML using MediaPipe, WebGPU, and WebAssembly — and the hard lessons about memory, GPU compatibility, and browser limitations that no documentation tells you.</p>
+  <div class="meta">
+    <span>Abhi Das</span>
+    <span class="dot"></span>
+    <span>April 2026</span>
+    <span class="dot"></span>
+    <span>12 min read</span>
+  </div>
+</header>
+
+<!-- Table of Contents -->
+<nav class="toc-wrapper">
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#why">Why Browser-Based ML?</a></li>
+      <li><a href="#architecture">The Architecture: Simpler Than You'd Think</a></li>
+      <li><a href="#wow">The "Wow Moment": Real Conversations, Zero Network</a></li>
+      <li><a href="#wasm">Lesson 1: WebAssembly Has a 4GB Ceiling</a></li>
+      <li><a href="#memory">Lesson 2: navigator.deviceMemory Lies</a></li>
+      <li><a href="#gpu">Lesson 3: GPU Compatibility Is the Real Gatekeeper</a></li>
+      <li><a href="#repetition">Lesson 4: Repetition Detection Is Harder Than It Sounds</a></li>
+      <li><a href="#models">Lesson 5: The Models That Actually Work</a></li>
+      <li><a href="#future">What I'd Build On Top of This</a></li>
+      <li><a href="#try">Try It Yourself</a></li>
+    </ol>
+  </div>
+</nav>
+
+<!-- Article -->
+<article>
+
+  <p class="lead">Most on-device ML demos show a 135MB model generating "Hello World" and call it a day. I wanted to see if you could actually run real, multi-billion parameter models — Gemma, Qwen, DeepSeek — entirely in a browser tab, with no server, no API keys, and no data leaving the device.</p>
+
+  <p>The result is <a href="https://ai-edge-gallery-web.vercel.app">AI Edge Gallery for Web</a>: an open-source browser app that downloads, loads, and runs LLMs on-device using Google's MediaPipe + WebGPU. Here's what I built, what broke, and what I'd tell anyone trying to do the same.</p>
+
+  <hr>
+
+  <!-- Section: Why -->
+  <h2 id="why">Why Browser-Based ML?</h2>
+
+  <p>The pitch is compelling: zero infrastructure, zero cost, complete privacy. The user downloads a model once, and every subsequent interaction is free and offline. No GPU servers, no API rate limits, no data processing agreements.</p>
+
+  <p>But the reality? Browsers are hostile environments for ML. You're fighting WebAssembly memory limits, GPU driver quirks, and a runtime that was designed for web pages, not neural networks.</p>
+
+  <p>I wanted to understand these constraints firsthand — not from documentation, but from shipping something real.</p>
+
+  <hr>
+
+  <!-- Section: Architecture -->
+  <h2 id="architecture">The Architecture: Simpler Than You'd Think</h2>
+
+  <p>The entire stack is:</p>
+  <ul>
+    <li><strong>React 19 + Vite 6</strong> — standard frontend</li>
+    <li><strong>MediaPipe LLM Inference API</strong> — Google's on-device ML runtime (WASM + WebGPU)</li>
+    <li><strong>OPFS</strong> (Origin Private File System) — browser storage that persists across sessions</li>
+    <li><strong>Cloudflare R2</strong> — model file hosting (~$0.15/month)</li>
+  </ul>
+
+  <p>No backend. No database. No auth. The model downloads from R2 to OPFS once, then inference runs entirely in-browser via WebGPU.</p>
+
+  <!-- DIAGRAM: Architecture -->
+  <div class="figure">
+    <div class="figure-inner">
+      <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg">
+        <!-- Step boxes -->
+        <defs>
+          <filter id="shadow1" x="-4%" y="-4%" width="108%" height="116%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+          </filter>
+          <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#4285F4"/>
+          </marker>
+        </defs>
+        <!-- Box 1: Cloudflare R2 -->
+        <rect x="8" y="60" width="120" height="80" rx="10" fill="#fff4e6" stroke="#f4a236" stroke-width="1.5" filter="url(#shadow1)"/>
+        <text x="68" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">Cloudflare R2</text>
+        <text x="68" y="108" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9.5" fill="#888">CDN / Model Host</text>
+        <text x="68" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#b8860b">~$0.15/mo</text>
+        <text x="68" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#4285F4">STEP 1</text>
+        <!-- Arrow 1 -->
+        <line x1="132" y1="100" x2="160" y2="100" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow)"/>
+        <!-- Box 2: OPFS -->
+        <rect x="164" y="60" width="120" height="80" rx="10" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5" filter="url(#shadow1)"/>
+        <text x="224" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">OPFS Storage</text>
+        <text x="224" y="108" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9.5" fill="#888">Persistent Browser FS</text>
+        <text x="224" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#2e7d32">Download Once</text>
+        <text x="224" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#4285F4">STEP 2</text>
+        <!-- Arrow 2 -->
+        <line x1="288" y1="100" x2="316" y2="100" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow)"/>
+        <!-- Box 3: MediaPipe WASM -->
+        <rect x="320" y="60" width="120" height="80" rx="10" fill="#e3f2fd" stroke="#4285F4" stroke-width="1.5" filter="url(#shadow1)"/>
+        <text x="380" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">MediaPipe</text>
+        <text x="380" y="108" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9.5" fill="#888">WASM Runtime</text>
+        <text x="380" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#1565c0">LLM Inference API</text>
+        <text x="380" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#4285F4">STEP 3</text>
+        <!-- Arrow 3 -->
+        <line x1="444" y1="100" x2="472" y2="100" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow)"/>
+        <!-- Box 4: WebGPU -->
+        <rect x="476" y="60" width="120" height="80" rx="10" fill="#ede7f6" stroke="#7c4dff" stroke-width="1.5" filter="url(#shadow1)"/>
+        <text x="536" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">WebGPU</text>
+        <text x="536" y="108" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9.5" fill="#888">GPU Acceleration</text>
+        <text x="536" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#4a148c">On-Device</text>
+        <text x="536" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#4285F4">STEP 4</text>
+        <!-- Arrow 4 -->
+        <line x1="600" y1="100" x2="628" y2="100" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow)"/>
+        <!-- Box 5: Response -->
+        <rect x="632" y="60" width="80" height="80" rx="10" fill="#fce4ec" stroke="#e91e63" stroke-width="1.5" filter="url(#shadow1)"/>
+        <text x="672" y="93" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">Response</text>
+        <text x="672" y="112" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9.5" fill="#888">Streaming</text>
+        <text x="672" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#4285F4">STEP 5</text>
+        <!-- Bottom label -->
+        <rect x="164" y="170" width="432" height="32" rx="6" fill="#f0f4ff" stroke="#4285F4" stroke-width="1" stroke-dasharray="4 2"/>
+        <text x="380" y="191" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" fill="#4285F4" font-weight="600">Zero network after initial download — all inference happens on-device</text>
+      </svg>
+    </div>
+    <div class="figure-caption">Fig 1. The 5-step pipeline: model files flow from CDN to browser storage, then inference runs entirely on the device's GPU.</div>
+  </div>
+
+  <hr>
+
+  <!-- Section: Wow Moment -->
+  <h2 id="wow">The "Wow Moment": Real Conversations, Zero Network</h2>
+
+  <p>The first time I loaded Qwen 2.5 1.5B, asked it to write a fizzbuzz in Python, and watched it stream tokens at 2-4 tok/s with <strong>zero bytes sent to any server</strong> — that was the moment it clicked. The network counter in the corner stayed at 0 the entire time.</p>
+
+  <p>This isn't a toy demo. The model understands context, generates structured code, and maintains multi-turn conversations. All running on a Chromebook's integrated Intel GPU.</p>
+
+  <hr>
+
+  <!-- Section: WASM 4GB -->
+  <h2 id="wasm">
+    <span class="lesson-num">Lesson 1</span>
+    WebAssembly Has a 4GB Ceiling — And It's Not What You Think
+  </h2>
+
+  <p>The biggest surprise: WASM has a hard 4GB address space limit. Not because of your RAM — my Chromebook has 32GB — but because WASM uses 32-bit addressing. Period.</p>
+
+  <p>This means a 2GB model + KV cache + WASM runtime can exceed 4GB and crash with "memory access out of bounds," even if your system has plenty of free memory.</p>
+
+  <!-- DIAGRAM: WASM Memory -->
+  <div class="figure">
+    <div class="figure-inner">
+      <svg viewBox="0 0 720 310" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="memGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fce4ec"/>
+            <stop offset="100%" stop-color="#fff"/>
+          </linearGradient>
+        </defs>
+        <!-- Outer container -->
+        <rect x="40" y="30" width="640" height="250" rx="14" fill="url(#memGrad)" stroke="#e91e63" stroke-width="2"/>
+        <text x="360" y="22" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="13" font-weight="700" fill="#1a1a2e">WASM 4GB Address Space (32-bit limit)</text>
+
+        <!-- Model Weights block -->
+        <rect x="60" y="55" width="280" height="90" rx="8" fill="#4285F4" opacity="0.9"/>
+        <text x="200" y="93" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">Model Weights</text>
+        <text x="200" y="115" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#bbdefb">~2.0 GB</text>
+        <text x="200" y="133" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9" fill="#e3f2fd">50% of total space</text>
+
+        <!-- KV Cache block -->
+        <rect x="350" y="55" width="155" height="90" rx="8" fill="#f4a236" opacity="0.9"/>
+        <text x="427" y="93" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">KV Cache</text>
+        <text x="427" y="115" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#fff8e1">~1.0 GB</text>
+        <text x="427" y="133" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9" fill="#fff8e1">Context window</text>
+
+        <!-- Runtime block -->
+        <rect x="515" y="55" width="80" height="90" rx="8" fill="#7c4dff" opacity="0.85"/>
+        <text x="555" y="88" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#fff">WASM</text>
+        <text x="555" y="105" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#fff">Runtime</text>
+        <text x="555" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#ede7f6">~0.5 GB</text>
+
+        <!-- GPU Buffers block -->
+        <rect x="605" y="55" width="60" height="90" rx="8" fill="#e91e63" opacity="0.85"/>
+        <text x="635" y="88" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#fff">GPU</text>
+        <text x="635" y="105" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#fff">Buf.</text>
+        <text x="635" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#fce4ec">~0.5G</text>
+
+        <!-- Usage bar at bottom -->
+        <rect x="60" y="170" width="605" height="24" rx="4" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
+        <rect x="60" y="170" width="560" height="24" rx="4" fill="#e91e63" opacity="0.2"/>
+        <rect x="60" y="170" width="560" height="24" rx="4" fill="none" stroke="#e91e63" stroke-width="1.5"/>
+        <text x="340" y="187" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#e91e63">~3.5 GB used / 4.0 GB limit &#x2014; DANGER ZONE</text>
+
+        <!-- Annotation -->
+        <rect x="60" y="215" width="605" height="50" rx="8" fill="#fff8e1" stroke="#f4a236" stroke-width="1"/>
+        <text x="80" y="236" font-family="Source Sans 3, sans-serif" font-size="11" fill="#856404" font-weight="600">The Irony:</text>
+        <text x="155" y="236" font-family="Source Sans 3, sans-serif" font-size="11" fill="#856404">Your system has 32GB RAM but WASM can only address 4GB.</text>
+        <text x="80" y="254" font-family="Source Sans 3, sans-serif" font-size="11" fill="#856404">WASM Memory64 (Chrome 133+) will raise this to 16GB — when MediaPipe adopts it.</text>
+      </svg>
+    </div>
+    <div class="figure-caption">Fig 2. How a 2GB model fills the WASM 4GB address space. Models over ~2GB risk OOM crashes regardless of system RAM.</div>
+  </div>
+
+  <p><strong>What I tried that didn't work:</strong></p>
+  <ul>
+    <li><code>ReadableStreamDefaultReader</code> for streaming model loading — MediaPipe's WASM calls <code>self.import()</code> internally, which Vite's bundler breaks</li>
+    <li><code>LlmInference.createWebGpuDevice()</code> for explicit GPU management — same <code>self.import</code> error, different code path</li>
+    <li>Web Workers to offload MediaPipe — <code>importScripts()</code> unavailable in ES module workers</li>
+  </ul>
+
+  <p><strong>What actually works:</strong> Plain blob URL loading. Read the model from OPFS as a Blob, create a blob URL, pass it to MediaPipe, revoke immediately after. Simple, boring, reliable.</p>
+
+  <div class="callout">
+    <strong>The irony:</strong> Google's own research blog shows they can run 7B+ models in the browser using layer-by-layer streaming. But that only works with the old <code>.bin</code> format — not the <code>.task</code> files that all new models use. The streaming path and the modern model format are on different tracks.
+  </div>
+
+  <hr>
+
+  <!-- Section: Memory -->
+  <h2 id="memory">
+    <span class="lesson-num">Lesson 2</span>
+    navigator.deviceMemory Lies
+  </h2>
+
+  <p>Browsers cap <code>navigator.deviceMemory</code> at 8GB for privacy. My 32GB Chromebook reports 8GB. A 16GB MacBook reports 8GB. An actual 8GB device reports 8GB. They're all the same.</p>
+
+  <p><strong>My workaround:</strong> Infer true RAM from Chrome's JS heap limit. If <code>performance.memory.jsHeapSizeLimit</code> > 3.5GB, the device almost certainly has 16GB+. Combined with a manual override in the UI, users can set their actual RAM and unlock models that would otherwise be blocked.</p>
+
+  <!-- DIAGRAM: Resource Monitor -->
+  <div class="figure">
+    <div class="figure-inner">
+      <svg viewBox="0 0 720 370" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="pillGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#4285F4"/>
+            <stop offset="60%" stop-color="#4285F4"/>
+            <stop offset="85%" stop-color="#f4a236"/>
+            <stop offset="100%" stop-color="#e91e63"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Panel background -->
+        <rect x="40" y="10" width="640" height="350" rx="16" fill="#1e1e2e" stroke="#313244" stroke-width="1.5"/>
+
+        <!-- Header bar -->
+        <rect x="40" y="10" width="640" height="44" rx="16" fill="#2a2a3e"/>
+        <rect x="40" y="38" width="640" height="16" fill="#2a2a3e"/>
+        <text x="72" y="37" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#cdd6f4">Resource Monitor</text>
+        <circle cx="646" cy="32" r="6" fill="#f38ba8"/>
+        <circle cx="626" cy="32" r="6" fill="#a6e3a1"/>
+
+        <!-- Memory Pill -->
+        <text x="72" y="80" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086" font-weight="600" text-transform="uppercase" letter-spacing="0.1em">MEMORY USAGE</text>
+        <rect x="72" y="90" width="576" height="22" rx="11" fill="#313244"/>
+        <rect x="72" y="90" width="400" height="22" rx="11" fill="url(#pillGrad)" opacity="0.85"/>
+        <text x="84" y="105" font-family="JetBrains Mono, monospace" font-size="9" fill="#fff" font-weight="500">2.8 GB / 4.0 GB WASM</text>
+        <text x="528" y="105" font-family="JetBrains Mono, monospace" font-size="9" fill="#6c7086">70%</text>
+
+        <!-- JS Heap bar -->
+        <text x="72" y="138" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086" font-weight="600">JS HEAP</text>
+        <rect x="72" y="148" width="576" height="14" rx="7" fill="#313244"/>
+        <rect x="72" y="148" width="250" height="14" rx="7" fill="#a6e3a1" opacity="0.7"/>
+        <text x="84" y="160" font-family="JetBrains Mono, monospace" font-size="8" fill="#1e1e2e" font-weight="500">1.2 GB</text>
+
+        <!-- GPU bar -->
+        <text x="72" y="185" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086" font-weight="600">GPU MEMORY</text>
+        <rect x="72" y="195" width="576" height="14" rx="7" fill="#313244"/>
+        <rect x="72" y="195" width="190" height="14" rx="7" fill="#89b4fa" opacity="0.7"/>
+        <text x="84" y="207" font-family="JetBrains Mono, monospace" font-size="8" fill="#1e1e2e" font-weight="500">0.8 GB</text>
+
+        <!-- Sparkline area -->
+        <text x="72" y="238" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086" font-weight="600">MEMORY OVER TIME</text>
+        <rect x="72" y="248" width="576" height="45" rx="6" fill="#252536"/>
+        <polyline points="82,280 120,275 160,278 200,265 240,270 280,262 320,258 360,260 400,255 440,258 480,260 520,262 560,258 600,256 636,254" fill="none" stroke="#4285F4" stroke-width="1.5"/>
+        <polyline points="82,280 120,275 160,278 200,265 240,270 280,262 320,258 360,260 400,255 440,258 480,260 520,262 560,258 600,256 636,254 636,288 82,288" fill="#4285F4" opacity="0.08"/>
+
+        <!-- RAM Override buttons -->
+        <text x="72" y="318" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086" font-weight="600">RAM OVERRIDE</text>
+        <text x="200" y="318" font-family="Source Sans 3, sans-serif" font-size="8.5" fill="#6c7086">(navigator.deviceMemory reports 8GB for all devices)</text>
+
+        <rect x="72" y="328" width="52" height="24" rx="6" fill="#313244" stroke="#6c7086" stroke-width="0.5"/>
+        <text x="98" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#6c7086">8 GB</text>
+
+        <rect x="132" y="328" width="52" height="24" rx="6" fill="#313244" stroke="#4285F4" stroke-width="1.5"/>
+        <text x="158" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#4285F4" font-weight="600">16 GB</text>
+
+        <rect x="192" y="328" width="52" height="24" rx="6" fill="#4285F4"/>
+        <text x="218" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#fff" font-weight="600">32 GB</text>
+
+        <rect x="252" y="328" width="52" height="24" rx="6" fill="#313244" stroke="#6c7086" stroke-width="0.5"/>
+        <text x="278" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#6c7086">64 GB</text>
+
+        <!-- Active indicator -->
+        <circle cx="218" cy="324" r="3" fill="#a6e3a1"/>
+      </svg>
+    </div>
+    <div class="figure-caption">Fig 3. The Resource Monitor panel — memory bars, sparkline, and RAM override buttons let users set their actual system RAM.</div>
+  </div>
+
+  <hr>
+
+  <!-- Section: GPU -->
+  <h2 id="gpu">
+    <span class="lesson-num">Lesson 3</span>
+    GPU Compatibility Is the Real Gatekeeper
+  </h2>
+
+  <p>Some models simply don't work on some GPUs. Not because of memory — because of missing GPU operations.</p>
+
+  <p>Qwen 2.5 0.5B crashed with <code>BROADCAST_TO: Operation is not supported</code> on my Chromebook's Intel GPU. Every single transformer block failed to delegate to the GPU. The same model works fine on desktop Nvidia GPUs.</p>
+
+  <p>Gemma 3 1B produced garbled nonsense — "andthatandand<strong>that</strong>it**" — from the very first token. Not a memory issue. Not a code issue. A GPU driver issue.</p>
+
+  <p><strong>What I learned:</strong> You can't assume GPU compatibility. I built a Model Compatibility Test page that auto-downloads each model, loads it, generates one test response, then unloads and deletes — giving a pass/fail for every model on the user's specific hardware.</p>
+
+  <!-- GPU Compatibility Matrix -->
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Size</th>
+          <th style="text-align:center">Chromebook<br><span style="font-weight:400;text-transform:none;font-size:0.7rem;opacity:0.7">Intel UHD iGPU</span></th>
+          <th style="text-align:center">Desktop<br><span style="font-weight:400;text-transform:none;font-size:0.7rem;opacity:0.7">Nvidia RTX</span></th>
+          <th>Failure Mode</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Qwen 2.5 1.5B</strong></td>
+          <td>1.5 GB</td>
+          <td style="text-align:center"><span style="color:#22863a;font-size:1.2em">&#10003;</span></td>
+          <td style="text-align:center"><span style="color:#22863a;font-size:1.2em">&#10003;</span></td>
+          <td><span style="color:#999">None</span></td>
+        </tr>
+        <tr>
+          <td><strong>Gemma 3n E2B</strong></td>
+          <td>2.8 GB</td>
+          <td style="text-align:center"><span style="color:#22863a;font-size:1.2em">&#10003;</span></td>
+          <td style="text-align:center"><span style="color:#22863a;font-size:1.2em">&#10003;</span></td>
+          <td><span style="color:#999">None</span></td>
+        </tr>
+        <tr>
+          <td>Qwen 2.5 0.5B</td>
+          <td>0.5 GB</td>
+          <td style="text-align:center"><span style="color:#cb2431;font-size:1.2em">&#10007;</span></td>
+          <td style="text-align:center"><span style="color:#22863a;font-size:1.2em">&#10003;</span></td>
+          <td><code>BROADCAST_TO</code> unsupported</td>
+        </tr>
+        <tr>
+          <td>Gemma 3 1B</td>
+          <td>1.0 GB</td>
+          <td style="text-align:center"><span style="color:#cb2431;font-size:1.2em">&#10007;</span></td>
+          <td style="text-align:center"><span style="color:#e36209;font-size:1.2em">?</span></td>
+          <td>Garbled output (driver issue)</td>
+        </tr>
+        <tr>
+          <td>SmolLM 135M</td>
+          <td>159 MB</td>
+          <td style="text-align:center"><span style="color:#cb2431;font-size:1.2em">&#10007;</span></td>
+          <td style="text-align:center"><span style="color:#e36209;font-size:1.2em">?</span></td>
+          <td>Garbled GPU output</td>
+        </tr>
+        <tr>
+          <td>TinyLlama 1.1B</td>
+          <td>1.1 GB</td>
+          <td style="text-align:center"><span style="color:#cb2431;font-size:1.2em">&#10007;</span></td>
+          <td style="text-align:center"><span style="color:#e36209;font-size:1.2em">?</span></td>
+          <td>Aborted — GPU op issue</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:0.8rem;color:#888;text-align:center;margin-top:-0.8rem;margin-bottom:2rem;">Fig 4. GPU compatibility varies wildly between integrated and discrete GPUs. The same model binary can pass on one and crash on another.</p>
+
+  <hr>
+
+  <!-- Section: Repetition -->
+  <h2 id="repetition">
+    <span class="lesson-num">Lesson 4</span>
+    Repetition Detection Is Harder Than It Sounds
+  </h2>
+
+  <p>Small models (1-2B parameters) get stuck in loops. "This This This This This..." or "to-to-to-to-to-to" repeating forever. MediaPipe's web API has <strong>no repetition penalty parameter</strong> — only topK, temperature, maxTokens, and randomSeed.</p>
+
+  <p>My first detector used 3-gram matching with a threshold of 5. It caught simple loops but missed hyphenated patterns ("to-to-to-to" is one word to a whitespace splitter) and triggered false positives on code (fizzbuzz naturally repeats <code>if i %</code>).</p>
+
+  <!-- DIAGRAM: Repetition Detection Flow -->
+  <div class="figure">
+    <div class="figure-inner">
+      <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#4285F4"/>
+          </marker>
+          <marker id="arrowRed" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#e91e63"/>
+          </marker>
+          <marker id="arrowGreen" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50"/>
+          </marker>
+        </defs>
+
+        <!-- Token Stream -->
+        <rect x="30" y="90" width="120" height="60" rx="10" fill="#e3f2fd" stroke="#4285F4" stroke-width="1.5"/>
+        <text x="90" y="116" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#1a1a2e">Token Stream</text>
+        <text x="90" y="135" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#4285F4">from MediaPipe</text>
+
+        <!-- Arrow to Detector -->
+        <line x1="154" y1="120" x2="210" y2="120" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow2)"/>
+
+        <!-- Detector box with 3 layers -->
+        <rect x="214" y="30" width="280" height="180" rx="12" fill="#f9f8f5" stroke="#1a1a2e" stroke-width="1.5"/>
+        <text x="354" y="20" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#1a1a2e">REPETITION DETECTOR</text>
+        <text x="354" y="56" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086">ModelContext.generate() wrapper</text>
+
+        <!-- Layer 1 -->
+        <rect x="234" y="68" width="240" height="36" rx="6" fill="#fff" stroke="#4285F4" stroke-width="1"/>
+        <circle cx="254" cy="86" r="10" fill="#4285F4"/>
+        <text x="254" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#fff">1</text>
+        <text x="280" y="83" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="600" fill="#1a1a2e">Consecutive Words</text>
+        <text x="280" y="97" font-family="JetBrains Mono, monospace" font-size="8" fill="#888">threshold: 6+ identical</text>
+
+        <!-- Layer 2 -->
+        <rect x="234" y="112" width="240" height="36" rx="6" fill="#fff" stroke="#f4a236" stroke-width="1"/>
+        <circle cx="254" cy="130" r="10" fill="#f4a236"/>
+        <text x="254" y="134" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#fff">2</text>
+        <text x="280" y="127" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="600" fill="#1a1a2e">Trigram Frequency</text>
+        <text x="280" y="141" font-family="JetBrains Mono, monospace" font-size="8" fill="#888">5+ same trigram in 60-word window</text>
+
+        <!-- Layer 3 (visual only — shows combined decision) -->
+        <rect x="234" y="156" width="240" height="36" rx="6" fill="#fff" stroke="#7c4dff" stroke-width="1"/>
+        <circle cx="254" cy="174" r="10" fill="#7c4dff"/>
+        <text x="254" y="178" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#fff">3</text>
+        <text x="280" y="172" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="600" fill="#1a1a2e">Decision Gate</text>
+        <text x="280" y="186" font-family="JetBrains Mono, monospace" font-size="8" fill="#888">any layer triggers → cancel</text>
+
+        <!-- Arrow to Cancel -->
+        <line x1="498" y1="90" x2="560" y2="55" stroke="#e91e63" stroke-width="2" marker-end="url(#arrowRed)"/>
+        <!-- Arrow to Continue -->
+        <line x1="498" y1="155" x2="560" y2="185" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowGreen)"/>
+
+        <!-- Cancel box -->
+        <rect x="564" y="28" width="120" height="52" rx="10" fill="#fce4ec" stroke="#e91e63" stroke-width="1.5"/>
+        <text x="624" y="50" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#e91e63">CANCEL</text>
+        <text x="624" y="68" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9" fill="#c62828">Stop generation</text>
+
+        <!-- Continue box -->
+        <rect x="564" y="162" width="120" height="52" rx="10" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5"/>
+        <text x="624" y="184" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#2e7d32">CONTINUE</text>
+        <text x="624" y="202" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9" fill="#2e7d32">Stream to user</text>
+
+        <!-- Bottom note -->
+        <text x="360" y="248" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" fill="#888" font-style="italic">Global check in generate() — protects all features (chat, compat test, etc.) automatically</text>
+      </svg>
+    </div>
+    <div class="figure-caption">Fig 5. The repetition detection pipeline runs inside the shared generate() wrapper, catching loops before they reach the user.</div>
+  </div>
+
+  <p><strong>What works:</strong> Two simple checks with high thresholds:</p>
+  <ol>
+    <li>6+ consecutive identical words</li>
+    <li>Same trigram appearing 5+ times in a 60-word window</li>
+  </ol>
+
+  <p>And critically — put the detection <strong>in the generate wrapper</strong>, not in each page. One global check in <code>ModelContext.generate()</code> protects every feature automatically.</p>
+
+  <hr>
+
+  <!-- Section: Models -->
+  <h2 id="models">
+    <span class="lesson-num">Lesson 5</span>
+    The Models That Actually Work
+  </h2>
+
+  <p>After testing every model on a 32GB Chromebook with Intel integrated graphics:</p>
+
+  <!-- Model Results Table -->
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Size</th>
+          <th>Status</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Qwen 2.5 1.5B</strong></td>
+          <td>1.5 GB</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td>Recommended — best all-around performer</td>
+        </tr>
+        <tr>
+          <td><strong>Gemma 3n E2B</strong></td>
+          <td>2.8 GB</td>
+          <td><span class="badge badge-pass">PASS</span></td>
+          <td>Multimodal (text + image + audio)</td>
+        </tr>
+        <tr>
+          <td>Gemma 4 E2B</td>
+          <td>1.9 GB</td>
+          <td><span class="badge badge-fail">FAIL</span></td>
+          <td>Exceeds WASM 4GB memory limit</td>
+        </tr>
+        <tr>
+          <td>Gemma 3n E4B</td>
+          <td>4.1 GB</td>
+          <td><span class="badge badge-fail">FAIL</span></td>
+          <td>Too large for WASM address space</td>
+        </tr>
+        <tr>
+          <td>SmolLM 135M</td>
+          <td>159 MB</td>
+          <td><span class="badge badge-fail">FAIL</span></td>
+          <td>Garbled GPU output on Intel iGPU</td>
+        </tr>
+        <tr>
+          <td>TinyLlama 1.1B</td>
+          <td>1.1 GB</td>
+          <td><span class="badge badge-fail">FAIL</span></td>
+          <td>Aborted — unsupported GPU operation</td>
+        </tr>
+        <tr>
+          <td>Phi-4 Mini</td>
+          <td>3.8 GB</td>
+          <td><span class="badge badge-fail">FAIL</span></td>
+          <td>Too large for WASM address space</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Two out of seven text models work reliably on consumer hardware. That's the honest state of browser-based ML in 2026.</p>
+
+  <hr>
+
+  <!-- Section: Future -->
+  <h2 id="future">What I'd Build On Top of This</h2>
+
+  <p>If you're exploring on-device ML, here's what I think is worth pursuing:</p>
+
+  <ol>
+    <li><strong>Service Worker model serving</strong> — Intercept fetch requests for model files and stream from OPFS, potentially enabling the layer-by-layer loading that bypasses WASM limits</li>
+    <li><strong>WASM Memory64</strong> — Chrome 133+ supports 64-bit WASM addressing (up to 16GB). When MediaPipe adopts it, the 4GB ceiling disappears</li>
+    <li><strong>Hybrid local+cloud</strong> — Route simple queries to the on-device model, complex ones to a cloud API. Best of both worlds</li>
+    <li><strong>Model fine-tuning in-browser</strong> — LoRA adapters are small enough to train on-device</li>
+  </ol>
+
+  <hr>
+
+  <!-- Section: Try -->
+  <h2 id="try">Try It Yourself</h2>
+
+  <p>The app is live and the code is open source:</p>
+
+  <ul>
+    <li><strong>Live demo:</strong> <a href="https://ai-edge-gallery-web.vercel.app">ai-edge-gallery-web.vercel.app</a></li>
+    <li><strong>Source code:</strong> <a href="https://github.com/abhid1234/ai-edge-gallery-web">github.com/abhid1234/ai-edge-gallery-web</a></li>
+  </ul>
+
+  <p>Load Qwen 2.5 1.5B, ask it anything, and watch the network counter stay at zero. That part never gets old.</p>
+
+  <p>If you're building something similar or have ideas for improvements, I'd love to hear about it. Issues and PRs welcome.</p>
+
+  <p style="color:#888;font-style:italic;margin-top:2rem;font-size:0.9rem;">This post is part of my ongoing exploration of AI at the edge. Previously: <a href="https://abhid.substack.com/p/i-built-an-open-source-ai-agent-framework">I Built an Open-Source AI Agent Framework</a>.</p>
+
+</article>
+
+<!-- Author Card -->
+<div class="author-card">
+  <div class="author-card-inner">
+    <div class="author-avatar">A</div>
+    <div class="author-info">
+      <h3>Abhi Das</h3>
+      <p>Sr. Strategic Partnerships Manager at Google Cloud. Building at the intersection of AI, open source, and developer experience.</p>
+      <div class="author-links">
+        <a href="https://github.com/abhid1234">GitHub</a>
+        <a href="https://abhid.substack.com">Substack</a>
+        <a href="https://ai-edge-gallery-web.vercel.app">AI Edge Gallery</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2026 Abhi Das. Built with curiosity and too many browser crashes.</p>
+</footer>
+
+<script>
+  // Sticky header on scroll
+  const header = document.getElementById('stickyHeader');
+  const hero = document.querySelector('.hero');
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      header.classList.toggle('visible', !entry.isIntersecting);
+    },
+    { threshold: 0, rootMargin: '-56px 0px 0px 0px' }
+  );
+  observer.observe(hero);
+</script>
+
+</body>
+</html>
