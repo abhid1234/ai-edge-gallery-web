@@ -48,6 +48,10 @@ export async function initModel(
     (options as Record<string, unknown>).maxNumImages = 5;
   }
 
+  if (modelInfo.capabilities.includes("audio")) {
+    (options as Record<string, unknown>).supportAudio = true;
+  }
+
   instance = await LlmInference.createFromOptions(genaiFileset, options);
   currentModelId = modelInfo.id;
   } finally {
