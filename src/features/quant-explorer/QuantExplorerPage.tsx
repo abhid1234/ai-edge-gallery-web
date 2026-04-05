@@ -65,14 +65,10 @@ const QUANT_LEVELS: QuantLevel[] = [
 
 // Catalog models with their actual quantization
 const CATALOG_MODELS = [
-  { name: "Gemma 3 1B", quant: "Q4", paramB: 1, sizeGB: 0.529 },
-  { name: "Gemma 3 4B", quant: "Q4", paramB: 4, sizeGB: 2.1 },
-  { name: "Gemma 3 12B", quant: "Q4", paramB: 12, sizeGB: 6.3 },
-  { name: "Gemma 3n E2B", quant: "Q8", paramB: 2, sizeGB: 2.0 },
-  { name: "Gemma 3n E4B", quant: "Q8", paramB: 4, sizeGB: 4.2 },
-  { name: "DeepSeek R1 Distill Qwen 1.5B", quant: "Q8", paramB: 1.5, sizeGB: 1.7 },
-  { name: "Phi-4 Mini", quant: "Q4", paramB: 3.8, sizeGB: 2.0 },
-  { name: "Qwen 2.5 0.5B", quant: "Q8", paramB: 0.5, sizeGB: 0.53 },
+  { name: "Qwen 2.5 1.5B", quant: "Q8", paramB: 1.5, sizeGB: 1.5 },
+  { name: "Gemma 3n E2B", quant: "INT4", paramB: 2, sizeGB: 2.8 },
+  { name: "Gemma 4 E2B", quant: "INT4", paramB: 2, sizeGB: 1.9 },
+  { name: "Gemma 3n E4B", quant: "INT4", paramB: 4, sizeGB: 4.1 },
 ];
 
 function getQuantForModel(quant: string): QuantLevel {
