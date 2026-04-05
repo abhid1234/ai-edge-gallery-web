@@ -85,18 +85,29 @@ export function useChatSession() {
           fullResponse += partial;
           tokenCount = Math.round(fullResponse.length / 4);
 
-          // Detect repetition loops and auto-cancel
-          if (!done && !repetitionCancelled && fullResponse.length > 100 && detectRepetition(fullResponse)) {
+          // Detect repetition loops and auto-cancel (check early — after 50 chars)
+          if (!done && !repetitionCancelled && fullResponse.length > 50 && detectRepetition(fullResponse)) {
             repetitionCancelled = true;
             cancel();
-            // Trim to content before the repetition started
+            // Trim: walk backward to find where repetition started
             const words = fullResponse.trim().split(/\s+/);
-            const seen = new Set<string>();
             let cutoff = words.length;
-            for (let i = Math.max(0, words.length - 30); i < words.length - 2; i++) {
-              const trigram = words.slice(i, i + 3).join(" ");
-              if (seen.has(trigram)) { cutoff = i; break; }
-              seen.add(trigram);
+            // Find the first position where a word repeats 3+ times consecutively
+            for (let i = words.length - 1; i >= 2; i--) {
+              if (words[i] === words[i - 1] && words[i] === words[i - 2]) {
+                cutoff = i - 2;
+              } else if (cutoff < words.length) {
+                break; // found the boundary
+              }
+            }
+            // Fallback: trigram scan if no consecutive match found
+            if (cutoff === words.length) {
+              const seen = new Set<string>();
+              for (let i = Math.max(0, words.length - 50); i < words.length - 2; i++) {
+                const tg = words[i] + " " + words[i + 1] + " " + words[i + 2];
+                if (seen.has(tg)) { cutoff = i; break; }
+                seen.add(tg);
+              }
             }
             fullResponse = words.slice(0, cutoff).join(" ") + "\n\n⚠️ _Response was cut short — the model started repeating itself._";
             setStreamingContent(fullResponse);
