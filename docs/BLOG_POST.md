@@ -6,7 +6,7 @@
 
 Most on-device ML demos show a 135MB model generating "Hello World" and call it a day. I wanted to see if you could actually run real, multi-billion parameter models — Gemma, Qwen, DeepSeek — entirely in a browser tab, with no server, no API keys, and no data leaving the device.
 
-The result is [AI Edge Gallery for Web](https://ai-edge-gallery-web.vercel.app): an open-source browser app that downloads, loads, and runs LLMs on-device using Google's MediaPipe + WebGPU. Here's what I built, what broke, and what I'd tell anyone trying to do the same.
+The result is [AI Edge Gallery for Web](https://www.ondeviceml.space): an open-source browser app that downloads, loads, and runs LLMs on-device using Google's MediaPipe + WebGPU. Here's what I built, what broke, and what I'd tell anyone trying to do the same.
 
 ---
 
@@ -134,7 +134,7 @@ If you're exploring on-device ML, here's what I think is worth pursuing:
 
 The app is live and the code is open source:
 
-- **Live demo:** [ai-edge-gallery-web.vercel.app](https://ai-edge-gallery-web.vercel.app)
+- **Live demo:** [www.ondeviceml.space](https://www.ondeviceml.space)
 - **Source code:** [github.com/abhid1234/ai-edge-gallery-web](https://github.com/abhid1234/ai-edge-gallery-web)
 
 Load Qwen 2.5 1.5B, ask it anything, and watch the network counter stay at zero. That part never gets old.
