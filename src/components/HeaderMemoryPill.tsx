@@ -85,11 +85,11 @@ export function HeaderMemoryPill() {
   const sparkline = samples.length > 1 ? renderSparkline(samples) : null;
 
   return (
-    <div className="relative hidden sm:block" ref={panelRef}>
+    <div className="relative" ref={panelRef}>
       {/* Pill */}
       <button
         onClick={() => setExpanded((v) => !v)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-semibold cursor-pointer transition-all"
+        className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-[11px] font-semibold cursor-pointer transition-all"
         style={{
           backgroundColor: `${color}15`,
           color: "var(--color-on-surface-variant)",

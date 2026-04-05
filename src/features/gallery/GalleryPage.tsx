@@ -214,6 +214,23 @@ export function Component() {
         </div>
       </div>
 
+      {/* Mobile warning */}
+      {/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && (
+        <div className="mx-4 sm:mx-6 mb-4 rounded-xl p-4" style={{ backgroundColor: "#FEF3C7", border: "1px solid #F59E0B" }}>
+          <div className="flex items-start gap-3">
+            <span className="text-xl flex-shrink-0">📱</span>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: "#92400E" }}>
+                Best experienced on a laptop or desktop
+              </p>
+              <p className="text-xs mt-1" style={{ color: "#A16207" }}>
+                AI models need more memory than mobile browsers allow. You can browse the gallery here, but for the best experience loading and chatting with models, open this site on a laptop with Chrome.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Feature task cards */}
       <div className="px-4 sm:px-6 pb-2">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
