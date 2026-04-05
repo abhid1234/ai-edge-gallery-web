@@ -13,6 +13,16 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
+const SECTION_COLORS: Record<string, { text: string; bg: string }> = {
+  Main: { text: "#1A73E8", bg: "#E8F0FE" },
+  Multimodal: { text: "#E37400", bg: "#FEF3E0" },
+  Tools: { text: "#0D652D", bg: "#E6F4EA" },
+  Analytics: { text: "#7B1FA2", bg: "#F3E8FD" },
+  Experiments: { text: "#C62828", bg: "#FDECEA" },
+  Advanced: { text: "#00695C", bg: "#E0F2F1" },
+  Developer: { text: "#4E342E", bg: "#EFEBE9" },
+};
+
 const NAV_GROUPS: { title?: string; items: NavItem[] }[] = [
   {
     title: "Main",
@@ -275,8 +285,11 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             )}
             {group.title && !collapsed && (
               <div
-                className="px-3 pt-1 pb-0.5 text-[10px] font-semibold uppercase tracking-wider"
-                style={{ color: "var(--color-outline)" }}
+                className="mx-3 mt-1 mb-0.5 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded"
+                style={{
+                  color: SECTION_COLORS[group.title]?.text ?? "var(--color-outline)",
+                  backgroundColor: SECTION_COLORS[group.title]?.bg ?? "transparent",
+                }}
               >
                 {group.title}
               </div>
