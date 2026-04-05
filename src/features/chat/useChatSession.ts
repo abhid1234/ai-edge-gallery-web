@@ -111,7 +111,7 @@ export function useChatSession() {
                 seen.add(tg);
               }
             }
-            cleanedResponse = words.slice(0, cutoff).join(" ") + "\n\n⚠️ _Response was cut short — the model started repeating itself._";
+            cleanedResponse = words.slice(0, cutoff).join(" ");
             fullResponse = cleanedResponse;
             setStreamingContent(cleanedResponse);
             return;
