@@ -72,21 +72,7 @@ export function Layout() {
               </svg>
             </button>
 
-            {/* Title + subtitle */}
-            <div className="hidden md:block">
-              <h1
-                className="text-lg font-bold leading-tight"
-                style={{ fontFamily: "var(--font-sans)", color: "var(--color-on-surface)" }}
-              >
-                <span style={{
-                  background: "linear-gradient(90deg, var(--color-title-gradient-start), var(--color-title-gradient-end))",
-                  WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                }}>Google AI</span> Edge Gallery
-              </h1>
-              <p className="text-[11px]" style={{ color: "var(--color-on-surface-variant)" }}>On-Device ML Platform</p>
-            </div>
-
-            {/* Title visible on mobile (sidebar hidden) */}
+            {/* Title visible on mobile only (sidebar has it on desktop) */}
             <h1
               className="text-base font-bold md:hidden"
               style={{ fontFamily: "var(--font-sans)", color: "var(--color-on-surface)" }}
