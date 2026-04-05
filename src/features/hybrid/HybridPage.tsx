@@ -179,7 +179,7 @@ export function Component() {
         <p className="text-xs mt-4" style={{ color: "var(--color-on-surface-variant)" }}>
           Simple factual questions and short tasks run entirely on-device — fast, private, free.
           Complex multi-step reasoning, research, or long-form generation gets routed to cloud APIs where larger models excel.
-          This is the architecture Google's ODML team is exploring for edge/cloud federation.
+          This is the architecture pattern used for edge/cloud federation.
         </p>
       </div>
 

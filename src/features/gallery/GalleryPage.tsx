@@ -172,9 +172,6 @@ export function Component() {
     <div className="min-h-full bg-[var(--color-surface-container)] max-w-6xl mx-auto">
       {/* Hero title section */}
       <div className="px-10 pt-12 pb-8">
-        <h1 className="text-5xl font-extrabold leading-tight text-[var(--color-on-surface)] tracking-tight">
-          Google AI
-        </h1>
         <h1 className="text-5xl font-extrabold leading-tight tracking-tight">
           <span
             className="bg-clip-text text-transparent"
@@ -182,7 +179,7 @@ export function Component() {
               backgroundImage: "linear-gradient(135deg, #85B1F8 0%, #3174F1 100%)",
             }}
           >
-            Edge Gallery
+            AI Edge Gallery
           </span>
         </h1>
         <p className="mt-4 text-base text-[var(--color-on-surface-variant)] max-w-md leading-relaxed">

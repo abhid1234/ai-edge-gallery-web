@@ -264,7 +264,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 <span style={{
                   background: "linear-gradient(90deg, var(--color-title-gradient-start), var(--color-title-gradient-end))",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-                }}>Google AI</span>
+                }}>AI</span>
                 {" "}Edge Gallery
               </p>
               <p className="text-[10px]" style={{ color: "var(--color-on-surface-variant)" }}>On-Device ML Platform</p>
