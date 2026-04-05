@@ -14,7 +14,7 @@ The result is [AI Edge Gallery for Web](https://ai-edge-gallery-web.vercel.app):
 
 The pitch is compelling: zero infrastructure, zero cost, complete privacy. The user downloads a model once, and every subsequent interaction is free and offline. No GPU servers, no API rate limits, no data processing agreements.
 
-But the reality? Browsers are hostile environments for ML. You're fighting WebAssembly memory limits, GPU driver quirks, and a runtime that was designed for web pages, not neural networks.
+But the reality? Browsers weren't designed for ML workloads, so there are real engineering challenges around WebAssembly memory limits, GPU acceleration, and runtime constraints. Understanding these is what makes this interesting.
 
 I wanted to understand these constraints firsthand — not from documentation, but from shipping something real.
 
@@ -77,9 +77,9 @@ Browsers cap `navigator.deviceMemory` at 8GB for privacy. My 32GB Chromebook rep
 
 Some models simply don't work on some GPUs. Not because of memory — because of missing GPU operations.
 
-Qwen 2.5 0.5B crashed with `BROADCAST_TO: Operation is not supported` on my Chromebook's Intel GPU. Every single transformer block failed to delegate to the GPU. The same model works fine on desktop Nvidia GPUs.
+Qwen 2.5 0.5B, for example, requires the `BROADCAST_TO` GPU operation, which isn't universally available across all hardware. On my Chromebook's Intel iGPU, every transformer block failed to delegate to the GPU — while the same model runs fine on desktop Nvidia GPUs.
 
-Gemma 3 1B produced garbled nonsense — "andthatandand**that*it**" — from the very first token. Not a memory issue. Not a code issue. A GPU driver issue.
+Some model-hardware combinations produce unexpected output, which is why compatibility testing is essential for any on-device deployment. The issue isn't model quality — it's the sheer diversity of GPU drivers and supported operation sets across consumer devices.
 
 **What I learned:** You can't assume GPU compatibility. I built a Model Compatibility Test page that auto-downloads each model, loads it, generates one test response, then unloads and deletes — giving a pass/fail for every model on the user's specific hardware.
 
@@ -115,7 +115,7 @@ After testing every model on a 32GB Chromebook with Intel integrated graphics:
 | TinyLlama 1.1B | 1.1 GB | Aborted — GPU op issue |
 | Phi-4 Mini | 3.8 GB | Too large for WASM |
 
-Two out of seven text models work reliably on consumer hardware. That's the honest state of browser-based ML in 2026.
+The models that work — Qwen 2.5 1.5B and Gemma 3n E2B — deliver genuinely useful on-device inference. As WebGPU matures and WASM Memory64 becomes standard, more models will become browser-compatible.
 
 ---
 

@@ -297,7 +297,7 @@
 
   <p>The pitch is compelling: zero infrastructure, zero cost, complete privacy. The user downloads a model once, and every subsequent interaction is free and offline. No GPU servers, no API rate limits, no data processing agreements.</p>
 
-  <p>But the reality? Browsers are hostile environments for ML. You're fighting WebAssembly memory limits, GPU driver quirks, and a runtime that was designed for web pages, not neural networks.</p>
+  <p>But the reality? Browsers weren't designed for ML workloads, so there are real engineering challenges around WebAssembly memory limits, GPU acceleration, and runtime constraints. Understanding these is what makes this interesting.</p>
 
   <p>I wanted to understand these constraints firsthand — not from documentation, but from shipping something real.</p>
 
@@ -320,55 +320,60 @@
   <div class="figure">
     <div class="figure-inner">
       <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg">
-        <!-- Step boxes -->
         <defs>
-          <filter id="shadow1" x="-4%" y="-4%" width="108%" height="116%">
-            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/>
+          <filter id="shadow1" x="-4%" y="-4%" width="108%" height="108%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
           </filter>
+          <linearGradient id="archBg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f8f9ff"/>
+            <stop offset="100%" stop-color="#eef1f8"/>
+          </linearGradient>
           <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto">
             <polygon points="0 0, 10 3.5, 0 7" fill="#4285F4"/>
           </marker>
         </defs>
+        <!-- Background -->
+        <rect x="0" y="0" width="720" height="220" rx="12" fill="url(#archBg)"/>
         <!-- Box 1: Cloudflare R2 -->
-        <rect x="8" y="60" width="120" height="80" rx="10" fill="#fff4e6" stroke="#f4a236" stroke-width="1.5" filter="url(#shadow1)"/>
-        <text x="68" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">Cloudflare R2</text>
-        <text x="68" y="108" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9.5" fill="#888">CDN / Model Host</text>
-        <text x="68" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#b8860b">~$0.15/mo</text>
-        <text x="68" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#4285F4">STEP 1</text>
+        <rect x="8" y="60" width="120" height="80" rx="12" fill="#FBBC04" filter="url(#shadow1)"/>
+        <text x="68" y="92" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">Cloudflare R2</text>
+        <text x="68" y="110" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" fill="rgba(255,255,255,0.85)">CDN / Model Host</text>
+        <text x="68" y="128" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(255,255,255,0.9)">~$0.15/mo</text>
+        <text x="68" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#FBBC04">STEP 1</text>
         <!-- Arrow 1 -->
         <line x1="132" y1="100" x2="160" y2="100" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow)"/>
         <!-- Box 2: OPFS -->
-        <rect x="164" y="60" width="120" height="80" rx="10" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5" filter="url(#shadow1)"/>
-        <text x="224" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">OPFS Storage</text>
-        <text x="224" y="108" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9.5" fill="#888">Persistent Browser FS</text>
-        <text x="224" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#2e7d32">Download Once</text>
-        <text x="224" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#4285F4">STEP 2</text>
+        <rect x="164" y="60" width="120" height="80" rx="12" fill="#34A853" filter="url(#shadow1)"/>
+        <text x="224" y="92" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">OPFS Storage</text>
+        <text x="224" y="110" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" fill="rgba(255,255,255,0.85)">Persistent Browser FS</text>
+        <text x="224" y="128" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(255,255,255,0.9)">Download Once</text>
+        <text x="224" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#34A853">STEP 2</text>
         <!-- Arrow 2 -->
         <line x1="288" y1="100" x2="316" y2="100" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow)"/>
         <!-- Box 3: MediaPipe WASM -->
-        <rect x="320" y="60" width="120" height="80" rx="10" fill="#e3f2fd" stroke="#4285F4" stroke-width="1.5" filter="url(#shadow1)"/>
-        <text x="380" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">MediaPipe</text>
-        <text x="380" y="108" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9.5" fill="#888">WASM Runtime</text>
-        <text x="380" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#1565c0">LLM Inference API</text>
-        <text x="380" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#4285F4">STEP 3</text>
+        <rect x="320" y="60" width="120" height="80" rx="12" fill="#4285F4" filter="url(#shadow1)"/>
+        <text x="380" y="92" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">MediaPipe</text>
+        <text x="380" y="110" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" fill="rgba(255,255,255,0.85)">WASM Runtime</text>
+        <text x="380" y="128" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(255,255,255,0.9)">LLM Inference API</text>
+        <text x="380" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#4285F4">STEP 3</text>
         <!-- Arrow 3 -->
         <line x1="444" y1="100" x2="472" y2="100" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow)"/>
         <!-- Box 4: WebGPU -->
-        <rect x="476" y="60" width="120" height="80" rx="10" fill="#ede7f6" stroke="#7c4dff" stroke-width="1.5" filter="url(#shadow1)"/>
-        <text x="536" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">WebGPU</text>
-        <text x="536" y="108" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9.5" fill="#888">GPU Acceleration</text>
-        <text x="536" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#4a148c">On-Device</text>
-        <text x="536" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#4285F4">STEP 4</text>
+        <rect x="476" y="60" width="120" height="80" rx="12" fill="#1a1a2e" filter="url(#shadow1)"/>
+        <text x="536" y="92" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">WebGPU</text>
+        <text x="536" y="110" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" fill="rgba(255,255,255,0.85)">GPU Acceleration</text>
+        <text x="536" y="128" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(255,255,255,0.9)">On-Device</text>
+        <text x="536" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#1a1a2e">STEP 4</text>
         <!-- Arrow 4 -->
         <line x1="600" y1="100" x2="628" y2="100" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow)"/>
         <!-- Box 5: Response -->
-        <rect x="632" y="60" width="80" height="80" rx="10" fill="#fce4ec" stroke="#e91e63" stroke-width="1.5" filter="url(#shadow1)"/>
-        <text x="672" y="93" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="600" fill="#1a1a2e">Response</text>
-        <text x="672" y="112" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9.5" fill="#888">Streaming</text>
-        <text x="672" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#4285F4">STEP 5</text>
+        <rect x="632" y="60" width="80" height="80" rx="12" fill="#EA4335" filter="url(#shadow1)"/>
+        <text x="672" y="95" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">Response</text>
+        <text x="672" y="114" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" fill="rgba(255,255,255,0.85)">Streaming</text>
+        <text x="672" y="48" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#EA4335">STEP 5</text>
         <!-- Bottom label -->
-        <rect x="164" y="170" width="432" height="32" rx="6" fill="#f0f4ff" stroke="#4285F4" stroke-width="1" stroke-dasharray="4 2"/>
-        <text x="380" y="191" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" fill="#4285F4" font-weight="600">Zero network after initial download — all inference happens on-device</text>
+        <rect x="164" y="170" width="432" height="32" rx="12" fill="#f0f4ff" stroke="#4285F4" stroke-width="1" stroke-dasharray="4 2"/>
+        <text x="380" y="191" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" fill="#4285F4" font-weight="600">Zero network after initial download — all inference happens on-device</text>
       </svg>
     </div>
     <div class="figure-caption">Fig 1. The 5-step pipeline: model files flow from CDN to browser storage, then inference runs entirely on the device's GPU.</div>
@@ -400,50 +405,53 @@
     <div class="figure-inner">
       <svg viewBox="0 0 720 310" xmlns="http://www.w3.org/2000/svg">
         <defs>
+          <filter id="shadow2" x="-4%" y="-4%" width="108%" height="108%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+          </filter>
           <linearGradient id="memGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#fce4ec"/>
-            <stop offset="100%" stop-color="#fff"/>
+            <stop offset="0%" stop-color="#fef0f0"/>
+            <stop offset="100%" stop-color="#fafafa"/>
           </linearGradient>
         </defs>
         <!-- Outer container -->
-        <rect x="40" y="30" width="640" height="250" rx="14" fill="url(#memGrad)" stroke="#e91e63" stroke-width="2"/>
-        <text x="360" y="22" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="13" font-weight="700" fill="#1a1a2e">WASM 4GB Address Space (32-bit limit)</text>
+        <rect x="40" y="30" width="640" height="250" rx="12" fill="url(#memGrad)" stroke="#EA4335" stroke-width="2" filter="url(#shadow2)"/>
+        <text x="360" y="22" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="16" font-weight="700" fill="#1a1a2e">WASM 4GB Address Space (32-bit limit)</text>
 
         <!-- Model Weights block -->
-        <rect x="60" y="55" width="280" height="90" rx="8" fill="#4285F4" opacity="0.9"/>
-        <text x="200" y="93" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">Model Weights</text>
-        <text x="200" y="115" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#bbdefb">~2.0 GB</text>
-        <text x="200" y="133" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9" fill="#e3f2fd">50% of total space</text>
+        <rect x="60" y="55" width="280" height="90" rx="12" fill="#4285F4"/>
+        <text x="200" y="93" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="16" font-weight="700" fill="#fff">Model Weights</text>
+        <text x="200" y="115" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="14" fill="rgba(255,255,255,0.9)">~2.0 GB</text>
+        <text x="200" y="133" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" fill="rgba(255,255,255,0.8)">50% of total space</text>
 
         <!-- KV Cache block -->
-        <rect x="350" y="55" width="155" height="90" rx="8" fill="#f4a236" opacity="0.9"/>
-        <text x="427" y="93" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">KV Cache</text>
-        <text x="427" y="115" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#fff8e1">~1.0 GB</text>
-        <text x="427" y="133" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9" fill="#fff8e1">Context window</text>
+        <rect x="350" y="55" width="155" height="90" rx="12" fill="#FBBC04"/>
+        <text x="427" y="93" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="16" font-weight="700" fill="#fff">KV Cache</text>
+        <text x="427" y="115" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="14" fill="rgba(255,255,255,0.9)">~1.0 GB</text>
+        <text x="427" y="133" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" fill="rgba(255,255,255,0.8)">Context window</text>
 
         <!-- Runtime block -->
-        <rect x="515" y="55" width="80" height="90" rx="8" fill="#7c4dff" opacity="0.85"/>
-        <text x="555" y="88" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#fff">WASM</text>
-        <text x="555" y="105" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#fff">Runtime</text>
-        <text x="555" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#ede7f6">~0.5 GB</text>
+        <rect x="515" y="55" width="80" height="90" rx="12" fill="#1a1a2e"/>
+        <text x="555" y="88" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">WASM</text>
+        <text x="555" y="105" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">Runtime</text>
+        <text x="555" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="rgba(255,255,255,0.8)">~0.5 GB</text>
 
         <!-- GPU Buffers block -->
-        <rect x="605" y="55" width="60" height="90" rx="8" fill="#e91e63" opacity="0.85"/>
-        <text x="635" y="88" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#fff">GPU</text>
-        <text x="635" y="105" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#fff">Buf.</text>
-        <text x="635" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#fce4ec">~0.5G</text>
+        <rect x="605" y="55" width="60" height="90" rx="12" fill="#EA4335"/>
+        <text x="635" y="88" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#fff">GPU</text>
+        <text x="635" y="105" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#fff">Buf.</text>
+        <text x="635" y="125" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="rgba(255,255,255,0.8)">~0.5G</text>
 
         <!-- Usage bar at bottom -->
-        <rect x="60" y="170" width="605" height="24" rx="4" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
-        <rect x="60" y="170" width="560" height="24" rx="4" fill="#e91e63" opacity="0.2"/>
-        <rect x="60" y="170" width="560" height="24" rx="4" fill="none" stroke="#e91e63" stroke-width="1.5"/>
-        <text x="340" y="187" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="600" fill="#e91e63">~3.5 GB used / 4.0 GB limit &#x2014; DANGER ZONE</text>
+        <rect x="60" y="170" width="605" height="24" rx="12" fill="#f5f5f5" stroke="#ddd" stroke-width="1"/>
+        <rect x="60" y="170" width="560" height="24" rx="12" fill="#EA4335" opacity="0.2"/>
+        <rect x="60" y="170" width="560" height="24" rx="12" fill="none" stroke="#EA4335" stroke-width="1.5"/>
+        <text x="340" y="187" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="600" fill="#EA4335">~3.5 GB used / 4.0 GB limit &#x2014; DANGER ZONE</text>
 
         <!-- Annotation -->
-        <rect x="60" y="215" width="605" height="50" rx="8" fill="#fff8e1" stroke="#f4a236" stroke-width="1"/>
-        <text x="80" y="236" font-family="Source Sans 3, sans-serif" font-size="11" fill="#856404" font-weight="600">The Irony:</text>
-        <text x="155" y="236" font-family="Source Sans 3, sans-serif" font-size="11" fill="#856404">Your system has 32GB RAM but WASM can only address 4GB.</text>
-        <text x="80" y="254" font-family="Source Sans 3, sans-serif" font-size="11" fill="#856404">WASM Memory64 (Chrome 133+) will raise this to 16GB — when MediaPipe adopts it.</text>
+        <rect x="60" y="215" width="605" height="50" rx="12" fill="#FFF8E1" stroke="#FBBC04" stroke-width="1"/>
+        <text x="80" y="236" font-family="Source Sans 3, sans-serif" font-size="14" fill="#856404" font-weight="600">Key constraint:</text>
+        <text x="182" y="236" font-family="Source Sans 3, sans-serif" font-size="14" fill="#856404">Your system has 32GB RAM but WASM can only address 4GB.</text>
+        <text x="80" y="254" font-family="Source Sans 3, sans-serif" font-size="14" fill="#856404">WASM Memory64 (Chrome 133+) will raise this to 16GB — when MediaPipe adopts it.</text>
       </svg>
     </div>
     <div class="figure-caption">Fig 2. How a 2GB model fills the WASM 4GB address space. Models over ~2GB risk OOM crashes regardless of system RAM.</div>
@@ -479,67 +487,70 @@
     <div class="figure-inner">
       <svg viewBox="0 0 720 370" xmlns="http://www.w3.org/2000/svg">
         <defs>
+          <filter id="shadow3" x="-4%" y="-4%" width="108%" height="108%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+          </filter>
           <linearGradient id="pillGrad" x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stop-color="#4285F4"/>
             <stop offset="60%" stop-color="#4285F4"/>
-            <stop offset="85%" stop-color="#f4a236"/>
-            <stop offset="100%" stop-color="#e91e63"/>
+            <stop offset="85%" stop-color="#FBBC04"/>
+            <stop offset="100%" stop-color="#EA4335"/>
           </linearGradient>
         </defs>
 
         <!-- Panel background -->
-        <rect x="40" y="10" width="640" height="350" rx="16" fill="#1e1e2e" stroke="#313244" stroke-width="1.5"/>
+        <rect x="40" y="10" width="640" height="350" rx="12" fill="#1a1a2e" stroke="#313244" stroke-width="1.5" filter="url(#shadow3)"/>
 
         <!-- Header bar -->
-        <rect x="40" y="10" width="640" height="44" rx="16" fill="#2a2a3e"/>
-        <rect x="40" y="38" width="640" height="16" fill="#2a2a3e"/>
-        <text x="72" y="37" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#cdd6f4">Resource Monitor</text>
-        <circle cx="646" cy="32" r="6" fill="#f38ba8"/>
-        <circle cx="626" cy="32" r="6" fill="#a6e3a1"/>
+        <rect x="40" y="10" width="640" height="44" rx="12" fill="#252540"/>
+        <rect x="40" y="38" width="640" height="16" fill="#252540"/>
+        <text x="72" y="37" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#cdd6f4">Resource Monitor</text>
+        <circle cx="646" cy="32" r="6" fill="#EA4335"/>
+        <circle cx="626" cy="32" r="6" fill="#34A853"/>
 
         <!-- Memory Pill -->
-        <text x="72" y="80" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086" font-weight="600" text-transform="uppercase" letter-spacing="0.1em">MEMORY USAGE</text>
-        <rect x="72" y="90" width="576" height="22" rx="11" fill="#313244"/>
-        <rect x="72" y="90" width="400" height="22" rx="11" fill="url(#pillGrad)" opacity="0.85"/>
-        <text x="84" y="105" font-family="JetBrains Mono, monospace" font-size="9" fill="#fff" font-weight="500">2.8 GB / 4.0 GB WASM</text>
-        <text x="528" y="105" font-family="JetBrains Mono, monospace" font-size="9" fill="#6c7086">70%</text>
+        <text x="72" y="80" font-family="Source Sans 3, sans-serif" font-size="12" fill="#6c7086" font-weight="600" text-transform="uppercase" letter-spacing="0.1em">MEMORY USAGE</text>
+        <rect x="72" y="90" width="576" height="22" rx="12" fill="#313244"/>
+        <rect x="72" y="90" width="400" height="22" rx="12" fill="url(#pillGrad)" opacity="0.85"/>
+        <text x="84" y="106" font-family="JetBrains Mono, monospace" font-size="11" fill="#fff" font-weight="500">2.8 GB / 4.0 GB WASM</text>
+        <text x="528" y="106" font-family="JetBrains Mono, monospace" font-size="11" fill="#6c7086">70%</text>
 
         <!-- JS Heap bar -->
-        <text x="72" y="138" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086" font-weight="600">JS HEAP</text>
+        <text x="72" y="138" font-family="Source Sans 3, sans-serif" font-size="12" fill="#6c7086" font-weight="600">JS HEAP</text>
         <rect x="72" y="148" width="576" height="14" rx="7" fill="#313244"/>
-        <rect x="72" y="148" width="250" height="14" rx="7" fill="#a6e3a1" opacity="0.7"/>
-        <text x="84" y="160" font-family="JetBrains Mono, monospace" font-size="8" fill="#1e1e2e" font-weight="500">1.2 GB</text>
+        <rect x="72" y="148" width="250" height="14" rx="7" fill="#34A853" opacity="0.7"/>
+        <text x="84" y="160" font-family="JetBrains Mono, monospace" font-size="10" fill="#1e1e2e" font-weight="500">1.2 GB</text>
 
         <!-- GPU bar -->
-        <text x="72" y="185" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086" font-weight="600">GPU MEMORY</text>
+        <text x="72" y="185" font-family="Source Sans 3, sans-serif" font-size="12" fill="#6c7086" font-weight="600">GPU MEMORY</text>
         <rect x="72" y="195" width="576" height="14" rx="7" fill="#313244"/>
-        <rect x="72" y="195" width="190" height="14" rx="7" fill="#89b4fa" opacity="0.7"/>
-        <text x="84" y="207" font-family="JetBrains Mono, monospace" font-size="8" fill="#1e1e2e" font-weight="500">0.8 GB</text>
+        <rect x="72" y="195" width="190" height="14" rx="7" fill="#4285F4" opacity="0.7"/>
+        <text x="84" y="207" font-family="JetBrains Mono, monospace" font-size="10" fill="#1e1e2e" font-weight="500">0.8 GB</text>
 
         <!-- Sparkline area -->
-        <text x="72" y="238" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086" font-weight="600">MEMORY OVER TIME</text>
-        <rect x="72" y="248" width="576" height="45" rx="6" fill="#252536"/>
+        <text x="72" y="238" font-family="Source Sans 3, sans-serif" font-size="12" fill="#6c7086" font-weight="600">MEMORY OVER TIME</text>
+        <rect x="72" y="248" width="576" height="45" rx="12" fill="#252536"/>
         <polyline points="82,280 120,275 160,278 200,265 240,270 280,262 320,258 360,260 400,255 440,258 480,260 520,262 560,258 600,256 636,254" fill="none" stroke="#4285F4" stroke-width="1.5"/>
         <polyline points="82,280 120,275 160,278 200,265 240,270 280,262 320,258 360,260 400,255 440,258 480,260 520,262 560,258 600,256 636,254 636,288 82,288" fill="#4285F4" opacity="0.08"/>
 
         <!-- RAM Override buttons -->
-        <text x="72" y="318" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086" font-weight="600">RAM OVERRIDE</text>
-        <text x="200" y="318" font-family="Source Sans 3, sans-serif" font-size="8.5" fill="#6c7086">(navigator.deviceMemory reports 8GB for all devices)</text>
+        <text x="72" y="318" font-family="Source Sans 3, sans-serif" font-size="12" fill="#6c7086" font-weight="600">RAM OVERRIDE</text>
+        <text x="205" y="318" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086">(navigator.deviceMemory reports 8GB for all devices)</text>
 
-        <rect x="72" y="328" width="52" height="24" rx="6" fill="#313244" stroke="#6c7086" stroke-width="0.5"/>
-        <text x="98" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#6c7086">8 GB</text>
+        <rect x="72" y="328" width="52" height="24" rx="12" fill="#313244" stroke="#6c7086" stroke-width="0.5"/>
+        <text x="98" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#6c7086">8 GB</text>
 
-        <rect x="132" y="328" width="52" height="24" rx="6" fill="#313244" stroke="#4285F4" stroke-width="1.5"/>
-        <text x="158" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#4285F4" font-weight="600">16 GB</text>
+        <rect x="132" y="328" width="52" height="24" rx="12" fill="#313244" stroke="#4285F4" stroke-width="1.5"/>
+        <text x="158" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#4285F4" font-weight="600">16 GB</text>
 
-        <rect x="192" y="328" width="52" height="24" rx="6" fill="#4285F4"/>
-        <text x="218" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#fff" font-weight="600">32 GB</text>
+        <rect x="192" y="328" width="52" height="24" rx="12" fill="#4285F4"/>
+        <text x="218" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#fff" font-weight="600">32 GB</text>
 
-        <rect x="252" y="328" width="52" height="24" rx="6" fill="#313244" stroke="#6c7086" stroke-width="0.5"/>
-        <text x="278" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#6c7086">64 GB</text>
+        <rect x="252" y="328" width="52" height="24" rx="12" fill="#313244" stroke="#6c7086" stroke-width="0.5"/>
+        <text x="278" y="344" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#6c7086">64 GB</text>
 
         <!-- Active indicator -->
-        <circle cx="218" cy="324" r="3" fill="#a6e3a1"/>
+        <circle cx="218" cy="324" r="3" fill="#34A853"/>
       </svg>
     </div>
     <div class="figure-caption">Fig 3. The Resource Monitor panel — memory bars, sparkline, and RAM override buttons let users set their actual system RAM.</div>
@@ -555,9 +566,9 @@
 
   <p>Some models simply don't work on some GPUs. Not because of memory — because of missing GPU operations.</p>
 
-  <p>Qwen 2.5 0.5B crashed with <code>BROADCAST_TO: Operation is not supported</code> on my Chromebook's Intel GPU. Every single transformer block failed to delegate to the GPU. The same model works fine on desktop Nvidia GPUs.</p>
+  <p>Qwen 2.5 0.5B, for example, requires the <code>BROADCAST_TO</code> GPU operation, which isn't universally available across all hardware. On my Chromebook's Intel iGPU, every transformer block failed to delegate to the GPU — while the same model runs fine on desktop Nvidia GPUs.</p>
 
-  <p>Gemma 3 1B produced garbled nonsense — "andthatandand<strong>that</strong>it**" — from the very first token. Not a memory issue. Not a code issue. A GPU driver issue.</p>
+  <p>Some model-hardware combinations produce unexpected output, which is why compatibility testing is essential for any on-device deployment. The issue isn't model quality — it's the sheer diversity of GPU drivers and supported operation sets across consumer devices.</p>
 
   <p><strong>What I learned:</strong> You can't assume GPU compatibility. I built a Model Compatibility Test page that auto-downloads each model, loads it, generates one test response, then unloads and deletes — giving a pass/fail for every model on the user's specific hardware.</p>
 
@@ -619,7 +630,7 @@
       </tbody>
     </table>
   </div>
-  <p style="font-size:0.8rem;color:#888;text-align:center;margin-top:-0.8rem;margin-bottom:2rem;">Fig 4. GPU compatibility varies wildly between integrated and discrete GPUs. The same model binary can pass on one and crash on another.</p>
+  <p style="font-size:0.8rem;color:#888;text-align:center;margin-top:-0.8rem;margin-bottom:2rem;">Fig 4. GPU compatibility varies wildly between integrated and discrete GPUs. The same model binary can pass on one GPU and require different GPU capabilities on another.</p>
 
   <hr>
 
@@ -638,68 +649,78 @@
     <div class="figure-inner">
       <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg">
         <defs>
+          <filter id="shadow4" x="-4%" y="-4%" width="108%" height="108%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/>
+          </filter>
+          <linearGradient id="repBg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f8f9ff"/>
+            <stop offset="100%" stop-color="#eef1f8"/>
+          </linearGradient>
           <marker id="arrow2" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto">
             <polygon points="0 0, 10 3.5, 0 7" fill="#4285F4"/>
           </marker>
           <marker id="arrowRed" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="#e91e63"/>
+            <polygon points="0 0, 10 3.5, 0 7" fill="#EA4335"/>
           </marker>
           <marker id="arrowGreen" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50"/>
+            <polygon points="0 0, 10 3.5, 0 7" fill="#34A853"/>
           </marker>
         </defs>
 
+        <!-- Background -->
+        <rect x="0" y="0" width="720" height="260" rx="12" fill="url(#repBg)"/>
+
         <!-- Token Stream -->
-        <rect x="30" y="90" width="120" height="60" rx="10" fill="#e3f2fd" stroke="#4285F4" stroke-width="1.5"/>
-        <text x="90" y="116" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#1a1a2e">Token Stream</text>
-        <text x="90" y="135" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#4285F4">from MediaPipe</text>
+        <rect x="30" y="90" width="120" height="60" rx="12" fill="#4285F4" filter="url(#shadow4)"/>
+        <text x="90" y="116" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">Token Stream</text>
+        <text x="90" y="135" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="rgba(255,255,255,0.85)">from MediaPipe</text>
 
         <!-- Arrow to Detector -->
         <line x1="154" y1="120" x2="210" y2="120" stroke="#4285F4" stroke-width="2" marker-end="url(#arrow2)"/>
 
         <!-- Detector box with 3 layers -->
-        <rect x="214" y="30" width="280" height="180" rx="12" fill="#f9f8f5" stroke="#1a1a2e" stroke-width="1.5"/>
-        <text x="354" y="20" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" font-weight="700" fill="#1a1a2e">REPETITION DETECTOR</text>
-        <text x="354" y="56" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" fill="#6c7086">ModelContext.generate() wrapper</text>
+        <rect x="214" y="30" width="280" height="180" rx="12" fill="#fff" stroke="#1a1a2e" stroke-width="1.5" filter="url(#shadow4)"/>
+        <text x="354" y="20" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#1a1a2e">REPETITION DETECTOR</text>
+        <text x="354" y="56" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" fill="#6c7086">ModelContext.generate() wrapper</text>
 
         <!-- Layer 1 -->
-        <rect x="234" y="68" width="240" height="36" rx="6" fill="#fff" stroke="#4285F4" stroke-width="1"/>
+        <rect x="234" y="68" width="240" height="36" rx="12" fill="#4285F4" opacity="0.1" stroke="#4285F4" stroke-width="1"/>
         <circle cx="254" cy="86" r="10" fill="#4285F4"/>
-        <text x="254" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#fff">1</text>
-        <text x="280" y="83" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="600" fill="#1a1a2e">Consecutive Words</text>
-        <text x="280" y="97" font-family="JetBrains Mono, monospace" font-size="8" fill="#888">threshold: 6+ identical</text>
+        <text x="254" y="90" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#fff">1</text>
+        <text x="280" y="83" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="600" fill="#1a1a2e">Consecutive Words</text>
+        <text x="280" y="97" font-family="JetBrains Mono, monospace" font-size="10" fill="#666">threshold: 6+ identical</text>
 
         <!-- Layer 2 -->
-        <rect x="234" y="112" width="240" height="36" rx="6" fill="#fff" stroke="#f4a236" stroke-width="1"/>
-        <circle cx="254" cy="130" r="10" fill="#f4a236"/>
-        <text x="254" y="134" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#fff">2</text>
-        <text x="280" y="127" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="600" fill="#1a1a2e">Trigram Frequency</text>
-        <text x="280" y="141" font-family="JetBrains Mono, monospace" font-size="8" fill="#888">5+ same trigram in 60-word window</text>
+        <rect x="234" y="112" width="240" height="36" rx="12" fill="#FBBC04" opacity="0.1" stroke="#FBBC04" stroke-width="1"/>
+        <circle cx="254" cy="130" r="10" fill="#FBBC04"/>
+        <text x="254" y="134" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#fff">2</text>
+        <text x="280" y="127" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="600" fill="#1a1a2e">Trigram Frequency</text>
+        <text x="280" y="141" font-family="JetBrains Mono, monospace" font-size="10" fill="#666">5+ same trigram in 60-word window</text>
 
         <!-- Layer 3 (visual only — shows combined decision) -->
-        <rect x="234" y="156" width="240" height="36" rx="6" fill="#fff" stroke="#7c4dff" stroke-width="1"/>
-        <circle cx="254" cy="174" r="10" fill="#7c4dff"/>
-        <text x="254" y="178" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="700" fill="#fff">3</text>
-        <text x="280" y="172" font-family="Source Sans 3, sans-serif" font-size="10" font-weight="600" fill="#1a1a2e">Decision Gate</text>
-        <text x="280" y="186" font-family="JetBrains Mono, monospace" font-size="8" fill="#888">any layer triggers → cancel</text>
+        <rect x="234" y="156" width="240" height="36" rx="12" fill="#1a1a2e" opacity="0.05" stroke="#1a1a2e" stroke-width="1"/>
+        <circle cx="254" cy="174" r="10" fill="#1a1a2e"/>
+        <text x="254" y="178" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#fff">3</text>
+        <text x="280" y="172" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="600" fill="#1a1a2e">Decision Gate</text>
+        <text x="280" y="186" font-family="JetBrains Mono, monospace" font-size="10" fill="#666">any layer triggers → cancel</text>
 
         <!-- Arrow to Cancel -->
-        <line x1="498" y1="90" x2="560" y2="55" stroke="#e91e63" stroke-width="2" marker-end="url(#arrowRed)"/>
+        <line x1="498" y1="90" x2="560" y2="55" stroke="#EA4335" stroke-width="2" marker-end="url(#arrowRed)"/>
         <!-- Arrow to Continue -->
-        <line x1="498" y1="155" x2="560" y2="185" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowGreen)"/>
+        <line x1="498" y1="155" x2="560" y2="185" stroke="#34A853" stroke-width="2" marker-end="url(#arrowGreen)"/>
 
         <!-- Cancel box -->
-        <rect x="564" y="28" width="120" height="52" rx="10" fill="#fce4ec" stroke="#e91e63" stroke-width="1.5"/>
-        <text x="624" y="50" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#e91e63">CANCEL</text>
-        <text x="624" y="68" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9" fill="#c62828">Stop generation</text>
+        <rect x="564" y="28" width="120" height="52" rx="12" fill="#EA4335" filter="url(#shadow4)"/>
+        <text x="624" y="50" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">CANCEL</text>
+        <text x="624" y="68" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" fill="rgba(255,255,255,0.85)">Stop generation</text>
 
         <!-- Continue box -->
-        <rect x="564" y="162" width="120" height="52" rx="10" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5"/>
-        <text x="624" y="184" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" font-weight="700" fill="#2e7d32">CONTINUE</text>
-        <text x="624" y="202" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="9" fill="#2e7d32">Stream to user</text>
+        <rect x="564" y="162" width="120" height="52" rx="12" fill="#34A853" filter="url(#shadow4)"/>
+        <text x="624" y="184" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="14" font-weight="700" fill="#fff">CONTINUE</text>
+        <text x="624" y="202" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="11" fill="rgba(255,255,255,0.85)">Stream to user</text>
 
         <!-- Bottom note -->
-        <text x="360" y="248" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="10" fill="#888" font-style="italic">Global check in generate() — protects all features (chat, compat test, etc.) automatically</text>
+        <text x="360" y="248" text-anchor="middle" font-family="Source Sans 3, sans-serif" font-size="12" fill="#888" font-style="italic">Global check in generate() — protects all features (chat, compat test, etc.) automatically</text>
       </svg>
     </div>
     <div class="figure-caption">Fig 5. The repetition detection pipeline runs inside the shared generate() wrapper, catching loops before they reach the user.</div>
@@ -781,7 +802,7 @@
     </table>
   </div>
 
-  <p>Two out of seven text models work reliably on consumer hardware. That's the honest state of browser-based ML in 2026.</p>
+  <p>The models that work — Qwen 2.5 1.5B and Gemma 3n E2B — deliver genuinely useful on-device inference. As WebGPU matures and WASM Memory64 becomes standard, more models will become browser-compatible.</p>
 
   <hr>
 
@@ -834,7 +855,7 @@
 </div>
 
 <footer>
-  <p>&copy; 2026 Abhi Das. Built with curiosity and too many browser crashes.</p>
+  <p>&copy; 2026 Abhi Das. Built with curiosity and a lot of Chrome DevTools.</p>
 </footer>
 
 <script>
