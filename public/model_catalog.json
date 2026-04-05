@@ -67,7 +67,7 @@
       "capabilities": ["text", "image"],
       "quantization": "int4",
       "parameterCount": "E2B (~2B active)",
-      "description": "Gemma 4 multimodal. Text + image. Requires a device with 8GB+ free memory — may not load on all browsers due to WebAssembly memory limits.",
+      "description": "Gemma 4 multimodal. Text + image. May not load in some browsers due to WebAssembly memory limits. Works best on desktop Chrome with dedicated GPUs.",
       "maxTokens": 128,
       "chatTemplate": "gemma",
       "tags": ["multimodal", "gemma4", "high-memory"],
@@ -89,7 +89,7 @@
       ],
       "quantization": "int4",
       "parameterCount": "E4B (~4B active)",
-      "description": "Largest multimodal model. Highest quality. Requires a device with 12GB+ free memory — may not load on all browsers due to WebAssembly memory limits.",
+      "description": "Largest multimodal model. Highest quality text + image + audio. May not load in some browsers due to WebAssembly memory limits. Works best on desktop Chrome with dedicated GPUs.",
       "maxTokens": 4096,
       "tags": [
         "multimodal",
