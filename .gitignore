@@ -27,3 +27,10 @@ dist-ssr/
 .env
 .env.local
 .env.*.local
+.vercel
+
+# Blog and social media content (personal, not for repo)
+docs/BLOG_POST.md
+docs/blog.html
+docs/SOCIAL_POSTS.md
+public/blog.html
