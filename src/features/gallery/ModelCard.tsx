@@ -11,6 +11,28 @@ interface Props {
   model: ModelInfo;
 }
 
+function getCompatibleFeatures(model: ModelInfo): { label: string; path: string }[] {
+  const features: { label: string; path: string }[] = [];
+  if (model.capabilities.includes("text")) {
+    features.push(
+      { label: "Chat", path: "chat" },
+      { label: "Research", path: "research" },
+      { label: "Tool Sandbox", path: "tool-sandbox" },
+      { label: "Web Actions", path: "web-actions" },
+    );
+  }
+  if (model.capabilities.includes("image")) {
+    features.push(
+      { label: "Ask Image", path: "ask-image" },
+      { label: "Vision RAG", path: "vision-rag" },
+    );
+  }
+  if (model.capabilities.includes("audio")) {
+    features.push({ label: "Ask Audio", path: "ask-audio" });
+  }
+  return features;
+}
+
 export function ModelCard({ model }: Props) {
   const { getModelStatus, downloadProgress, startDownload, removeModel, getModelBlob } =
     useDownload();
@@ -18,40 +40,51 @@ export function ModelCard({ model }: Props) {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [autoRun, setAutoRun] = useState(false);
+  const [pendingNavPath, setPendingNavPath] = useState<string | null>(null);
 
   const status = getModelStatus(model.id);
   const progress = downloadProgress[model.id];
   const isActive = currentModel?.id === model.id;
   const memCheck = checkMemoryForModel(model.sizeBytes);
 
+  const defaultNavPath = model.category === "vision" ? "vision" : "chat";
+  const compatibleFeatures = getCompatibleFeatures(model);
+
   useEffect(() => {
-    if (autoRun && status === "ready" && !isActive) {
+    if (pendingNavPath && status === "ready" && !isActive) {
       (async () => {
         try {
           const blob = await getModelBlob(model);
           await loadModel(model, blob);
-          navigate(model.category === "vision" ? "/vision" : "/chat");
+          navigate(`/${pendingNavPath}`);
         } catch (e) {
           setLoadError(e instanceof Error ? e.message : "Failed to load");
         } finally {
-          setAutoRun(false);
+          setPendingNavPath(null);
         }
       })();
-    } else if (autoRun && isActive) {
-      navigate(model.category === "vision" ? "/vision" : "/chat");
-      setAutoRun(false);
+    } else if (pendingNavPath && isActive) {
+      navigate(`/${pendingNavPath}`);
+      setPendingNavPath(null);
     }
-  }, [autoRun, status, isActive]);
+  }, [pendingNavPath, status, isActive]);
 
   const handleRun = () => {
     if (status === "not_downloaded") {
       startDownload(model);
-      setAutoRun(true);
+      setPendingNavPath(defaultNavPath);
     } else if (status === "ready" && !isActive) {
-      setAutoRun(true);
+      setPendingNavPath(defaultNavPath);
     } else if (isActive) {
-      navigate(model.category === "vision" ? "/vision" : "/chat");
+      navigate(`/${defaultNavPath}`);
+    }
+  };
+
+  const handleChipClick = (path: string) => {
+    if (isActive) {
+      navigate(`/${path}`);
+    } else if (status === "ready") {
+      setPendingNavPath(path);
     }
   };
 
@@ -138,7 +171,7 @@ export function ModelCard({ model }: Props) {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={(e) => { e.stopPropagation(); handleRun(); }}
-              disabled={isLoading || (status === "downloading" && !autoRun) || (!memCheck.canLoadModel && !isActive && status !== "not_downloaded")}
+              disabled={isLoading || (status === "downloading" && !pendingNavPath) || (!memCheck.canLoadModel && !isActive && status !== "not_downloaded")}
               className="px-3 py-1 rounded-full text-xs font-semibold text-white transition-colors disabled:opacity-50"
               style={{ backgroundColor: "var(--color-tertiary)" }}
               title={
@@ -148,8 +181,8 @@ export function ModelCard({ model }: Props) {
                 "Download, load into memory, and start chatting — all in one click"
               }
             >
-              {autoRun && status === "downloading" ? "Downloading..." :
-               autoRun && status === "ready" ? "Loading..." :
+              {pendingNavPath && status === "downloading" ? "Downloading..." :
+               pendingNavPath && status === "ready" ? "Loading..." :
                isLoading ? "Loading..." :
                isActive ? "Open Chat →" :
                "Run →"}
@@ -247,6 +280,39 @@ export function ModelCard({ model }: Props) {
                   {cap}
                 </span>
               ))}
+            </div>
+          )}
+
+          {compatibleFeatures.length > 0 && (
+            <div className="mb-4">
+              <p className="text-[10px] font-semibold uppercase tracking-wide mb-2" style={{ color: "var(--color-on-surface-variant)" }}>
+                Works with
+              </p>
+              <div className="flex gap-2 flex-wrap">
+                {compatibleFeatures.map((f) => {
+                  const unavailable = status === "not_downloaded" || status === "downloading";
+                  return (
+                    <button
+                      key={f.path}
+                      disabled={unavailable}
+                      onClick={(e) => { e.stopPropagation(); handleChipClick(f.path); }}
+                      className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      style={
+                        unavailable
+                          ? { backgroundColor: "var(--color-surface-container-high)", color: "var(--color-on-surface-variant)", border: "1px solid var(--color-outline-variant)" }
+                          : isActive
+                          ? { backgroundColor: "var(--color-tertiary-container)", color: "var(--color-tertiary)", border: "1px solid var(--color-tertiary)", cursor: "pointer" }
+                          : { backgroundColor: "var(--color-primary-container)", color: "var(--color-on-primary-container)", border: "1px solid transparent", cursor: "pointer" }
+                      }
+                    >
+                      {isActive && (
+                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: "var(--color-tertiary)" }} />
+                      )}
+                      {f.label} →
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 

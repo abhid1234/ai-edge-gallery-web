@@ -4,7 +4,7 @@ Where the Research-mode feature is and what to do next. Update at the end of eve
 
 ## Last updated
 
-2026-04-29 — Phase 2 complete; scaffold done, build passes clean
+2026-04-29 — HF local-apps features shipped (Sessions 1+2 complete)
 
 ## Phase status
 
@@ -13,7 +13,8 @@ Where the Research-mode feature is and what to do next. Update at the end of eve
 - ✅ **Phase 2: Scaffold** — `src/features/research/` created (14 files: index, ResearchPage, 5 components, 3 hooks, 3 lib, types). Route `/research` wired in App.tsx. "Research Mode" entry in Sidebar under Experiments. Build passes clean (`npm run build` ✓).
 - ✅ **Phase 3: Plan-Retrieve-Synthesize loop** — `usePlan` (Gemma → JSON plan), `useRetrieve` (mock snippets per subquery, 300ms delay), `useSynthesize` (Gemma → streamed answer with [N] citation markers). `ResearchPage` wired with phase state machine + phase bar. Build passes clean.
 - ✅ **Phase 4: Polish** — Real Wikipedia retrieval (Action API, CORS-safe, 6s timeout, per-subquery error state), plan edit wired (`setPlan`), citation scroll-on-click (`useRef` map), error banners with Retry buttons (plan + synthesis), RetrievalDrawer expanded with live snippet links. Build passes clean.
-- ⏸️ **Phase 5: Ship** — Deploy to ondeviceml.space, draft LinkedIn post, draft Substack technical writeup. (Per `feedback_social_posts_never_in_git.md`, the LinkedIn/Substack drafts live OUTSIDE git.)
+- ✅ **Phase 5: Ship** — Committed + pushed (cbc0902). Vercel CI built. End-to-end test + LinkedIn/Substack remain.
+- ✅ **Phase 6: HF local-apps** — "Works With" chips on ModelCard (Session 1), HF deep-link intake `?hf_model=&task=` on GalleryPage (Session 2). Build passes clean. Session 3 (hub-docs PR) pending deployment.
 
 ## Resume here next session
 

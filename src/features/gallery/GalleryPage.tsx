@@ -1,13 +1,33 @@
-import { useEffect, useState, useMemo } from "react";
-import { Link } from "react-router";
+import { useEffect, useState, useMemo, useCallback } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { loadCatalog } from "../../lib/catalog";
 import { useDownload } from "../../contexts/DownloadContext";
+import { useModel } from "../../contexts/ModelContext";
 import { useWebGPU } from "../../hooks/useWebGPU";
 import { ModelCard } from "./ModelCard";
 import { ModelFilters } from "./ModelFilters";
 import { ModelImport } from "./ModelImport";
 import { getTotalStorageUsage } from "../../lib/storage";
 import type { ModelInfo } from "../../types";
+
+// Maps lowercase HuggingFace model IDs to catalog IDs for deep-link intake
+const HF_TO_CATALOG: Record<string, string> = {
+  "qwen/qwen2.5-1.5b-instruct": "qwen-1.5b",
+  "google/gemma-3n-e2b-it": "gemma-3n-e2b",
+  "google/gemma-4-e2b-it": "gemma-4-e2b",
+  "google/gemma-3n-e4b-it": "gemma-3n-e4b",
+};
+
+// Maps HF task strings + short aliases to gallery route paths
+const TASK_TO_PATH: Record<string, string> = {
+  chat: "chat",
+  "text-generation": "chat",
+  research: "research",
+  "ask-image": "ask-image",
+  "image-to-text": "ask-image",
+  "ask-audio": "ask-audio",
+  "automatic-speech-recognition": "ask-audio",
+};
 
 // Task card color rotation: red → green → blue → yellow (uses CSS variables for dark mode)
 const TASK_COLORS = [
@@ -102,8 +122,14 @@ export function Component() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [sortBy, setSortBy] = useState("default");
   const [storageUsed, setStorageUsed] = useState(0);
-  const { checkStoredModels, hfToken, setHfToken, modelStatuses } = useDownload();
+  const [hfIntake, setHfIntake] = useState<{ model: ModelInfo; task: string } | null>(null);
+  const [intakeLoading, setIntakeLoading] = useState(false);
+
+  const { checkStoredModels, hfToken, setHfToken, modelStatuses, getModelStatus, startDownload, getModelBlob } = useDownload();
+  const { loadModel, currentModel } = useModel();
   const { info: gpuInfo } = useWebGPU();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     async function init() {
@@ -117,6 +143,59 @@ export function Component() {
     }
     init();
   }, [checkStoredModels]);
+
+  // Parse ?hf_model=&task= deep-link params once models are loaded
+  useEffect(() => {
+    const hfModel = searchParams.get("hf_model");
+    const task = searchParams.get("task") ?? "chat";
+    if (!hfModel || models.length === 0 || hfIntake) return;
+    const catalogId = HF_TO_CATALOG[hfModel.toLowerCase()];
+    const matched = models.find((m) => m.id === catalogId);
+    if (!matched) return;
+    setHfIntake({ model: matched, task: TASK_TO_PATH[task] ?? "chat" });
+    setSearchParams({}, { replace: true });
+  }, [models, searchParams]);
+
+  // When intake model finishes downloading, auto-load and navigate
+  const intakeModelStatus = hfIntake ? getModelStatus(hfIntake.model.id) : "not_downloaded";
+  useEffect(() => {
+    if (!hfIntake || !intakeLoading || intakeModelStatus !== "ready") return;
+    (async () => {
+      try {
+        const blob = await getModelBlob(hfIntake.model);
+        await loadModel(hfIntake.model, blob);
+        navigate(`/${hfIntake.task}`);
+        setHfIntake(null);
+      } catch {
+        setIntakeLoading(false);
+      }
+    })();
+  }, [intakeModelStatus, hfIntake, intakeLoading]);
+
+  const handleLoadAndOpen = useCallback(async () => {
+    if (!hfIntake) return;
+    const { model, task } = hfIntake;
+    if (currentModel?.id === model.id) {
+      navigate(`/${task}`);
+      setHfIntake(null);
+      return;
+    }
+    setIntakeLoading(true);
+    const status = getModelStatus(model.id);
+    if (status === "not_downloaded") {
+      startDownload(model);
+      // the intakeModelStatus effect fires when download finishes
+      return;
+    }
+    try {
+      const blob = await getModelBlob(model);
+      await loadModel(model, blob);
+      navigate(`/${task}`);
+      setHfIntake(null);
+    } catch {
+      setIntakeLoading(false);
+    }
+  }, [hfIntake, currentModel, getModelStatus, startDownload, getModelBlob, loadModel, navigate]);
 
   // Refresh storage usage whenever download status changes
   useEffect(() => {
@@ -249,6 +328,51 @@ export function Component() {
           </a>
         </div>
       </div>
+
+      {/* HuggingFace deep-link intake banner */}
+      {hfIntake && (
+        <div
+          className="mx-4 sm:mx-6 mb-4 rounded-xl p-4 flex items-center justify-between gap-4 flex-wrap"
+          style={{ backgroundColor: "var(--color-primary-container)", border: "1px solid var(--color-primary)" }}
+        >
+          <div className="flex items-center gap-2 flex-wrap min-w-0">
+            <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 flex-shrink-0" style={{ color: "var(--color-primary)" }}>
+              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+            </svg>
+            <span className="text-sm font-semibold" style={{ color: "var(--color-on-primary-container)" }}>
+              Open {hfIntake.model.name}
+            </span>
+            <span className="text-xs" style={{ color: "var(--color-on-surface-variant)" }}>in</span>
+            <span className="text-sm font-semibold capitalize" style={{ color: "var(--color-primary)" }}>
+              {hfIntake.task.replace(/-/g, " ")}
+            </span>
+            {intakeLoading && intakeModelStatus === "downloading" && (
+              <span className="text-xs animate-pulse" style={{ color: "var(--color-on-surface-variant)" }}>
+                Downloading model…
+              </span>
+            )}
+          </div>
+          <div className="flex gap-2 flex-shrink-0">
+            <button
+              onClick={handleLoadAndOpen}
+              disabled={intakeLoading && intakeModelStatus !== "ready"}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white disabled:opacity-60 transition-opacity"
+              style={{ backgroundColor: "var(--color-primary)" }}
+            >
+              {intakeLoading
+                ? intakeModelStatus === "downloading" ? "Downloading…" : "Loading…"
+                : "Load & Open"}
+            </button>
+            <button
+              onClick={() => { setHfIntake(null); setIntakeLoading(false); }}
+              className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
+              style={{ color: "var(--color-on-primary-container)", border: "1px solid var(--color-primary)" }}
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* How to get started */}
       <div className="mx-4 sm:mx-6 mb-4 rounded-xl p-4" style={{ backgroundColor: "var(--color-surface)", border: "1px solid var(--color-outline-variant)" }}>
