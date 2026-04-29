@@ -4,31 +4,38 @@ Where the Research-mode feature is and what to do next. Update at the end of eve
 
 ## Last updated
 
-2026-04-29 — feature spec written; no code yet
+2026-04-29 — Phase 2 complete; scaffold done, build passes clean
 
 ## Phase status
 
 - ✅ **Phase 0: Decision** — Path A picked over EdgeKit (extension), ModelDeck (web playground), and Path C (thesis-only). Reasoning: don't build a worse subset of what `ondeviceml.space` already has. Add the one thing it lacks — an *agentic workflow primitive*.
 - ✅ **Phase 1: Spec** — `docs/features/research-mode.md` written. UX flow + components + reused primitives identified.
-- ⏳ **Phase 2: Scaffold** — Create `src/features/research/` with stub components, route, sidebar entry. ~2 hours.
-- ⏸️ **Phase 3: Plan-Retrieve-Synthesize loop** — Wire Gemma 270M IT for the planning step + reuse `web-actions` for retrieval + reuse `chat` model for synthesis. ~1 weekend.
-- ⏸️ **Phase 4: Polish** — Streaming UI, plan-card visualization, citation rendering, error states. ~1 weekend.
+- ✅ **Phase 2: Scaffold** — `src/features/research/` created (14 files: index, ResearchPage, 5 components, 3 hooks, 3 lib, types). Route `/research` wired in App.tsx. "Research Mode" entry in Sidebar under Experiments. Build passes clean (`npm run build` ✓).
+- ✅ **Phase 3: Plan-Retrieve-Synthesize loop** — `usePlan` (Gemma → JSON plan), `useRetrieve` (mock snippets per subquery, 300ms delay), `useSynthesize` (Gemma → streamed answer with [N] citation markers). `ResearchPage` wired with phase state machine + phase bar. Build passes clean.
+- ✅ **Phase 4: Polish** — Real Wikipedia retrieval (Action API, CORS-safe, 6s timeout, per-subquery error state), plan edit wired (`setPlan`), citation scroll-on-click (`useRef` map), error banners with Retry buttons (plan + synthesis), RetrievalDrawer expanded with live snippet links. Build passes clean.
 - ⏸️ **Phase 5: Ship** — Deploy to ondeviceml.space, draft LinkedIn post, draft Substack technical writeup. (Per `feedback_social_posts_never_in_git.md`, the LinkedIn/Substack drafts live OUTSIDE git.)
 
 ## Resume here next session
 
-**The exact next step: Phase 2 — scaffold the feature directory.**
+**The exact next step: Phase 5 — deploy to ondeviceml.space and test end-to-end.**
 
-```bash
-cd ~/Core/Workspace/ClaudeCode/ODML
-# Open docs/features/research-mode.md and read the "File scaffolding" section.
-# It enumerates the exact files to create under src/features/research/.
-# Create them as stubs (empty components, type-only exports). Don't implement yet.
-# Add the route + sidebar entry per existing feature patterns.
-# `npm run dev` should still work; new "Research" tab should appear and render an empty shell.
-```
+### Phase 5 checklist
 
-After scaffolding, run `npm run dev`, navigate to the new tab, confirm the shell renders without errors. Commit. Then move to Phase 3.
+1. **Deploy** — `git add -p && git commit && git push` to trigger the Vercel CI build. Confirm bench.ondeviceml.space + ondeviceml.space both resolve and the new `/research` route renders.
+
+2. **End-to-end test on the deployed site** — load Gemma 270M IT or Gemma 1B IT from the Gallery, navigate to Research Mode, run all 5 spec test prompts:
+   - "What's the difference between WebGPU and WebNN?"
+   - "How does MediaPipe's GPU delegate handle memory pressure on Chromebooks?"
+   - "What did Andrej Karpathy mean by an 'LLM Wiki' in his April 2026 gist?"
+   - "Compare LiteRT.js vs ONNX Runtime Web for production deployments."
+   - "Why is on-device inference becoming a hiring priority at frontier labs?"
+   - For each: confirm plan parses, Wikipedia retrieval fires (check Network tab), answer streams, citation [N] badges appear.
+
+3. **Known risk: plan JSON reliability** — Gemma 270M IT may produce extra text around the JSON. `parsePlanJson` handles fences and extracts `{...}` objects. If it still fails on some prompts, add a fallback: if parse throws, construct a synthetic 2-query plan from the question itself.
+
+4. **LinkedIn post + Substack writeup** — draft OUTSIDE git per `feedback_social_posts_never_in_git.md`. Angle: "Inspired by GemmaDesktop — added agentic research to my web AI gallery. 270M-parameter model plans, browses Wikipedia, and synthesizes an answer in-browser, fully offline."
+
+5. **Optional — add to GalleryPage** — add Research Mode as a featured card in the gallery grid so it's discoverable from the home page. Mirror the existing card format.
 
 **If a feature pattern question comes up:** look at `src/features/tool-sandbox/` and `src/features/vision-rag/` first. Those are the closest existing analogs in the codebase; mirror their shape.
 

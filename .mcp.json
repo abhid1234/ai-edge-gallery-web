@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "google-workspace": {
+      "command": "node",
+      "args": [
+        "/home/abhidaas/.gemini/extensions/google-workspace/dist/index.js",
+        "--use-dot-names"
+      ]
+    },
+    "bigquery": {
+      "command": "/home/abhidaas/Core/Workspace/ClaudeCode/Work/gmail-mcp-env/bin/python3",
+      "args": [
+        "/home/abhidaas/Core/Workspace/ClaudeCode/Work/bigquery-mcp-server.py"
+      ]
+    },
+    "gbrain": {
+      "command": "/home/abhidaas/.bun/bin/gbrain",
+      "args": ["serve"]
+    }
+  }
+}

@@ -71,7 +71,18 @@ const FEATURE_CARDS = [
       </svg>
     ),
   },
-] as const;
+  {
+    title: "Research Mode",
+    subtitle: "Plan · Retrieve · Synthesize",
+    path: "/research",
+    badge: "New",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6">
+        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+      </svg>
+    ),
+  },
+];
 
 function formatSize(bytes: number): string {
   if (bytes === 0) return "0 B";
@@ -284,9 +295,14 @@ export function Component() {
               <Link
                 key={card.title}
                 to={card.path}
-                className="rounded-3xl px-6 py-5 flex items-center justify-between shadow-sm hover:opacity-90 transition-opacity"
+                className="relative rounded-3xl px-6 py-5 flex items-center justify-between shadow-sm hover:opacity-90 transition-opacity"
                 style={{ backgroundColor: `var(${color.bgVar})` }}
               >
+                {"badge" in card && card.badge && (
+                  <span className="absolute top-3 right-3 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[var(--color-primary)] text-white">
+                    {card.badge}
+                  </span>
+                )}
                 <div>
                   <p className="text-base font-bold text-[var(--color-on-surface)]">{card.title}</p>
                   <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">{card.subtitle}</p>
