@@ -22,6 +22,7 @@ const HF_TO_CATALOG: Record<string, string> = {
 const TASK_TO_PATH: Record<string, string> = {
   chat: "chat",
   "text-generation": "chat",
+  "image-text-to-text": "chat",
   research: "research",
   "ask-image": "ask-image",
   "image-to-text": "ask-image",
