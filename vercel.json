@@ -1,4 +1,16 @@
 {
   "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/research",
+      "destination": "https://agent.ondeviceml.space/research",
+      "permanent": false
+    },
+    {
+      "source": "/research/:path*",
+      "destination": "https://agent.ondeviceml.space/research/:path*",
+      "permanent": false
+    }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

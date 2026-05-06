@@ -55,7 +55,6 @@ const router = createBrowserRouter(
         { path: "model-test", lazy: () => import("./features/model-test/ModelTestPage") },
         { path: "webnn-test", lazy: () => import("./features/webnn-test/WebNNTestPage") },
         { path: "webnn-notes", lazy: () => import("./features/webnn-notes/WebNNNotesPage") },
-        { path: "research", lazy: () => import("./features/research") },
       ],
     },
   ],

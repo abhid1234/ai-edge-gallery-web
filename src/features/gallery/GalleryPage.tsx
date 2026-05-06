@@ -30,6 +30,15 @@ const TASK_TO_PATH: Record<string, string> = {
   "automatic-speech-recognition": "ask-audio",
 };
 
+// Research moved to agent.ondeviceml.space — hard-redirect for that task only.
+function navigateToTask(navigate: (to: string) => void, task: string) {
+  if (task === "research") {
+    window.location.assign("https://agent.ondeviceml.space/research");
+    return;
+  }
+  navigate(`/${task}`);
+}
+
 // Task card color rotation: red → green → blue → yellow (uses CSS variables for dark mode)
 const TASK_COLORS = [
   {
@@ -89,17 +98,6 @@ const FEATURE_CARDS = [
     icon: (
       <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/>
-      </svg>
-    ),
-  },
-  {
-    title: "Research Mode",
-    subtitle: "Plan · Retrieve · Synthesize",
-    path: "/research",
-    badge: "New",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="white" className="w-6 h-6">
-        <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
       </svg>
     ),
   },
@@ -177,7 +175,7 @@ export function Component() {
     if (!hfIntake) return;
     const { model, task } = hfIntake;
     if (currentModel?.id === model.id) {
-      navigate(`/${task}`);
+      navigateToTask(navigate, task);
       setHfIntake(null);
       return;
     }
@@ -191,7 +189,7 @@ export function Component() {
     try {
       const blob = await getModelBlob(model);
       await loadModel(model, blob);
-      navigate(`/${task}`);
+      navigateToTask(navigate, task);
       setHfIntake(null);
     } catch {
       setIntakeLoading(false);
@@ -423,11 +421,6 @@ export function Component() {
                 className="relative rounded-3xl px-6 py-5 flex items-center justify-between shadow-sm hover:opacity-90 transition-opacity"
                 style={{ backgroundColor: `var(${color.bgVar})` }}
               >
-                {"badge" in card && card.badge && (
-                  <span className="absolute top-3 right-3 text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[var(--color-primary)] text-white">
-                    {card.badge}
-                  </span>
-                )}
                 <div>
                   <p className="text-base font-bold text-[var(--color-on-surface)]">{card.title}</p>
                   <p className="text-sm text-[var(--color-on-surface-variant)] mt-0.5">{card.subtitle}</p>
